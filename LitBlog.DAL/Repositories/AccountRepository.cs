@@ -17,7 +17,14 @@ namespace LitBlog.DAL.Repositories
             _context = context;
         }
 
-        public IEnumerable<Account> GetAllAccounts() => _context.Accounts.ToList();
+        public IQueryable<Account> GetAllAccounts() => _context.Accounts;
+
+        public Account GetAccount(int id)
+        {
+            var account = _context.Accounts.Find(id);
+            if (account == null) throw new KeyNotFoundException("Account not found");
+            return account;
+        }
 
         public Account GetRefreshToken(string token) =>  _context.Accounts.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
 

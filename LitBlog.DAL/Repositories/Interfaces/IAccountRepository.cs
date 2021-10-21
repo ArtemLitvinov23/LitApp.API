@@ -7,7 +7,9 @@ namespace LitBlog.DAL.Repositories
 {
     public interface IAccountRepository
     {
-        public IEnumerable<Account> GetAllAccounts();
+        public IQueryable<Account> GetAllAccounts();
+
+        public Account GetAccount(int id);
 
         public Account GetRefreshToken(string token);
 

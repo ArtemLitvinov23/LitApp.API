@@ -86,58 +86,127 @@ namespace LitBlog.BLL.Services
             await _accountRepository.UpdateAccount(account);
         }
 
-        public Task Register(AccountCreateDto model, string origin)
+        public async Task Register(AccountCreateDto model, string origin)
         {
-            var account = _accountRepository.GetAllAccounts().Any(x => x.Email == model.Email);
-            if (account)
-            {
-                
-            }
+            if (_accountRepository.GetAllAccounts().Any(x => x.Email == model.Email))
+                _emailService.SendAlreadyRegisteredEmail(model, origin);
+
+            var account = _mapper.Map<Account>(model);
+
+            var isFirstAccount = _accountRepository.GetAllAccounts().Any();
+            account.Role = isFirstAccount ? Role.Admin : Role.User;
+            account.Created = DateTime.UtcNow;
+            account.VerificationToken = _jwtOptions.RandomTokenString();
+
+            account.PasswordHash = _password.HashPassword(model.Password);
+
+            await _accountRepository.CreateAccount(account);
+
+            var accountDto = _mapper.Map<AccountCreateDto>(account);
+            _emailService.SendVerificationEmail(accountDto,origin);
+
         }
 
-        public Task VerifyEmail(string token)
+        public async Task VerifyEmail(string token)
         {
-            throw new NotImplementedException();
+            var account = _accountRepository.GetAllAccounts().SingleOrDefault(x => x.VerificationToken == token);
+            if (account == null) throw new ApplicationException("Verification failed");
+
+            account.Verified = DateTime.UtcNow;
+            account.VerificationToken = null;
+
+            await _accountRepository.UpdateAccount(account);
+
         }
 
-        public Task ForgotPassword(ForgotPasswordRequestDto model, string origin)
+        public async Task ForgotPassword(ForgotPasswordRequestDto model, string origin)
         {
-            throw new NotImplementedException();
+            var account = _accountRepository.GetAllAccounts().SingleOrDefault(x => x.Email == model.Email);
+            if (account == null) return;
+
+            account.ResetToken = _jwtOptions.RandomTokenString();
+            account.ResetTokenExpires = DateTime.UtcNow.AddDays(1);
+
+            await _accountRepository.UpdateAccount(account);
+
+            var accountDto = _mapper.Map<AccountCreateDto>(account);
+            _emailService.SendPasswordResetEmail(accountDto,origin);
         }
 
-        public Task ValidateResetToken(RevokeTokenRequest model)
+        public void ValidateResetToken(RevokeTokenRequest model)
         {
-            throw new NotImplementedException();
+            var account = _accountRepository.GetAllAccounts().SingleOrDefault(x =>
+                x.ResetToken == model.Token && x.ResetTokenExpires > DateTime.UtcNow);
+            if (account == null)
+                throw new ApplicationException("Invalid token");
         }
 
-        public Task ResetPassword(ResetPasswordRequest model)
+        public async Task ResetPassword(ResetPasswordRequest model)
         {
-            throw new NotImplementedException();
+            var account = _accountRepository.GetAllAccounts().SingleOrDefault(x =>
+                x.ResetToken == model.Token && x.ResetTokenExpires > DateTime.UtcNow);
+            if (account == null)
+                throw new ApplicationException("Invalid token");
+
+            account.PasswordHash = _password.HashPassword(model.Password);
+            account.PasswordReset = DateTime.UtcNow;
+            account.ResetToken = null;
+            account.ResetTokenExpires = null;
+
+            await _accountRepository.UpdateAccount(account);
         }
 
-        public Task<IEnumerable<AccountResponseDto>> GetAll()
+        public IQueryable<AccountResponseDto> GetAll()
         {
-            throw new NotImplementedException();
+            var account = _accountRepository.GetAllAccounts();
+            return _mapper.Map<IQueryable<AccountResponseDto>>(account);
         }
 
-        public Task<AccountResponseDto> GetAccountById(int accountId)
+        public async Task<AccountResponseDto> GetAccountById(int accountId)
         {
-            throw new NotImplementedException();
+            var account =  await _accountRepository.GetAccountById(accountId);
+            return _mapper.Map<AccountResponseDto>(account);
         }
 
-        public Task<AccountResponseDto> Create(AccountCreateDto model)
+        public async Task<AccountResponseDto> Create(AccountCreateDto model)
         {
-            throw new NotImplementedException();
+            if (_accountRepository.GetAllAccounts().Any(x => x.Email == model.Email))
+                throw new ApplicationException($"Email '{model.Email}' is already registered");
+
+            // map model to new account object
+            var account = _mapper.Map<Account>(model);
+            account.Created = DateTime.UtcNow;
+            account.Verified = DateTime.UtcNow;
+
+            account.PasswordHash = _password.HashPassword(model.Password);
+
+            await _accountRepository.CreateAccount(account);
+
+            return _mapper.Map<AccountResponseDto>(account);
         }
 
-        public Task<AccountResponseDto> Update(int id, UpdateAccount model)
+        public async Task<AccountResponseDto> Update(int id, UpdateAccount model)
         {
-            throw new NotImplementedException();
+            var getAccount = _accountRepository.GetAccount(id);
+
+            if (getAccount.Email != model.Email && _accountRepository.GetAllAccounts().Any(x=>x.Email == model.Email))
+                throw new ApplicationException($"Email {model.Email}i s alerady");
+
+            if (!string.IsNullOrEmpty(model.Password))
+                getAccount.PasswordHash = _password.HashPassword(model.Password);
+
+            // copy model to account and save
+            _mapper.Map(model, getAccount);
+            getAccount.Updated = DateTime.UtcNow;
+            await _accountRepository.UpdateAccount(getAccount);
+
+            return _mapper.Map<AccountResponseDto>(getAccount);
         }
 
         public void Delete(int id)
         {
-            throw new NotImplementedException();
+            _accountRepository.Delete(id);
+
         }
     }
 }
