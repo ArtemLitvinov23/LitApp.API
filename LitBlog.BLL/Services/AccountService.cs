@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using LitBlog.BLL.Helpers;
 using LitBlog.BLL.Jwt;
 using LitBlog.BLL.ModelsDto;
 using LitBlog.BLL.PasswordHasher;
@@ -35,13 +36,12 @@ namespace LitBlog.BLL.Services
         }
 
 
-        public async Task<AuthenticateResponseDto> Authenticate(AuthenticateRequest authRequest, string ipAddress)
+        public async Task<AuthenticateResponseDto> Authenticate(AuthenticateRequestDto authRequest, string ipAddress)
         {
             var account = _accountRepository.GetAllAccounts().FirstOrDefault(x => x.Email == authRequest.Email);
             if (account == null || !account.IsVerified || !_password.Verify(authRequest.Password, account.PasswordHash))
-                throw new ApplicationException("Email or password is incorrect");
-
-            var accountDto = _mapper.Map<AccountCreateDto>(account);
+                throw new AppException("Email or password is incorrect");
+            var accountDto = _mapper.Map<AccountDto>(account);
             var jwtToken = _jwtOptions.GenerateJwtToken(accountDto);
             var refreshToken = _jwtOptions.GenerateRefreshToken(ipAddress);
             account.RefreshTokens.Add(refreshToken);
@@ -57,6 +57,7 @@ namespace LitBlog.BLL.Services
             return response;
         }
 
+
         public async Task<AuthenticateResponseDto> RefreshToken(string token, string ipAddress)
         {
             var (refreshToken, account) = _jwtOptions.GetRefreshToken(token);
@@ -66,7 +67,7 @@ namespace LitBlog.BLL.Services
             refreshToken.ReplacedByToken = newRefreshToken.Token;
             account.RefreshTokens.Add(newRefreshToken);
 
-            var accountDto = _mapper.Map<AccountCreateDto>(account);
+            var accountDto = _mapper.Map<AccountDto>(account);
             _jwtOptions.RemoveOldRefreshTokens(accountDto);
             await _accountRepository.UpdateAccount(account);
 
@@ -86,7 +87,7 @@ namespace LitBlog.BLL.Services
             await _accountRepository.UpdateAccount(account);
         }
 
-        public async Task Register(AccountCreateDto model, string origin)
+        public async Task Register(AccountDto model, string origin)
         {
             if (_accountRepository.GetAllAccounts().Any(x => x.Email == model.Email))
                 _emailService.SendAlreadyRegisteredEmail(model, origin);
@@ -102,7 +103,7 @@ namespace LitBlog.BLL.Services
 
             await _accountRepository.CreateAccount(account);
 
-            var accountDto = _mapper.Map<AccountCreateDto>(account);
+            var accountDto = _mapper.Map<AccountDto>(account);
             _emailService.SendVerificationEmail(accountDto,origin);
 
         }
@@ -110,7 +111,7 @@ namespace LitBlog.BLL.Services
         public async Task VerifyEmail(string token)
         {
             var account = _accountRepository.GetAllAccounts().SingleOrDefault(x => x.VerificationToken == token);
-            if (account == null) throw new ApplicationException("Verification failed");
+            if (account == null) throw new AppException("Verification failed");
 
             account.Verified = DateTime.UtcNow;
             account.VerificationToken = null;
@@ -129,24 +130,24 @@ namespace LitBlog.BLL.Services
 
             await _accountRepository.UpdateAccount(account);
 
-            var accountDto = _mapper.Map<AccountCreateDto>(account);
+            var accountDto = _mapper.Map<AccountDto>(account);
             _emailService.SendPasswordResetEmail(accountDto,origin);
         }
 
-        public void ValidateResetToken(RevokeTokenRequest model)
+        public void ValidateResetToken(RevokeTokenRequestDto model)
         {
             var account = _accountRepository.GetAllAccounts().SingleOrDefault(x =>
                 x.ResetToken == model.Token && x.ResetTokenExpires > DateTime.UtcNow);
             if (account == null)
-                throw new ApplicationException("Invalid token");
+                throw new AppException("Invalid token");
         }
 
-        public async Task ResetPassword(ResetPasswordRequest model)
+        public async Task ResetPassword(ResetPasswordRequestDto model)
         {
             var account = _accountRepository.GetAllAccounts().SingleOrDefault(x =>
                 x.ResetToken == model.Token && x.ResetTokenExpires > DateTime.UtcNow);
             if (account == null)
-                throw new ApplicationException("Invalid token");
+                throw new AppException("Invalid token");
 
             account.PasswordHash = _password.HashPassword(model.Password);
             account.PasswordReset = DateTime.UtcNow;
@@ -154,6 +155,12 @@ namespace LitBlog.BLL.Services
             account.ResetTokenExpires = null;
 
             await _accountRepository.UpdateAccount(account);
+        }
+
+        public IQueryable<UsersResponseDto> GetUsers()
+        {
+            var accounts = _accountRepository.GetAllAccounts();
+            return _mapper.Map<IQueryable<UsersResponseDto>>(accounts);
         }
 
         public IQueryable<AccountResponseDto> GetAll()
@@ -168,10 +175,10 @@ namespace LitBlog.BLL.Services
             return _mapper.Map<AccountResponseDto>(account);
         }
 
-        public async Task<AccountResponseDto> Create(AccountCreateDto model)
+        public async Task<AccountResponseDto> Create(AccountDto model)
         {
             if (_accountRepository.GetAllAccounts().Any(x => x.Email == model.Email))
-                throw new ApplicationException($"Email '{model.Email}' is already registered");
+                throw new AppException($"Email '{model.Email}' is already registered");
 
             // map model to new account object
             var account = _mapper.Map<Account>(model);
@@ -185,12 +192,12 @@ namespace LitBlog.BLL.Services
             return _mapper.Map<AccountResponseDto>(account);
         }
 
-        public async Task<AccountResponseDto> Update(int id, UpdateAccount model)
+        public async Task<AccountResponseDto> Update(int id, UpdateAccountDto model)
         {
             var getAccount = _accountRepository.GetAccount(id);
 
             if (getAccount.Email != model.Email && _accountRepository.GetAllAccounts().Any(x=>x.Email == model.Email))
-                throw new ApplicationException($"Email {model.Email}i s alerady");
+                throw new AppException($"Email {model.Email}i s alerady");
 
             if (!string.IsNullOrEmpty(model.Password))
                 getAccount.PasswordHash = _password.HashPassword(model.Password);

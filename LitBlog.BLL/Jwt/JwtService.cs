@@ -7,6 +7,7 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
+using LitBlog.BLL.Helpers;
 using LitBlog.BLL.ModelsDto;
 using LitBlog.BLL.Settings;
 using LitBlog.DAL.Models;
@@ -25,7 +26,7 @@ namespace LitBlog.BLL.Jwt
             _accountRepository = accountRepository;
             _appSettings = appSettings.Value;
         }
-        public string GenerateJwtToken(AccountCreateDto account)
+        public string GenerateJwtToken(AccountDto account)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key =  new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_appSettings.Secret));
@@ -43,10 +44,10 @@ namespace LitBlog.BLL.Jwt
         {
             var account = _accountRepository.GetRefreshToken(token);
             if (account == null)
-                throw new ApplicationException("InvalidToken");
+                throw new AppException("InvalidToken");
             var refreshToken = account.RefreshTokens.Single(x => x.Token == token);
             if (!refreshToken.IsActive)
-                throw new ApplicationException("Invalid token");
+                throw new AppException("Invalid token");
             return (refreshToken, account);
         }
 
@@ -61,7 +62,7 @@ namespace LitBlog.BLL.Jwt
             };
         }
 
-        public void RemoveOldRefreshTokens(AccountCreateDto account)
+        public void RemoveOldRefreshTokens(AccountDto account)
         {
             account.RefreshTokens.RemoveAll(x =>
                 !x.IsActive && x.Created.AddDays(_appSettings.RefreshTokenTTL) <= DateTime.UtcNow);

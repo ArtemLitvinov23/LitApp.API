@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using LitBlog.DAL.Models;
 
-namespace LitBlog.BLL.ModelsDto
+namespace LitBlog.API.Models
 {
-    public class UpdateAccount
+    public class UpdateAccountViewModel
     {
-      
+
         public string Title { get; set; }
 
         [EnumDataType(typeof(Role))]

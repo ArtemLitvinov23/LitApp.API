@@ -33,7 +33,7 @@ namespace LitBlog.BLL.Services
             smtp.DisconnectAsync(true);
         }
 
-        public void SendVerificationEmail(AccountCreateDto account, string origin)
+        public void SendVerificationEmail(AccountDto account, string origin)
         {
             string message;
             if (!string.IsNullOrEmpty(origin))
@@ -51,7 +51,7 @@ namespace LitBlog.BLL.Services
                 );
         }
 
-        public void SendAlreadyRegisteredEmail(AccountCreateDto account, string origin)
+        public void SendAlreadyRegisteredEmail(AccountDto account, string origin)
         {
             string message;
             if (!string.IsNullOrEmpty(origin))
@@ -66,7 +66,7 @@ namespace LitBlog.BLL.Services
             );
         }
 
-        public void SendPasswordResetEmail(AccountCreateDto account, string origin)
+        public void SendPasswordResetEmail(AccountDto account, string origin)
         {
             string message;
             if (!string.IsNullOrEmpty(origin))

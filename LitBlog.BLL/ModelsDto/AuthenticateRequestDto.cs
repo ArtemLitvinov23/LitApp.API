@@ -2,7 +2,7 @@
 
 namespace LitBlog.BLL.ModelsDto
 {
-    public class AuthenticateRequest
+    public class AuthenticateRequestDto
     {
         [Required]
         [EmailAddress]

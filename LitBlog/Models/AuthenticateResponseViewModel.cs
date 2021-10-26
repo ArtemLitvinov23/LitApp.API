@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
-namespace LitBlog.BLL.ModelsDto
+namespace LitBlog.API.Models
 {
-    public class AuthenticateResponseDto
+    public class AuthenticateResponseViewModel
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -15,6 +16,7 @@ namespace LitBlog.BLL.ModelsDto
         public bool IsVerified { get; set; }
         public string JwtToken { get; set; }
 
+        [JsonIgnore] // refresh token is returned in http only cookie
         public string RefreshToken { get; set; }
     }
 }

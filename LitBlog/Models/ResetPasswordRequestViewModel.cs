@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace LitBlog.BLL.ModelsDto
+namespace LitBlog.API.Models
 {
-    public class ResetPasswordRequest
+    public class ResetPasswordRequestViewModel
     {
         [Required]
         public string Token { get; set; }

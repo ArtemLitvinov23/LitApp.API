@@ -6,10 +6,10 @@ namespace LitBlog.BLL.Services
     {
         void Send(string to, string subject, string html, string from = null);
 
-        void SendVerificationEmail(AccountCreateDto account, string origin);
+        void SendVerificationEmail(AccountDto account, string origin);
 
-        void SendAlreadyRegisteredEmail(AccountCreateDto account, string origin);
+        void SendAlreadyRegisteredEmail(AccountDto account, string origin);
 
-        void SendPasswordResetEmail(AccountCreateDto account, string origin);
+        void SendPasswordResetEmail(AccountDto account, string origin);
     }
 }

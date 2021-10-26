@@ -1,5 +1,4 @@
-﻿using System;
-using LitBlog.DAL.Models;
+﻿using LitBlog.DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace LitBlog.DAL
