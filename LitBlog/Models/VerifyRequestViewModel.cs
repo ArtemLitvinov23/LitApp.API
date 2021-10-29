@@ -2,10 +2,9 @@
 
 namespace LitBlog.API.Models
 {
-    public class ForgotPasswordRequestViewModel
+    public class VerifyRequestViewModel
     {
         [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+        public string Token { get; set; }
     }
 }

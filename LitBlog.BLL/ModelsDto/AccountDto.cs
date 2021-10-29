@@ -6,9 +6,7 @@ namespace LitBlog.BLL.ModelsDto
 {
     public class AccountDto
     {
-        [Key] public int Id { get; set; }
-
-        [Required] public string Title { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [EnumDataType(typeof(Role))]
@@ -20,11 +18,16 @@ namespace LitBlog.BLL.ModelsDto
         [Required]
         public string LastName { get; set; }
 
-        [Required] [EmailAddress] public string Email { get; set; }
+        [Required] 
+        [EmailAddress] public string Email { get; set; }
 
-        [Required] [MinLength(8)] public string Password { get; set; }
+        [Required] 
+        [MinLength(8)] public string Password { get; set; }
 
         public List<RefreshToken> RefreshTokens { get; set; }
 
+        public string VerificationToken { get; set; }
+
+        public string ResetToken { get; set; }
     }
 }

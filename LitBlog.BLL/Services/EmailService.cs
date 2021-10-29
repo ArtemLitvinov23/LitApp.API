@@ -1,83 +1,101 @@
 ﻿using LitBlog.BLL.ModelsDto;
 using LitBlog.BLL.Settings;
+using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.Text;
-using MailKit.Net.Smtp;
-using MailKit.Security;
+using System;
+using System.Threading.Tasks;
 
 namespace LitBlog.BLL.Services
 {
-    public class EmailService:IEmailService
+    public class EmailService : IEmailService
     {
         private readonly AppSettings _appSettings;
-        private readonly EmailTemplate _emailTemplate;
-        public EmailService(IOptions<AppSettings> settings, IOptions<EmailTemplate> emailTemplate)
+        public EmailService(IOptions<AppSettings> settings)
         {
             _appSettings = settings.Value;
-            _emailTemplate = emailTemplate.Value;
         }
-        public void Send(string to, string subject, string html, string @from = null)
+        public async Task Send(string to, string subject, string html, string from = null)
         {
+            try
+            {
+                var email = new MimeMessage(); 
+                email.From.Add(new MailboxAddress(_appSettings.SenderName, _appSettings.EmailFrom));
+                email.To.Add((MailboxAddress.Parse(to)));
+                email.Subject = subject;
+                email.Body = new TextPart((TextFormat.Html)) {Text = html};
 
-            var email = new MimeMessage();
-            email.From.Add(MailboxAddress.Parse(from?? _appSettings.EmailFrom));
-            email.To.Add((MailboxAddress.Parse(to)));
-            email.Subject = subject;
-            email.Body = new TextPart((TextFormat.Html)) {Text = html};
+           
+                using var smtp = new SmtpClient();
+                await smtp.ConnectAsync(_appSettings.SmtpHost, _appSettings.SmtpPort, true);
+                await smtp.AuthenticateAsync(_appSettings.SmtpUser, _appSettings.SmtpPass);
+                await smtp.SendAsync(email);
 
-            using var smtp = new SmtpClient();
-            smtp.ConnectAsync(_appSettings.SmtpHost, _appSettings.SmtpPort, SecureSocketOptions.StartTls);
-            smtp.AuthenticateAsync(_appSettings.SmtpUser, _appSettings.SmtpPass);
-            smtp.SendAsync(email);
-            smtp.DisconnectAsync(true);
+                await smtp.DisconnectAsync(true);
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException(e.Message);
+            }
+            
         }
 
-        public void SendVerificationEmail(AccountDto account, string origin)
+        public async Task SendVerificationEmail(AccountDto account, string origin)
         {
             string message;
             if (!string.IsNullOrEmpty(origin))
             {
-                var verifyUrl = _emailTemplate.VerifyEmailUrl;
-                message = _emailTemplate.VerificationEmailMessageSuccess;
+                var verifyUrl = $"{origin}/account/verify-email?token={account.VerificationToken}";
+                message = $@"<p>Please click the below link to verify your email address:</p>
+                             <p><a href=""{verifyUrl}"">{verifyUrl}</a></p>";
             }
             else
-                message = _emailTemplate.VerificationEmailMessageFailed;
+                message = $@"<p>Please use the below token to verify your email address with the <code>/accounts/verify-email</code> api route:</p>
+                             <p><code>{account.VerificationToken}</code></p>";
 
-            Send(
-                to: account.Email,
-                subject: _emailTemplate.VerificationSubject,
-                html: _emailTemplate.VerificationHtml
-                );
+            await Send(account.Email, "Sign-up Verification API - Verify Email",
+                $@"<h4>Verify Email</h4>
+                     <p>Thanks for registering!</p>
+                      {message}"
+                     );
         }
 
-        public void SendAlreadyRegisteredEmail(AccountDto account, string origin)
+        public async Task SendAlreadyRegisteredEmail(string email, string origin)
         {
             string message;
             if (!string.IsNullOrEmpty(origin))
-                message = _emailTemplate.RegisteredEmailMessageSuccess;
+                message = $@"<p>If you don't know your password please visit the <a href=""{origin}/account/forgot-password"">forgot password</a> page.</p>";
             else
-                message = _emailTemplate.RegisteredEmailMessageFailed;
+                message = "<p>If you don't know your password you can reset it via the <code>/accounts/forgot-password</code> api route.</p>";
 
-            Send(
-                to: account.Email,
-                subject: _emailTemplate.RegisteredSubject,
-                html: _emailTemplate.RegisteredHtml
+            await Send(
+                email,
+                "Sign-up Verification API - Email Already Registered",
+                $@"<h4>Email Already Registered</h4>
+                         <p>Your email <strong>{email}</strong> is already registered.</p>
+                         {message}"
             );
         }
 
-        public void SendPasswordResetEmail(AccountDto account, string origin)
+        public async Task SendPasswordResetEmail(AccountDto account, string origin)
         {
             string message;
             if (!string.IsNullOrEmpty(origin))
-                message = _emailTemplate.ResetPasswordSuccess;
+            {
+                var resetUrl = $"{origin}/account/reset-password?token={account.ResetToken}";
+                message = $@"<p>Please click the below link to reset your password, the link will be valid for 1 day:</p>
+                             <p><a href=""{resetUrl}"">{resetUrl}</a></p>";
+            }
             else
-                message = _emailTemplate.ResetPasswordFailed;
+                message = $@"<p>Please use the below token to reset your password with the <code>/accounts/reset-password</code> api route:</p>
+                             <p><code>{account.ResetToken}</code></p>";
 
-            Send(
-                to: account.Email,
-                subject: _emailTemplate.ResetPasswordSubject,
-                html: _emailTemplate.ResetPasswordHtml
+            await Send(
+                account.Email,
+                 "Sign-up Verification API - Reset Password",
+                 $@"<h4>Reset Password Email</h4>
+                         {message}"
             );
         }
     }

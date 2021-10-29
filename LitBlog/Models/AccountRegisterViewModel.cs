@@ -1,22 +1,14 @@
-﻿using LitBlog.BLL.ModelsDto;
-using LitBlog.DAL.Models;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace LitBlog.API.Models
 {
-    public class AccountViewModel
+    public class AccountRegisterViewModel
     {
-        [Key]
-        public int Id { get; set; }
+        [Required]
+        public string UserName { get; set; }
 
         [Required]
-        public string Title { get; set; }
-
-        [Required]
-        [EnumDataType(typeof(RoleDto))]
-        public string Role { get; set; }
+        public string LastName { get; set; }
 
         [Required]
         [EmailAddress]
@@ -29,8 +21,6 @@ namespace LitBlog.API.Models
         [Required]
         [Compare("Password")]
         public string ConfirmPassword { get; set; }
-
-        public List<RefreshToken> RefreshTokens { get; set; }
 
         [Range(typeof(bool), "true", "true")]
         public bool AcceptTerms { get; set; }

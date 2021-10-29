@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using LitBlog.DAL.Models;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace LitBlog.API.Models
 {
     public class UpdateAccountViewModel
     {
 
-        public string Title { get; set; }
+        public string UserName { get; set; }
 
-        [EnumDataType(typeof(Role))]
-        public string Role { get; set; }
+        public string LastName { get; set; }
 
         [EmailAddress]
         public string Email { get; set; }

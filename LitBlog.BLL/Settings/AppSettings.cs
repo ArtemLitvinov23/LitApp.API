@@ -2,11 +2,7 @@
 {
     public class AppSettings
     {
-        public string Secret { get; set; }
-        public int TokenLifeTime { get; set; }
-
-        public int RefreshTokenTTL { get; set; }
-
+        public string SenderName { get; set; }
         public string EmailFrom { get; set; }
         public string SmtpHost { get; set; }
         public int SmtpPort { get; set; }

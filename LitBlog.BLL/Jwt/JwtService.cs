@@ -1,27 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Cryptography;
-using LitBlog.BLL.Helpers;
+﻿using LitBlog.BLL.Helpers;
 using LitBlog.BLL.ModelsDto;
-using LitBlog.BLL.Settings;
 using LitBlog.DAL.Models;
 using LitBlog.DAL.Repositories;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace LitBlog.BLL.Jwt
 {
-    public class JwtService:IJwtOptions
+    public class JwtService : IJwtOptions
     {
-        private readonly AppSettings _appSettings;
+        private readonly JWToptions _appSettings;
         private readonly IAccountRepository _accountRepository;
 
-        public JwtService(IOptions<AppSettings> appSettings, IAccountRepository accountRepository)
+        public JwtService(IOptions<JWToptions> appSettings, IAccountRepository accountRepository)
         {
             _accountRepository = accountRepository;
             _appSettings = appSettings.Value;
@@ -29,15 +26,16 @@ namespace LitBlog.BLL.Jwt
         public string GenerateJwtToken(AccountDto account)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key =  new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_appSettings.Secret));
+            var key = Encoding.ASCII.GetBytes("MySuperSecretTokenArtemLitvinov");
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[] {new Claim("id", account.Id.ToString())}),
-                Expires = DateTime.UtcNow.AddMinutes(_appSettings.TokenLifeTime),
-                SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature)
+                Subject = new ClaimsIdentity(new[] { new Claim("id", account.Id.ToString()) }),
+                Expires = DateTime.Now.AddDays(1),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+
         }
 
         public (RefreshToken, Account) GetRefreshToken(string token)
@@ -53,9 +51,12 @@ namespace LitBlog.BLL.Jwt
 
         public RefreshToken GenerateRefreshToken(string ipAddress)
         {
+            var randomNumber = new byte[32];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
             return new RefreshToken
             {
-                Token = RandomTokenString(),
+                Token = Convert.ToBase64String(randomNumber),
                 Expires = DateTime.UtcNow.AddDays(7),
                 Created = DateTime.UtcNow,
                 CreatedByIp = ipAddress

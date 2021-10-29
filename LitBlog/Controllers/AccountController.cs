@@ -1,13 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using LitBlog.API.Models;
 using LitBlog.BLL.ModelsDto;
 using LitBlog.BLL.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace LitBlog.API.Controllers
 {
@@ -25,14 +23,36 @@ namespace LitBlog.API.Controllers
         }
 
         [HttpPost("auth")]
-        public async Task<ActionResult<AuthenticateResponseViewModel>> Authenticate(
-            AuthenticateRequestViewModel request)
+        public async Task<ActionResult<AuthenticateResponseViewModel>> Authenticate(AuthenticateRequestViewModel request)
         {
             var requestDto = _mapper.Map<AuthenticateRequestDto>(request);
             var response = await _accountService.Authenticate(requestDto, IpAddress());
             SetTokenCookie(response.RefreshToken);
-            return Ok(response);
+            var mapper = _mapper.Map<AuthenticateResponseViewModel>(response);
+            return Ok(mapper);
         }
+
+
+        [HttpPost("register")]
+        public async Task<ActionResult> SignUp(AccountRegisterViewModel request)
+        {
+            var account = _mapper.Map<AccountDto>(request);
+
+            if (account == null)
+                throw new NullReferenceException();
+
+            await _accountService.Register(account, Request.Headers["origin"]);
+            return Ok(new {message = "Registration successful" });
+        }
+
+
+        [HttpPost("verify")]
+        public async Task<ActionResult> Verify(VerifyRequestViewModel verifyRequest)
+        {
+            await _accountService.VerifyEmail(verifyRequest.Token);
+            return Ok(new {message = "Verification successful, you can now login"});
+        }
+
 
         private void SetTokenCookie(string token)
         {

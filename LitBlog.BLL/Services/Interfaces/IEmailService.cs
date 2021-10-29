@@ -1,15 +1,16 @@
-﻿using LitBlog.BLL.ModelsDto;
+﻿using System.Threading.Tasks;
+using LitBlog.BLL.ModelsDto;
 
 namespace LitBlog.BLL.Services
 {
     public interface IEmailService
     {
-        void Send(string to, string subject, string html, string from = null);
+        Task Send(string to, string subject, string html, string from = null);
 
-        void SendVerificationEmail(AccountDto account, string origin);
+        Task SendVerificationEmail(AccountDto account, string origin);
 
-        void SendAlreadyRegisteredEmail(AccountDto account, string origin);
+        Task SendAlreadyRegisteredEmail(string email, string origin);
 
-        void SendPasswordResetEmail(AccountDto account, string origin);
+        Task SendPasswordResetEmail(AccountDto account, string origin);
     }
 }

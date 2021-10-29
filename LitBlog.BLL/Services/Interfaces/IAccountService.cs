@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using LitBlog.BLL.ModelsDto;
 using System.Linq;
 using System.Threading.Tasks;
-using LitBlog.BLL.ModelsDto;
 
 namespace LitBlog.BLL.Services.Interfaces
 {

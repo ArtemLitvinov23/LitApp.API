@@ -10,8 +10,6 @@ namespace LitBlog.DAL.Models
         [Key]
         public int Id  { get; set; }
 
-        public string Title { get; set; }
-
         [Required]
         [EmailAddress]
         public string Email { get; set; }
@@ -26,10 +24,15 @@ namespace LitBlog.DAL.Models
         public string LastName { get; set; }
 
         public Role Role { get; set; }
+
         public string VerificationToken { get; set; }
+
         public DateTime? Verified { get; set; }
-        public bool IsVerified => Verified.HasValue || PasswordReset.HasValue;
+
+        public bool IsVerified { get; set; }
+
         public string ResetToken { get; set; }
+
         public DateTime? ResetTokenExpires { get; set; }
 
         public DateTime? PasswordReset { get; set; }

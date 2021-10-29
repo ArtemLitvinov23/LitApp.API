@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using LitBlog.BLL.Helpers;
 using LitBlog.BLL.Jwt;
 using LitBlog.BLL.ModelsDto;
@@ -11,6 +6,9 @@ using LitBlog.BLL.PasswordHasher;
 using LitBlog.BLL.Services.Interfaces;
 using LitBlog.DAL.Models;
 using LitBlog.DAL.Repositories;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LitBlog.BLL.Services
 {
@@ -39,17 +37,20 @@ namespace LitBlog.BLL.Services
         public async Task<AuthenticateResponseDto> Authenticate(AuthenticateRequestDto authRequest, string ipAddress)
         {
             var account = _accountRepository.GetAllAccounts().FirstOrDefault(x => x.Email == authRequest.Email);
-            if (account == null || !account.IsVerified || !_password.Verify(authRequest.Password, account.PasswordHash))
-                throw new AppException("Email or password is incorrect");
+            if (account != null && account.IsVerified)
+                _password.Verify( authRequest.Password,account.PasswordHash);
             var accountDto = _mapper.Map<AccountDto>(account);
             var jwtToken = _jwtOptions.GenerateJwtToken(accountDto);
             var refreshToken = _jwtOptions.GenerateRefreshToken(ipAddress);
-            account.RefreshTokens.Add(refreshToken);
+            if (account != null)
+            {
+                account.RefreshTokens.Add(refreshToken);
 
-            //remove old refresh tokens from account
-            _jwtOptions.RemoveOldRefreshTokens(accountDto);
+                //remove old refresh tokens from account
+                _jwtOptions.RemoveOldRefreshTokens(accountDto);
 
-            await _accountRepository.UpdateAccount(account);
+                await _accountRepository.UpdateAccount(account);
+            }
 
             var response = _mapper.Map<AuthenticateResponseDto>(accountDto);
             response.JwtToken = jwtToken;
@@ -90,21 +91,21 @@ namespace LitBlog.BLL.Services
         public async Task Register(AccountDto model, string origin)
         {
             if (_accountRepository.GetAllAccounts().Any(x => x.Email == model.Email))
-                _emailService.SendAlreadyRegisteredEmail(model, origin);
+               await _emailService.SendAlreadyRegisteredEmail(model.Email, origin);
 
             var account = _mapper.Map<Account>(model);
 
-            var isFirstAccount = _accountRepository.GetAllAccounts().Any();
-            account.Role = isFirstAccount ? Role.Admin : Role.User;
-            account.Created = DateTime.UtcNow;
+            account.IsVerified = false;
+            account.Role = Role.Admin;
+            account.Created = DateTime.Now;
             account.VerificationToken = _jwtOptions.RandomTokenString();
 
             account.PasswordHash = _password.HashPassword(model.Password);
 
             await _accountRepository.CreateAccount(account);
-
-            var accountDto = _mapper.Map<AccountDto>(account);
-            _emailService.SendVerificationEmail(accountDto,origin);
+            
+             var result = _mapper.Map<AccountDto>(account);
+             await _emailService.SendVerificationEmail(result,origin);
 
         }
 
@@ -114,6 +115,7 @@ namespace LitBlog.BLL.Services
             if (account == null) throw new AppException("Verification failed");
 
             account.Verified = DateTime.UtcNow;
+            account.IsVerified = true;
             account.VerificationToken = null;
 
             await _accountRepository.UpdateAccount(account);
@@ -131,7 +133,7 @@ namespace LitBlog.BLL.Services
             await _accountRepository.UpdateAccount(account);
 
             var accountDto = _mapper.Map<AccountDto>(account);
-            _emailService.SendPasswordResetEmail(accountDto,origin);
+            await _emailService.SendPasswordResetEmail(accountDto,origin);
         }
 
         public void ValidateResetToken(RevokeTokenRequestDto model)

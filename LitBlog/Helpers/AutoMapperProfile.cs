@@ -12,20 +12,12 @@ namespace LitBlog.API.Helpers
     {
         public AutoMapperProfile()
         {
-            CreateMap<AccountDto, AccountViewModel>();
-            CreateMap<AccountDto, AccountResponseViewModel>();
-            CreateMap<AccountDto, UserResponseViewModel>();
-            CreateMap<AccountDto, AuthenticateRequestViewModel>();
-            CreateMap<AccountDto, AuthenticateResponseViewModel>();
-            CreateMap<UserResponseViewModel, UsersResponseDto>();
-            CreateMap<UpdateAccountViewModel, AccountDto>()
-                .ForAllMembers(x => x.Condition((src, dest, prop) =>
-                {
-                    if (prop == null) return false;
-                    if (prop is string && string.IsNullOrEmpty((string)prop)) return true;
-                    if (x.DestinationMember.Name == "Role" && src.Role == null) return false;
-                    return true;
-                }));
+            CreateMap<AccountDto, AccountRegisterViewModel>().ReverseMap();
+            CreateMap<AuthenticateResponseDto, AccountRegisterViewModel>();
+            CreateMap<UsersResponseDto, UserResponseViewModel>();
+            CreateMap<AuthenticateRequestDto, AuthenticateRequestViewModel>().ReverseMap();
+            CreateMap<AuthenticateResponseDto, AuthenticateResponseViewModel>().ReverseMap();
+            CreateMap<UpdateAccountViewModel, UpdateAccountDto>();
         }
     }
 }
