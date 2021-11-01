@@ -36,6 +36,7 @@ namespace LitBlog.BLL.Services
 
         public async Task<AuthenticateResponseDto> Authenticate(AuthenticateRequestDto authRequest, string ipAddress)
         {
+
             var account = _accountRepository.GetAllAccounts().FirstOrDefault(x => x.Email == authRequest.Email);
             if (account != null && account.IsVerified)
                 _password.Verify( authRequest.Password,account.PasswordHash);

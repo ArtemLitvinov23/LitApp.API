@@ -10,6 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 
 namespace LitBlog.BLL.Jwt
 {
@@ -76,6 +77,5 @@ namespace LitBlog.BLL.Jwt
             rngCryptoServiceProvider.GetBytes(randomBytes);
             return BitConverter.ToString(randomBytes).Replace(" - ", " ");
         }
-        
     }
 }

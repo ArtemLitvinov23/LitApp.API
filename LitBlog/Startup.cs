@@ -84,7 +84,9 @@ namespace LitBlog.API
 
 
             //app.UseMiddleware<ErrorHandlerMiddleware>();
-            //app.UseMiddleware<JwtMiddleware>();
+            app.UseAuthentication();
+            app.UseAuthorization();
+           
 
             app.UseEndpoints(endpoints =>
             {

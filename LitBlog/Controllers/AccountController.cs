@@ -5,7 +5,10 @@ using LitBlog.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using LitBlog.API.Helpers;
 
 namespace LitBlog.API.Controllers
 {
@@ -42,7 +45,7 @@ namespace LitBlog.API.Controllers
                 throw new NullReferenceException();
 
             await _accountService.Register(account, Request.Headers["origin"]);
-            return Ok(new {message = "Registration successful" });
+            return Ok(new { message = "Registration successful" });
         }
 
 
@@ -50,10 +53,138 @@ namespace LitBlog.API.Controllers
         public async Task<ActionResult> Verify(VerifyRequestViewModel verifyRequest)
         {
             await _accountService.VerifyEmail(verifyRequest.Token);
-            return Ok(new {message = "Verification successful, you can now login"});
+            return Ok(new { message = "Verification successful, you can now login" });
         }
 
+        [HttpPost("forgot-password")]
+        public async Task<ActionResult> ForgotPassword(ForgotPasswordRequestViewModel model)
+        {
+            var mapModel = _mapper.Map<ForgotPasswordRequestDto>(model);
+            await _accountService.ForgotPassword(mapModel, Request.Headers["origin"]);
+            return Ok(new { message = "Please check your email for password reset instructions" });
+        }
 
+        [HttpPost("reset-password")]
+        public async Task<ActionResult> ResetPassword(ResetPasswordRequestViewModel model)
+        {
+            var mapModel = _mapper.Map<ResetPasswordRequestDto>(model);
+            await _accountService.ResetPassword(mapModel);
+            return Ok(new { message = "Password reset successful, you can now login" });
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<ActionResult<AuthenticateResponseViewModel>> RefreshToken()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+            var response = await _accountService.RefreshToken(refreshToken, IpAddress());
+            SetTokenCookie(response.RefreshToken);
+            return Ok(response);
+        }
+
+        [Authorize]
+        [HttpPost("revoke-token")]
+        public IActionResult RevokeToken(RevokeTokenRequestViewModel model)
+        {
+            var id = IdContext.GetUserId(HttpContext);
+            var userPermission = _accountService.GetAccountById(id);
+            if (userPermission.Result.Role != "Admin")
+                return Unauthorized(new { message = "Unauthorized" });
+
+            var token = model.Token ?? Request.Cookies["refreshToken"];
+
+            if (string.IsNullOrEmpty(token))
+                return BadRequest(new { message = "Token is required" });
+
+            _accountService.RevokeToken(token, IpAddress());
+            return Ok(new { message = "Token revoked" });
+        }
+        [HttpGet]
+        [Authorize]
+        public ActionResult<IQueryable<AccountResponseViewModel>> GetAllAccount()
+        {
+            var id = IdContext.GetUserId(HttpContext);
+            var accountsPermission = _accountService.GetAccountById(id);
+            if (accountsPermission.Result.Role == "Admin")
+            {
+                var result = _accountService.GetAll();
+                return Ok(result);
+            }
+            return Unauthorized(new { message = "Unauthorized" });
+        }
+
+        [HttpGet("get-users")]
+        [Authorize]
+        public ActionResult<IQueryable<UserResponseViewModel>> GetAllUsers()
+        {
+            var id = IdContext.GetUserId(HttpContext);
+            var accountsPermission = _accountService.GetAccountById(id);
+            if (accountsPermission.Result.Role == "Admin")
+            {
+                var result = _accountService.GetUsers();
+                return Ok(result);
+            }
+            return Unauthorized(new { message = "Unauthorized" });
+        }
+
+        [HttpGet("{id:int}")]
+        [Authorize]
+        public ActionResult<IQueryable<AccountResponseViewModel>> GetAllAccountById(int id)
+        {
+            var idContext = IdContext.GetUserId(HttpContext);
+            var accountsPermission = _accountService.GetAccountById(idContext);
+            if (accountsPermission.Result.Role == "Admin")
+            {
+                var result = _accountService.GetAccountById(id);
+                return Ok(result);
+            }
+            return Unauthorized(new { message = "Unauthorized" });
+           
+        }
+
+        [HttpPost("create")]
+        [Authorize]
+        public async Task<ActionResult<AccountResponseViewModel>> CreateAccount(AccountRegisterViewModel create)
+        {
+            var idContext = IdContext.GetUserId(HttpContext);
+            var accountsPermission = _accountService.GetAccountById(idContext);
+            if (accountsPermission.Result.Role == "Admin")
+            {
+                var mapModel = _mapper.Map<AccountDto>(create);
+                var createdAccount = await _accountService.Create(mapModel);
+                var response = _mapper.Map<AccountResponseViewModel>(createdAccount);
+                return Ok(response);
+            }
+            return Unauthorized(new { message = "Unauthorized" }); 
+        }
+
+        [HttpPut("{id:int}")]
+        [Authorize]
+        public async Task<ActionResult<AccountResponseViewModel>> UpdateAccount(int id,UpdateAccountViewModel create)
+        {
+            var idContext = IdContext.GetUserId(HttpContext);
+            var accountsPermission = _accountService.GetAccountById(idContext);
+            if (accountsPermission.Result.Role == "Admin")
+            {
+                var mapModel = _mapper.Map<UpdateAccountDto>(create);
+                var createdAccount = await _accountService.Update(id,mapModel);
+                var response = _mapper.Map<AccountResponseViewModel>(createdAccount);
+                return Ok(response);
+            }
+            return Unauthorized(new { message = "Unauthorized" });
+        }
+        [HttpDelete("{id:int}")]
+        [Authorize]
+        public  IActionResult DeleteAccount(int id)
+        {
+            var idContext = IdContext.GetUserId(HttpContext);
+            var accountsPermission = _accountService.GetAccountById(idContext);
+            if (accountsPermission.Result.Role == "Admin")
+            {
+                  _accountService.Delete(id);
+                return Ok();
+            }
+            return Unauthorized(new { message = "Unauthorized" });
+        }
         private void SetTokenCookie(string token)
         {
             var cookieOptions = new CookieOptions

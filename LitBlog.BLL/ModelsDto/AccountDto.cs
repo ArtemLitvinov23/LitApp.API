@@ -29,5 +29,10 @@ namespace LitBlog.BLL.ModelsDto
         public string VerificationToken { get; set; }
 
         public string ResetToken { get; set; }
+
+        public bool OwnsToken(string token)
+        {
+            return this.RefreshTokens?.Find(x => x.Token == token) != null;
+        }
     }
 }
