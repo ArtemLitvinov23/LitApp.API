@@ -4,6 +4,7 @@ using LitBlog.BLL.ModelsDto;
 using LitBlog.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,8 +42,8 @@ namespace LitBlog.API.Controllers
         {
             var account = _mapper.Map<AccountDto>(request);
 
-            if (account == null)
-                throw new NullReferenceException();
+            if (account.Email == request.Email)
+                return BadRequest(new { message = $"User with this mail {request.Email} already exists" });
 
             await _accountService.Register(account, Request.Headers["origin"]);
             return Ok(new { message = "Registration successful" });
@@ -114,7 +115,7 @@ namespace LitBlog.API.Controllers
 
         [HttpGet("get-users")]
         [Authorize]
-        public ActionResult<IQueryable<UserResponseViewModel>> GetAllUsers()
+        public ActionResult<IList<UserResponseViewModel>> GetAllUsers()
         {
             var id = IdContext.GetUserId(HttpContext);
             var accountsPermission = _accountService.GetAccountById(id);
@@ -128,7 +129,7 @@ namespace LitBlog.API.Controllers
 
         [HttpGet("{id:int}")]
         [Authorize]
-        public ActionResult<IQueryable<AccountResponseViewModel>> GetAllAccountById(int id)
+        public ActionResult<IList<AccountResponseViewModel>> GetAllAccountById(int id)
         {
             var idContext = IdContext.GetUserId(HttpContext);
             var accountsPermission = _accountService.GetAccountById(idContext);
@@ -157,18 +158,18 @@ namespace LitBlog.API.Controllers
             return Unauthorized(new { message = "Unauthorized" }); 
         }
 
-        [HttpPut("{id:int}")]
+        [HttpPut]
         [Authorize]
-        public async Task<ActionResult<AccountResponseViewModel>> UpdateAccount(int id,UpdateAccountViewModel create)
+        public async Task<ActionResult<AccountResponseViewModel>> UpdateAccount(UpdateAccountViewModel create)
         {
             var idContext = IdContext.GetUserId(HttpContext);
             var accountsPermission = _accountService.GetAccountById(idContext);
             if (accountsPermission.Result.Role == "Admin")
             {
                 var mapModel = _mapper.Map<UpdateAccountDto>(create);
-                var createdAccount = await _accountService.Update(id,mapModel);
-                var response = _mapper.Map<AccountResponseViewModel>(createdAccount);
-                return Ok(response);
+                await _accountService.Update(idContext,mapModel);
+             
+                return Ok("Updated");
             }
             return Unauthorized(new { message = "Unauthorized" });
         }

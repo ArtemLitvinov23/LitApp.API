@@ -17,7 +17,9 @@ namespace LitBlog.API.Helpers
             CreateMap<UsersResponseDto, UserResponseViewModel>();
             CreateMap<AuthenticateRequestDto, AuthenticateRequestViewModel>().ReverseMap();
             CreateMap<AuthenticateResponseDto, AuthenticateResponseViewModel>().ReverseMap();
-            CreateMap<UpdateAccountViewModel, UpdateAccountDto>();
+            CreateMap<UpdateAccountViewModel, UpdateAccountDto>().ReverseMap();
+            CreateMap<ResetPasswordRequestDto, ResetPasswordRequestViewModel>().ReverseMap();
+            CreateMap<ForgotPasswordRequestDto, ForgotPasswordRequestViewModel>().ReverseMap();
         }
     }
 }

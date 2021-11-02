@@ -1,5 +1,5 @@
 ﻿using LitBlog.BLL.ModelsDto;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace LitBlog.BLL.Services.Interfaces
@@ -14,8 +14,8 @@ namespace LitBlog.BLL.Services.Interfaces
         Task ForgotPassword(ForgotPasswordRequestDto model, string origin);
         void ValidateResetToken(RevokeTokenRequestDto model);
         Task ResetPassword(ResetPasswordRequestDto model);
-        IQueryable<UsersResponseDto> GetUsers();
-        IQueryable<AccountResponseDto> GetAll();
+        IList<UsersResponseDto> GetUsers();
+        IList<AccountResponseDto> GetAll();
         Task<AccountResponseDto> GetAccountById(int accountId);
         Task<AccountResponseDto> Create(AccountDto model);
         Task<AccountResponseDto> Update(int id, UpdateAccountDto model);

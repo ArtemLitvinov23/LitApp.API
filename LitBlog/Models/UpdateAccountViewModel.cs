@@ -9,14 +9,5 @@ namespace LitBlog.API.Models
 
         public string LastName { get; set; }
 
-        [EmailAddress]
-        public string Email { get; set; }
-
-        [MinLength(8)]
-        public string Password { get; set; }
-
-        [Compare("Password")]
-        public string ConfirmPassword { get; set; }
-
     }
 }

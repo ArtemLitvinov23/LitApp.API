@@ -16,6 +16,9 @@ namespace LitBlog.BLL.Mapper
             CreateMap<Account, AuthenticateResponseDto>();
             CreateMap<Role, RoleDto>();
             CreateMap<UpdateAccountDto, Account>();
+            CreateMap<AccountDto, ResetPasswordRequestDto>();
+            CreateMap<ResetPasswordRequestDto, object>().ReverseMap();
+            CreateMap<ForgotPasswordRequestDto, object>().ReverseMap();
         }
     }
 }

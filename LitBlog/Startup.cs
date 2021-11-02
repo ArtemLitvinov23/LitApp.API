@@ -43,7 +43,7 @@ namespace LitBlog.API
             });
 
 
-            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+            services.Configure<EmailSettings>(Configuration.GetSection("AppSettings"));
             services.AddAutoMapper(typeof(MapperProfile), typeof(AutoMapperProfile));
 
             services.AddScoped<IAccountService, AccountService>();

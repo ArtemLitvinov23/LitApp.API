@@ -9,6 +9,7 @@ using LitBlog.DAL.Repositories;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace LitBlog.BLL.Services
 {
@@ -160,16 +161,16 @@ namespace LitBlog.BLL.Services
             await _accountRepository.UpdateAccount(account);
         }
 
-        public IQueryable<UsersResponseDto> GetUsers()
+        public IList<UsersResponseDto> GetUsers()
         {
             var accounts = _accountRepository.GetAllAccounts();
-            return _mapper.Map<IQueryable<UsersResponseDto>>(accounts);
+            return _mapper.Map<List<UsersResponseDto>>(accounts);
         }
 
-        public IQueryable<AccountResponseDto> GetAll()
+        public IList<AccountResponseDto> GetAll()
         {
-            var account = _accountRepository.GetAllAccounts();
-            return _mapper.Map<IQueryable<AccountResponseDto>>(account);
+            var account = _accountRepository.GetAllAccounts().ToList();
+            return _mapper.Map<List<AccountResponseDto>>(account);
         }
 
         public async Task<AccountResponseDto> GetAccountById(int accountId)
@@ -199,11 +200,8 @@ namespace LitBlog.BLL.Services
         {
             var getAccount = _accountRepository.GetAccount(id);
 
-            if (getAccount.Email != model.Email && _accountRepository.GetAllAccounts().Any(x=>x.Email == model.Email))
-                throw new AppException($"Email {model.Email}i s alerady");
-
-            if (!string.IsNullOrEmpty(model.Password))
-                getAccount.PasswordHash = _password.HashPassword(model.Password);
+            if (getAccount == null)
+                throw new AppException();
 
             // copy model to account and save
             _mapper.Map(model, getAccount);

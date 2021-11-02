@@ -1,4 +1,5 @@
 ﻿using LitBlog.DAL.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -9,8 +10,11 @@ namespace LitBlog.BLL.ModelsDto
         public int Id { get; set; }
 
         [Required]
-        [EnumDataType(typeof(Role))]
-        public string Role { get; set; }
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+        public string Password { get; set; }
 
         [Required]
         public string UserName { get; set; }
@@ -18,17 +22,25 @@ namespace LitBlog.BLL.ModelsDto
         [Required]
         public string LastName { get; set; }
 
-        [Required] 
-        [EmailAddress] public string Email { get; set; }
-
-        [Required] 
-        [MinLength(8)] public string Password { get; set; }
-
-        public List<RefreshToken> RefreshTokens { get; set; }
+        public RoleDto Role { get; set; }
 
         public string VerificationToken { get; set; }
 
+        public DateTime? Verified { get; set; }
+
+        public bool IsVerified { get; set; }
+
         public string ResetToken { get; set; }
+
+        public DateTime? ResetTokenExpires { get; set; }
+
+        public DateTime? PasswordReset { get; set; }
+
+        public DateTime Created { get; set; }
+
+        public DateTime? Updated { get; set; }
+
+        public List<RefreshToken> RefreshTokens { get; set; }
 
         public bool OwnsToken(string token)
         {
