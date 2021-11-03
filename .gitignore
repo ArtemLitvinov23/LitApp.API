@@ -321,3 +321,20 @@ _Pvt_Extensions
 # Backup folder for Package Reference Convert tool in Visual Studio 2017
 MigrationBackup/
 
+*.cache
+*.dll
+*.exe
+*.pdb
+/build/
+*.suo
+*.user
+_ReSharper.*/
+*.sdf
+*.opensdf
+*.tlog
+*.log
+TestResult.xml
+*.VisualState.xml
+Version.cs
+Version.h
+Version.cpp

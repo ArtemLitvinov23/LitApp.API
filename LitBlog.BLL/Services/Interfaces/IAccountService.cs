@@ -20,6 +20,7 @@ namespace LitBlog.BLL.Services.Interfaces
         Task<AccountResponseDto> Create(AccountDto model);
         Task<AccountResponseDto> Update(int id, UpdateAccountDto model);
         void Delete(int id);
+        public bool ExistsAccount(AccountDto model);
 
     }
 }

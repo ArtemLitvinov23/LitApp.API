@@ -36,8 +36,7 @@ namespace LitBlog.BLL.Services
 
 
         public async Task<AuthenticateResponseDto> Authenticate(AuthenticateRequestDto authRequest, string ipAddress)
-        {
-
+        { 
             var account = _accountRepository.GetAllAccounts().FirstOrDefault(x => x.Email == authRequest.Email);
             if (account != null && account.IsVerified)
                 _password.Verify( authRequest.Password,account.PasswordHash);
@@ -92,11 +91,7 @@ namespace LitBlog.BLL.Services
 
         public async Task Register(AccountDto model, string origin)
         {
-            if (_accountRepository.GetAllAccounts().Any(x => x.Email == model.Email))
-               await _emailService.SendAlreadyRegisteredEmail(model.Email, origin);
-
             var account = _mapper.Map<Account>(model);
-
             account.IsVerified = false;
             account.Role = Role.Admin;
             account.Created = DateTime.Now;
@@ -216,5 +211,10 @@ namespace LitBlog.BLL.Services
             _accountRepository.Delete(id);
 
         }
+
+        public bool ExistsAccount(AccountDto model)
+        {
+             return _accountRepository.GetAllAccounts().Any(x => x.Email == model.Email);
+        } 
     }
 }

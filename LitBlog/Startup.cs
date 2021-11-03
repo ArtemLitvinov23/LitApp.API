@@ -83,7 +83,6 @@ namespace LitBlog.API
             app.UseRouting();
 
 
-            //app.UseMiddleware<ErrorHandlerMiddleware>();
             app.UseAuthentication();
             app.UseAuthorization();
            
@@ -91,18 +90,7 @@ namespace LitBlog.API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapGet("/{**path}", context =>
-                {
-                    if (!env.IsProduction())
-                    {
-                        context.Response.Redirect("/swagger");
-                        return Task.CompletedTask;
-                    }
-
-                    context.Response.WriteAsync("Not Found");
-                    return Task.CompletedTask;
-                });
-
+               
             });
         }
     }

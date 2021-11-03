@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using LitBlog.API.Helpers;
+using LitBlog.BLL.Services;
 
 namespace LitBlog.API.Controllers
 {
@@ -19,11 +20,13 @@ namespace LitBlog.API.Controllers
     {
         private readonly IAccountService _accountService;
         private readonly IMapper _mapper;
+        private readonly IEmailService _emailService;
 
-        public AccountController(IAccountService accountService, IMapper mapper)
+        public AccountController(IAccountService accountService, IMapper mapper, IEmailService emailService)
         {
             _accountService = accountService;
             _mapper = mapper;
+            _emailService = emailService;
         }
 
         [HttpPost("auth")]
@@ -40,10 +43,14 @@ namespace LitBlog.API.Controllers
         [HttpPost("register")]
         public async Task<ActionResult> SignUp(AccountRegisterViewModel request)
         {
-            var account = _mapper.Map<AccountDto>(request);
+            var accountDto = _mapper.Map<AccountDto>(request);
+            if (_accountService.ExistsAccount(accountDto))
+            {
+                await _emailService.SendAlreadyRegisteredEmail(accountDto.Email, Request.Headers["origin"]);
+                return BadRequest(new { message = $"User with this mail {accountDto.Email} already exists" });
+            }
 
-            if (account.Email == request.Email)
-                return BadRequest(new { message = $"User with this mail {request.Email} already exists" });
+            var account = _mapper.Map<AccountDto>(request);
 
             await _accountService.Register(account, Request.Headers["origin"]);
             return Ok(new { message = "Registration successful" });
