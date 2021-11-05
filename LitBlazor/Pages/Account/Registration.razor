@@ -1,0 +1,78 @@
+﻿@page "/account/register"
+@inject IAccountService AccountService
+@inject NavigationManager NavigationManager
+
+<div class="card">
+    <h4 class="card-header">Sign Up</h4>
+    <div class="card-body">
+        <EditForm Model="@_registerAccount" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+            <div class="form-group">
+                <label>First Name</label>
+                <InputText @bind-Value="_registerAccount.UserName" class="form-control" />
+                <ValidationMessage For="@(() => _registerAccount.UserName)" />
+            </div>
+            <div class="form-group">
+                <label>Last Name</label>
+                <InputText @bind-Value="_registerAccount.LastName" class="form-control" />
+                <ValidationMessage For="@(() => _registerAccount.LastName)" />
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <InputText @bind-Value="_registerAccount.Email" class="form-control" />
+                <ValidationMessage For="@(() => _registerAccount.Email)" />
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <InputText @bind-Value="_registerAccount.Password" type="password" class="form-control" />
+                <ValidationMessage For="@(() => _registerAccount.Password)" />
+            </div>
+            <div class="form-group">
+                <label>Confirm password</label>
+                <InputText @bind-Value="_registerAccount.ConfirmPassword" type="password" class="form-control" />
+                <ValidationMessage For="@(() => _registerAccount.ConfirmPassword)" />
+            </div>
+            <div class="form-group form-check">
+                <InputCheckbox @bind-Value="_registerAccount.AcceptTerms" id="acceptTerms" class="form-check-input" />
+                <label for="acceptTerms" class="form-check-label">Accept Terms & Conditions</label>
+                <ValidationMessage For="@(() => _registerAccount.AcceptTerms)" />
+            </div>
+            <button disabled="@loading" class="btn btn-primary">
+                @if (loading)
+                {
+                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                }
+                Register
+            </button>
+            @if (!string.IsNullOrEmpty(error))
+            {
+                <div class="alert alert-danger mt-3 mb-0">@error</div>
+            }
+            <NavLink href="account/login" class="btn btn-link">Cancel</NavLink>
+        </EditForm>
+    </div>
+</div>
+
+@code
+{
+    private readonly RegisterAccount _registerAccount = new();
+    private bool loading;
+    private string error;
+
+    private async void OnValidSubmit()
+    {
+        loading = true;
+        try
+        {
+            await AccountService.Register(_registerAccount);
+
+            NavigationManager.NavigateTo("account/verify");
+        }
+        catch(Exception ex)
+        {
+            error = ex.Message;
+            loading = false;
+            StateHasChanged();
+        }
+    }
+}

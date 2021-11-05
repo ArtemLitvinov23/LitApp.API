@@ -14,8 +14,8 @@ using LitBlog.BLL.Services;
 
 namespace LitBlog.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/Account")]
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
@@ -29,6 +29,7 @@ namespace LitBlog.API.Controllers
             _emailService = emailService;
         }
 
+        [AllowAnonymous]
         [HttpPost("auth")]
         public async Task<ActionResult<AuthenticateResponseViewModel>> Authenticate(AuthenticateRequestViewModel request)
         {
@@ -39,7 +40,7 @@ namespace LitBlog.API.Controllers
             return Ok(mapper);
         }
 
-
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<ActionResult> SignUp(AccountRegisterViewModel request)
         {
@@ -56,7 +57,7 @@ namespace LitBlog.API.Controllers
             return Ok(new { message = "Registration successful" });
         }
 
-
+        [AllowAnonymous]
         [HttpPost("verify")]
         public async Task<ActionResult> Verify(VerifyRequestViewModel verifyRequest)
         {
@@ -64,6 +65,7 @@ namespace LitBlog.API.Controllers
             return Ok(new { message = "Verification successful, you can now login" });
         }
 
+        [AllowAnonymous]
         [HttpPost("forgot-password")]
         public async Task<ActionResult> ForgotPassword(ForgotPasswordRequestViewModel model)
         {
@@ -72,6 +74,7 @@ namespace LitBlog.API.Controllers
             return Ok(new { message = "Please check your email for password reset instructions" });
         }
 
+        [AllowAnonymous]
         [HttpPost("reset-password")]
         public async Task<ActionResult> ResetPassword(ResetPasswordRequestViewModel model)
         {
@@ -80,6 +83,7 @@ namespace LitBlog.API.Controllers
             return Ok(new { message = "Password reset successful, you can now login" });
         }
 
+        [Authorize]
         [HttpPost("refresh-token")]
         public async Task<ActionResult<AuthenticateResponseViewModel>> RefreshToken()
         {
@@ -106,8 +110,9 @@ namespace LitBlog.API.Controllers
             _accountService.RevokeToken(token, IpAddress());
             return Ok(new { message = "Token revoked" });
         }
-        [HttpGet]
+
         [Authorize]
+        [HttpGet]
         public ActionResult<IQueryable<AccountResponseViewModel>> GetAllAccount()
         {
             var id = IdContext.GetUserId(HttpContext);
@@ -120,8 +125,8 @@ namespace LitBlog.API.Controllers
             return Unauthorized(new { message = "Unauthorized" });
         }
 
-        [HttpGet("get-users")]
         [Authorize]
+        [HttpGet("get-users")]
         public ActionResult<IList<UserResponseViewModel>> GetAllUsers()
         {
             var id = IdContext.GetUserId(HttpContext);
@@ -134,8 +139,8 @@ namespace LitBlog.API.Controllers
             return Unauthorized(new { message = "Unauthorized" });
         }
 
-        [HttpGet("{id:int}")]
         [Authorize]
+        [HttpGet("{id:int}")]
         public ActionResult<IList<AccountResponseViewModel>> GetAllAccountById(int id)
         {
             var idContext = IdContext.GetUserId(HttpContext);
@@ -149,8 +154,8 @@ namespace LitBlog.API.Controllers
            
         }
 
-        [HttpPost("create")]
         [Authorize]
+        [HttpPost("create")]
         public async Task<ActionResult<AccountResponseViewModel>> CreateAccount(AccountRegisterViewModel create)
         {
             var idContext = IdContext.GetUserId(HttpContext);
@@ -165,8 +170,8 @@ namespace LitBlog.API.Controllers
             return Unauthorized(new { message = "Unauthorized" }); 
         }
 
-        [HttpPut]
         [Authorize]
+        [HttpPut]
         public async Task<ActionResult<AccountResponseViewModel>> UpdateAccount(UpdateAccountViewModel create)
         {
             var idContext = IdContext.GetUserId(HttpContext);
@@ -180,8 +185,9 @@ namespace LitBlog.API.Controllers
             }
             return Unauthorized(new { message = "Unauthorized" });
         }
-        [HttpDelete("{id:int}")]
+
         [Authorize]
+        [HttpDelete("{id:int}")]
         public  IActionResult DeleteAccount(int id)
         {
             var idContext = IdContext.GetUserId(HttpContext);

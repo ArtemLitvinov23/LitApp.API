@@ -1,10 +1,6 @@
-using System;
-using System.Text;
-using System.Threading.Tasks;
 using LitBlog.API.Helpers;
 using LitBlog.BLL.Jwt;
 using LitBlog.BLL.Mapper;
-
 using LitBlog.BLL.PasswordHasher;
 using LitBlog.BLL.Services;
 using LitBlog.BLL.Services.Interfaces;
@@ -14,13 +10,13 @@ using LitBlog.DAL.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace LitBlog.API
 {
@@ -52,14 +48,27 @@ namespace LitBlog.API
             services.AddTransient<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IEmailService, EmailService>();
 
-
+           
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(x =>
             {
+                x.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = context =>
+                    {
+                        var accountService = context.HttpContext.RequestServices.GetRequiredService<IAccountService>();
+                        var userId = int.Parse(context.Principal.Identity.Name);
+                        var account = accountService.GetAccountById(userId);
+                        if (account == null)
+                        {
+                            context.Fail("Unauthorized");
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
                 x.RequireHttpsMetadata = false;
                 x.SaveToken = true;
                 x.TokenValidationParameters = new TokenValidationParameters
@@ -68,7 +77,6 @@ namespace LitBlog.API
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration.GetSection("JwtConfig").GetSection("Secret").Value)),
                     ValidateIssuer = false,
                     ValidateAudience = false,
-                    ClockSkew = TimeSpan.Zero
                 };
             });
 
@@ -76,22 +84,24 @@ namespace LitBlog.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseSwagger();
             app.UseSwaggerUI(x => x.SwaggerEndpoint("/swagger/v1/swagger.json", ".NET LitBlog API"));
+
             app.UseRouting();
 
-
+            app.UseCors(cors => cors
+                   .AllowAnyMethod()
+                   .AllowAnyHeader()
+                   .SetIsOriginAllowed(origin => true)
+                   .AllowCredentials()
+                    );
             app.UseAuthentication();
             app.UseAuthorization();
-           
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-               
-            });
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
+         
         }
     }
 }

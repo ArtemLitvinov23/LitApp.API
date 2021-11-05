@@ -1,0 +1,52 @@
+﻿@page "/account/verify"
+@inject IAccountService AccountService
+@inject NavigationManager NavigationManager
+
+<div class="card">
+    <h4 class="card-header">Sign Up</h4>
+    <div class="card-body">
+        <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+            <div class="form-group">
+                <label>Please enter the token sent to your email </label>
+                <InputText @bind-Value="model.Token" class="form-control" />
+                <ValidationMessage For="@(() => model.Token)" />
+            </div>
+            <button disabled="@loading" class="btn btn-primary">
+                @if (loading)
+                {
+                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                }
+                Verify account
+            </button>
+            @if (!string.IsNullOrEmpty(errors))
+            {
+                <div class="alert alert-danger mt-3 mb-0">@errors</div>
+            }
+            <NavLink href="account/register" class="btn btn-link">Cancel</NavLink>
+        </EditForm>
+    </div>
+</div>
+
+@code{
+    private VerifyAccount model = new();
+    private bool loading;
+    private string errors;
+
+    private async void OnValidSubmit()
+    {
+        loading = true;
+        try
+        {
+            await AccountService.Verify(model);
+
+            NavigationManager.NavigateTo("/account/login");
+        }
+        catch (Exception ex)
+        {
+            errors = ex.Message;
+            loading = false;
+            StateHasChanged();
+        }
+    }
+}
