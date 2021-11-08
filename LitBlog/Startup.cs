@@ -38,7 +38,7 @@ namespace LitBlog.API
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "LitBlog.WebApi", Version = "v1" });
             });
 
-
+            services.AddSignalR();
             services.Configure<EmailSettings>(Configuration.GetSection("AppSettings"));
             services.AddAutoMapper(typeof(MapperProfile), typeof(AutoMapperProfile));
 
@@ -47,8 +47,10 @@ namespace LitBlog.API
             services.AddTransient<IJwtOptions, JwtService>();
             services.AddTransient<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IChatRepository, ChatRepository>();
+            services.AddScoped<IChatService, ChatService>();
 
-           
+
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -100,8 +102,12 @@ namespace LitBlog.API
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => endpoints.MapControllers());
-         
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapHub<SignalRHub>("/SignalRHub");
+            });
+
         }
     }
 }

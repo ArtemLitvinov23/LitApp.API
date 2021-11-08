@@ -20,6 +20,7 @@ namespace LitBlog.API.Helpers
             CreateMap<UpdateAccountViewModel, UpdateAccountDto>().ReverseMap();
             CreateMap<ResetPasswordRequestDto, ResetPasswordRequestViewModel>().ReverseMap();
             CreateMap<ForgotPasswordRequestDto, ForgotPasswordRequestViewModel>().ReverseMap();
+            CreateMap<ChatMessageDto, ChatMessageModel>().ReverseMap();
         }
     }
 }
