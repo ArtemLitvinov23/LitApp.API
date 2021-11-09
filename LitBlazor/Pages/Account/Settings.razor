@@ -1,7 +1,8 @@
-﻿@page "/account/settings"
+﻿@page "/account/settings/{Id}"
 @attribute [Authorize]
 @inject IAccountService AccountService
 @inject NavigationManager NavigationManager
+
 
 <h1>Edit User</h1>
 @if (model != null)
@@ -28,11 +29,14 @@
                 }
                 Save
             </button>
-            @if (!string.IsNullOrEmpty(errors))
-            {
-                <div class="alert alert-danger mt-3 mb-0">@errors</div>
-            }
-            <NavLink href="" class="btn btn-link">Cancel</NavLink>
+            <button disabled="@loading" class="btn btn-primary">
+                @if (loading)
+                {
+                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                }
+                Login
+            </button>
+            <NavLink href="users" class="btn btn-link">Cancel</NavLink>
         </div>
     </EditForm>
 }
@@ -42,23 +46,30 @@ else
         <span class="spinner-border spinner-border-lg align-center"></span>
     </div>
 }
-
 @code {
     private UpdateAccount model;
     private bool loading;
-    private string errors;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await AccountService.GetById(Id);
+        model = new UpdateAccount(user);
+    }
 
     private async void OnValidSubmit()
     {
         loading = true;
         try
         {
-            await AccountService.Update(model);
-            NavigationManager.NavigateTo(" ");
+            await AccountService.Update(Id, model);
+        
+            NavigationManager.NavigateTo("/account");
         }
-        catch (Exception ex)
+        catch 
         {
-            errors = ex.Message;
             loading = false;
             StateHasChanged();
         }

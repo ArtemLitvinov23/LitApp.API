@@ -72,13 +72,15 @@ namespace LitBlazor.Services
             await _httpService.Post("api/Account/register", model);
         }
 
-        public async Task Update(UpdateAccount model)
+        public async Task Update(int id,UpdateAccount model)
         {
-
-            await _httpService.Put("api/Account", model);
-            Account.UserName = model.UserName;
-            Account.LastName = model.LastName;
-            await _localStorageService.SetItem("account", Account);
+            await _httpService.Put("api/Account/{id}", model);
+            if (id == Account.Id)
+            {
+                Account.UserName = model.UserName;
+                Account.LastName = model.LastName;
+                await _localStorageService.SetItem("account", Account);
+            }
         }
 
         public async Task Verify(VerifyAccount model)

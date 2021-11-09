@@ -171,15 +171,14 @@ namespace LitBlog.API.Controllers
         }
 
         [Authorize]
-        [HttpPut]
-        public async Task<ActionResult<AccountResponseViewModel>> UpdateAccount(UpdateAccountViewModel create)
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult<AccountResponseViewModel>> UpdateAccount(int id,UpdateAccountViewModel create)
         {
-            var idContext = IdContext.GetUserId(HttpContext);
-            var accountsPermission = _accountService.GetAccountById(idContext);
+            var accountsPermission = _accountService.GetAccountById(id);
             if (accountsPermission.Result.Role == "Admin")
             {
                 var mapModel = _mapper.Map<UpdateAccountDto>(create);
-                await _accountService.Update(idContext,mapModel);
+                await _accountService.Update(id,mapModel);
              
                 return Ok("Updated");
             }
