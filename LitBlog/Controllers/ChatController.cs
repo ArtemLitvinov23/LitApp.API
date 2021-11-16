@@ -25,16 +25,16 @@ namespace LitBlog.API.Controllers
 
 
         [HttpGet("User")]
-        public IActionResult GetAllUser()
+        public async Task<IActionResult> GetAllUser()
         {
-            var accounts = _chatService.GetAllUsers();
+            var accounts = await _chatService.GetAllUsersAsync();
             return Ok(accounts);
         }
 
         [HttpGet("User/{id}")]
-        public IActionResult GetUserDetails(int id)
+        public async Task<IActionResult> GetUserDetails(int id)
         {
-            var accounts = _chatService.GetUser(id);
+            var accounts = await _chatService.GetUserAsync(id);
             return Ok(accounts);
         }
 
@@ -43,7 +43,7 @@ namespace LitBlog.API.Controllers
         {
             var userId = IdContext.GetUserId(HttpContext);
             var messageDto = _mapper.Map<ChatMessageDto>(message);
-            await _chatService.SaveMessage(userId,messageDto);
+            await _chatService.SaveMessageAsync(userId,messageDto);
             return Ok();
         }
 

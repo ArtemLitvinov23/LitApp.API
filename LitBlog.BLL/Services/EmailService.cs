@@ -16,7 +16,7 @@ namespace LitBlog.BLL.Services
         {
             _appSettings = settings.Value;
         }
-        public async Task Send(string to, string subject, string html, string from = null)
+        public async Task SendAsync(string to, string subject, string html, string from = null)
         {
             try
             {
@@ -41,7 +41,7 @@ namespace LitBlog.BLL.Services
             
         }
 
-        public async Task SendVerificationEmail(AccountDto account, string origin)
+        public async Task SendVerificationEmailAsync(AccountDto account, string origin)
         {
             string message;
             if (!string.IsNullOrEmpty(origin))
@@ -54,14 +54,14 @@ namespace LitBlog.BLL.Services
                 message = $@"<p>Please use the below token to verify your email address with the <code>{origin}/Account/verify</code> api route:</p>
                              <p><code>{account.VerificationToken}</code></p>";
 
-            await Send(account.Email, "Sign-up Verification API - Verify Email",
+            await SendAsync(account.Email, "Sign-up Verification API - Verify Email",
                 $@"<h4>Verify Email</h4>
                      <p>Thanks for registering!</p>
                       {message}"
                      );
         }
 
-        public async Task SendAlreadyRegisteredEmail(string email, string origin)
+        public async Task SendAlreadyRegisteredEmailAsync(string email, string origin)
         {
             string message;
             if (!string.IsNullOrEmpty(origin))
@@ -69,7 +69,7 @@ namespace LitBlog.BLL.Services
             else
                 message = "<p>If you don't know your password you can reset it via the <code>/Account//forgot-password</code> api route.</p>";
 
-            await Send(
+            await SendAsync(
                 email,
                 "Sign-up Verification API - Email Already Registered",
                 $@"<h4>Email Already Registered</h4>
@@ -78,7 +78,7 @@ namespace LitBlog.BLL.Services
             );
         }
 
-        public async Task SendPasswordResetEmail(AccountDto account, string origin)
+        public async Task SendPasswordResetEmailAsync(AccountDto account, string origin)
         {
             string message;
             if (!string.IsNullOrEmpty(origin))
@@ -91,7 +91,7 @@ namespace LitBlog.BLL.Services
                 message = $@"<p>Please use the below token to reset your password with the <code>/accounts/reset-password</code> api route:</p>
                              <p><code>{account.ResetToken}</code></p>";
 
-            await Send(
+            await SendAsync(
                 account.Email,
                  "Sign-up Verification API - Reset Password",
                  $@"<h4>Reset Password Email</h4>

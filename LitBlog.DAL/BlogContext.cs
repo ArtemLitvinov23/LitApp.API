@@ -6,6 +6,7 @@ namespace LitBlog.DAL
     public class BlogContext : DbContext
     {
         public DbSet<Account> Accounts { get; set; }
+        public DbSet<FriendsList> Friends { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public BlogContext(DbContextOptions<BlogContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder builder)

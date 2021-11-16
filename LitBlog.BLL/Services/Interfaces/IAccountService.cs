@@ -6,20 +6,21 @@ namespace LitBlog.BLL.Services.Interfaces
 {
     public interface IAccountService
     {
-        Task<AuthenticateResponseDto> Authenticate(AuthenticateRequestDto authRequest, string ipAddress);
-        Task<AuthenticateResponseDto> RefreshToken(string token, string ipAddress);
-        Task RevokeToken(string token, string ipAddress);
-        Task Register(AccountDto model, string origin);
-        Task VerifyEmail(string token);
-        Task ForgotPassword(ForgotPasswordRequestDto model, string origin);
-        void ValidateResetToken(RevokeTokenRequestDto model);
-        Task ResetPassword(ResetPasswordRequestDto model);
-        IList<UsersResponseDto> GetUsers();
-        IList<AccountResponseDto> GetAll();
-        Task<AccountResponseDto> GetAccountById(int accountId);
-        Task<AccountResponseDto> Create(AccountDto model);
-        Task<AccountResponseDto> Update(int id, UpdateAccountDto model);
-        void Delete(int id);
+        Task<AuthenticateResponseDto> AuthenticateAsync(AuthenticateRequestDto authRequest, string ipAddress);
+        Task<AuthenticateResponseDto> RefreshTokenAsync(string token, string ipAddress);
+        Task RevokeTokenAsync(string token, string ipAddress);
+        Task RegisterAsync(AccountDto model, string origin);
+        Task VerifyEmailAsync(string token);
+        Task ForgotPasswordAsync(ForgotPasswordRequestDto model, string origin);
+        Task ValidateResetTokenAsync(RevokeTokenRequestDto model);
+        Task ResetPasswordAsync(ResetPasswordRequestDto model);
+        Task<List<UsersResponseDto>> GetUsersAsync();
+        Task<List<AccountResponseDto>> GetAllAsync();
+        Task<AccountResponseDto> GetAccountByIdAsync(int accountId);
+        Task<AccountResponseDto> CreateAsync(AccountDto model);
+        Task<AccountResponseDto> UpdateAsync(int id, UpdateAccountDto model);
+        Task<List<FriendResponseDto>>
+        Task DeleteAsync(int id);
         public bool ExistsAccount(AccountDto model);
 
     }

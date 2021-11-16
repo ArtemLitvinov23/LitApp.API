@@ -10,16 +10,16 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace LitBlog.BLL.Jwt
 {
     public class JwtService : IJwtOptions
     {
-        private readonly JWToptions _appSettings;
+        private readonly JWtOptions _appSettings;
         private readonly IAccountRepository _accountRepository;
 
-        public JwtService(IOptions<JWToptions> appSettings, IAccountRepository accountRepository)
+        public JwtService(IOptions<JWtOptions> appSettings, IAccountRepository accountRepository)
         {
             _accountRepository = accountRepository;
             _appSettings = appSettings.Value;

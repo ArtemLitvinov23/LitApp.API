@@ -5,12 +5,12 @@ namespace LitBlog.BLL.Services
 {
     public interface IEmailService
     {
-        Task Send(string to, string subject, string html, string from = null);
+        Task SendAsync(string to, string subject, string html, string from = null);
 
-        Task SendVerificationEmail(AccountDto account, string origin);
+        Task SendVerificationEmailAsync(AccountDto account, string origin);
 
-        Task SendAlreadyRegisteredEmail(string email, string origin);
+        Task SendAlreadyRegisteredEmailAsync(string email, string origin);
 
-        Task SendPasswordResetEmail(AccountDto account, string origin);
+        Task SendPasswordResetEmailAsync(AccountDto account, string origin);
     }
 }

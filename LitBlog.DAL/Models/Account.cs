@@ -42,6 +42,8 @@ namespace LitBlog.DAL.Models
 
         public List<RefreshToken> RefreshTokens { get; set; }
 
+        public virtual ICollection<FriendsList> Friends { get; set; }
+
         public bool OwnsToken(string token)
         {
             return this.RefreshTokens?.Find(x => x.Token == token) != null;

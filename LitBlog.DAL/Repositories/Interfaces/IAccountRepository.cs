@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using LitBlog.DAL.Models;
 using System.Linq;
 using System.Threading.Tasks;
-using LitBlog.DAL.Models;
 
 namespace LitBlog.DAL.Repositories
 {
@@ -9,16 +8,16 @@ namespace LitBlog.DAL.Repositories
     {
         public IQueryable<Account> GetAllAccounts();
 
-        public Account GetAccount(int id);
+        public Task<Account> GetAccountAsync(int id);
 
         public Account GetRefreshToken(string token);
 
-        public Task<Account> GetAccountById(int accountId);
+        public Task<Account> GetAccountByIdAsync(int accountId);
 
-        public Task CreateAccount(Account account);
+        public Task CreateAccountAsync(Account account);
 
-        public Task UpdateAccount(Account update);
+        public Task UpdateAccountAsync(Account update);
 
-        public void Delete(int accountId);
+        public Task DeleteAsync(int accountId);
     }
 }

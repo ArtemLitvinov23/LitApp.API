@@ -63,7 +63,7 @@ namespace LitBlog.API
                     {
                         var accountService = context.HttpContext.RequestServices.GetRequiredService<IAccountService>();
                         var userId = int.Parse(context.Principal.Identity.Name);
-                        var account = accountService.GetAccountById(userId);
+                        var account = accountService.GetAccountByIdAsync(userId);
                         if (account == null)
                         {
                             context.Fail("Unauthorized");

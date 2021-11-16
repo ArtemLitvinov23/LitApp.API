@@ -2,7 +2,9 @@
 using LitBlog.BLL.ModelsDto;
 using LitBlog.DAL.Models;
 using LitBlog.DAL.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,10 +23,10 @@ namespace LitBlog.BLL.Services
             _mapper = mapper;
         }
 
-        public UsersResponseDto GetAllUsers()
+        public async Task<List<UsersResponseDto>> GetAllUsersAsync()
         {
-            var allAccount = _accountRepository.GetAllAccounts();
-            return _mapper.Map<UsersResponseDto>(allAccount);
+            var allAccount = await _accountRepository.GetAllAccounts().ToListAsync();
+            return _mapper.Map<List<UsersResponseDto>>(allAccount);
             
         }
 
@@ -33,15 +35,15 @@ namespace LitBlog.BLL.Services
             await _chatRepository.GetConversationAsync(userId, contactId);
         }
 
-        public UsersResponseDto GetUser(int userId)
+        public async Task<UsersResponseDto> GetUserAsync(int userId)
         {
-            var account =  _accountRepository.GetAllAccounts().Where(x => x.Id == userId).FirstOrDefault();
+            var account = await _accountRepository.GetAllAccounts().Where(x => x.Id == userId).FirstOrDefaultAsync();
             var user = _mapper.Map<UsersResponseDto>(account);
             return user;
 
         }
 
-        public async Task SaveMessage(int userId,ChatMessageDto chatMessage)
+        public async Task SaveMessageAsync(int userId,ChatMessageDto chatMessage)
         {
             chatMessage.FromUserId = userId;
             chatMessage.CreatedDate = DateTime.UtcNow;

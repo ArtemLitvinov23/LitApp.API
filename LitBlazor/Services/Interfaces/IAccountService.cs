@@ -17,7 +17,7 @@ namespace LitBlazor
         Task Verify(VerifyAccount model);
         Task<IList<Account>> GetAll();
         Task<Account> GetById(int id);
-        Task Update(UpdateAccount model);
+        Task Update(int id, UpdateAccount model);
         Task Delete(int id);
         Task<IList<Users>> GetAllUsers();
     }

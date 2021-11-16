@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using LitBlog.API.Helpers;
@@ -34,7 +33,7 @@ namespace LitBlog.API.Controllers
         public async Task<ActionResult<AuthenticateResponseViewModel>> Authenticate(AuthenticateRequestViewModel request)
         {
             var requestDto = _mapper.Map<AuthenticateRequestDto>(request);
-            var response = await _accountService.Authenticate(requestDto, IpAddress());
+            var response = await _accountService.AuthenticateAsync(requestDto, IpAddress());
             SetTokenCookie(response.RefreshToken);
             var mapper = _mapper.Map<AuthenticateResponseViewModel>(response);
             return Ok(mapper);
@@ -47,13 +46,13 @@ namespace LitBlog.API.Controllers
             var accountDto = _mapper.Map<AccountDto>(request);
             if (_accountService.ExistsAccount(accountDto))
             {
-                await _emailService.SendAlreadyRegisteredEmail(accountDto.Email, Request.Headers["origin"]);
+                await _emailService.SendAlreadyRegisteredEmailAsync(accountDto.Email, Request.Headers["origin"]);
                 return BadRequest(new { message = $"User with this mail {accountDto.Email} already exists" });
             }
 
             var account = _mapper.Map<AccountDto>(request);
 
-            await _accountService.Register(account, Request.Headers["origin"]);
+            await _accountService.RegisterAsync(account, Request.Headers["origin"]);
             return Ok(new { message = "Registration successful" });
         }
 
@@ -61,7 +60,7 @@ namespace LitBlog.API.Controllers
         [HttpPost("verify")]
         public async Task<ActionResult> Verify(VerifyRequestViewModel verifyRequest)
         {
-            await _accountService.VerifyEmail(verifyRequest.Token);
+            await _accountService.VerifyEmailAsync(verifyRequest.Token);
             return Ok(new { message = "Verification successful, you can now login" });
         }
 
@@ -70,7 +69,7 @@ namespace LitBlog.API.Controllers
         public async Task<ActionResult> ForgotPassword(ForgotPasswordRequestViewModel model)
         {
             var mapModel = _mapper.Map<ForgotPasswordRequestDto>(model);
-            await _accountService.ForgotPassword(mapModel, Request.Headers["origin"]);
+            await _accountService.ForgotPasswordAsync(mapModel, Request.Headers["origin"]);
             return Ok(new { message = "Please check your email for password reset instructions" });
         }
 
@@ -79,7 +78,7 @@ namespace LitBlog.API.Controllers
         public async Task<ActionResult> ResetPassword(ResetPasswordRequestViewModel model)
         {
             var mapModel = _mapper.Map<ResetPasswordRequestDto>(model);
-            await _accountService.ResetPassword(mapModel);
+            await _accountService.ResetPasswordAsync(mapModel);
             return Ok(new { message = "Password reset successful, you can now login" });
         }
 
@@ -88,7 +87,7 @@ namespace LitBlog.API.Controllers
         public async Task<ActionResult<AuthenticateResponseViewModel>> RefreshToken()
         {
             var refreshToken = Request.Cookies["refreshToken"];
-            var response = await _accountService.RefreshToken(refreshToken, IpAddress());
+            var response = await _accountService.RefreshTokenAsync(refreshToken, IpAddress());
             SetTokenCookie(response.RefreshToken);
             return Ok(response);
         }
@@ -98,7 +97,7 @@ namespace LitBlog.API.Controllers
         public IActionResult RevokeToken(RevokeTokenRequestViewModel model)
         {
             var id = IdContext.GetUserId(HttpContext);
-            var userPermission = _accountService.GetAccountById(id);
+            var userPermission = _accountService.GetAccountByIdAsync(id);
             if (userPermission.Result.Role != "Admin")
                 return Unauthorized(new { message = "Unauthorized" });
 
@@ -107,19 +106,19 @@ namespace LitBlog.API.Controllers
             if (string.IsNullOrEmpty(token))
                 return BadRequest(new { message = "Token is required" });
 
-            _accountService.RevokeToken(token, IpAddress());
+            _accountService.RevokeTokenAsync(token, IpAddress());
             return Ok(new { message = "Token revoked" });
         }
 
         [Authorize]
         [HttpGet]
-        public ActionResult<IQueryable<AccountResponseViewModel>> GetAllAccount()
+        public async Task<ActionResult<List<AccountResponseViewModel>>> GetAllAccount()
         {
             var id = IdContext.GetUserId(HttpContext);
-            var accountsPermission = _accountService.GetAccountById(id);
-            if (accountsPermission.Result.Role == "Admin")
+            var accountsPermission = await _accountService.GetAccountByIdAsync(id);
+            if (accountsPermission.Role == "Admin")
             {
-                var result = _accountService.GetAll();
+                var result = await _accountService.GetAllAsync();
                 return Ok(result);
             }
             return Unauthorized(new { message = "Unauthorized" });
@@ -127,13 +126,13 @@ namespace LitBlog.API.Controllers
 
         [Authorize]
         [HttpGet("get-users")]
-        public ActionResult<IList<UserResponseViewModel>> GetAllUsers()
+        public async Task<ActionResult<List<UserResponseViewModel>>> GetAllUsers()
         {
             var id = IdContext.GetUserId(HttpContext);
-            var accountsPermission = _accountService.GetAccountById(id);
-            if (accountsPermission.Result.Role == "Admin")
+            var accountsPermission =await _accountService.GetAccountByIdAsync(id);
+            if (accountsPermission.Role == "Admin")
             {
-                var result = _accountService.GetUsers();
+                var result = _accountService.GetUsersAsync();
                 return Ok(result);
             }
             return Unauthorized(new { message = "Unauthorized" });
@@ -141,13 +140,13 @@ namespace LitBlog.API.Controllers
 
         [Authorize]
         [HttpGet("{id:int}")]
-        public ActionResult<IList<AccountResponseViewModel>> GetAllAccountById(int id)
+        public async Task<ActionResult<List<AccountResponseViewModel>>> GetAllAccountById(int id)
         {
             var idContext = IdContext.GetUserId(HttpContext);
-            var accountsPermission = _accountService.GetAccountById(idContext);
-            if (accountsPermission.Result.Role == "Admin")
+            var accountsPermission = await _accountService.GetAccountByIdAsync(idContext);
+            if (accountsPermission.Role == "Admin")
             {
-                var result = _accountService.GetAccountById(id);
+                var result = await _accountService.GetAccountByIdAsync(id);
                 return Ok(result);
             }
             return Unauthorized(new { message = "Unauthorized" });
@@ -159,11 +158,11 @@ namespace LitBlog.API.Controllers
         public async Task<ActionResult<AccountResponseViewModel>> CreateAccount(AccountRegisterViewModel create)
         {
             var idContext = IdContext.GetUserId(HttpContext);
-            var accountsPermission = _accountService.GetAccountById(idContext);
-            if (accountsPermission.Result.Role == "Admin")
+            var accountsPermission = await _accountService.GetAccountByIdAsync(idContext);
+            if (accountsPermission.Role == "Admin")
             {
                 var mapModel = _mapper.Map<AccountDto>(create);
-                var createdAccount = await _accountService.Create(mapModel);
+                var createdAccount = await _accountService.CreateAsync(mapModel);
                 var response = _mapper.Map<AccountResponseViewModel>(createdAccount);
                 return Ok(response);
             }
@@ -174,11 +173,11 @@ namespace LitBlog.API.Controllers
         [HttpPut("{id:int}")]
         public async Task<ActionResult<AccountResponseViewModel>> UpdateAccount(int id,UpdateAccountViewModel create)
         {
-            var accountsPermission = _accountService.GetAccountById(id);
-            if (accountsPermission.Result.Role == "Admin")
+            var accountsPermission = await _accountService.GetAccountByIdAsync(id);
+            if (accountsPermission.Role == "Admin")
             {
                 var mapModel = _mapper.Map<UpdateAccountDto>(create);
-                await _accountService.Update(id,mapModel);
+                await _accountService.UpdateAsync(id,mapModel);
              
                 return Ok("Updated");
             }
@@ -187,13 +186,13 @@ namespace LitBlog.API.Controllers
 
         [Authorize]
         [HttpDelete("{id:int}")]
-        public  IActionResult DeleteAccount(int id)
+        public async Task<IActionResult> DeleteAccount(int id)
         {
             var idContext = IdContext.GetUserId(HttpContext);
-            var accountsPermission = _accountService.GetAccountById(idContext);
-            if (accountsPermission.Result.Role == "Admin")
+            var accountsPermission = await _accountService.GetAccountByIdAsync(idContext);
+            if (accountsPermission.Role == "Admin")
             {
-                  _accountService.Delete(id);
+                  await _accountService.DeleteAsync(id);
                 return Ok();
             }
             return Unauthorized(new { message = "Unauthorized" });

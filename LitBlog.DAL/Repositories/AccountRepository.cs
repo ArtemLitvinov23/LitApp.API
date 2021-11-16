@@ -1,10 +1,9 @@
-﻿using System;
+﻿using LitBlog.DAL.Models;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using LitBlog.DAL.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace LitBlog.DAL.Repositories
 {
@@ -17,11 +16,11 @@ namespace LitBlog.DAL.Repositories
             _context = context;
         }
 
-        public IQueryable<Account> GetAllAccounts() => _context.Accounts;
+        public IQueryable<Account> GetAllAccounts() => _context.Accounts.AsQueryable();
 
-        public Account GetAccount(int id)
+        public async Task<Account> GetAccountAsync(int id)
         {
-            var account = _context.Accounts.Find(id);
+            var account = await _context.Accounts.FindAsync(id);
             if (account == null) throw new KeyNotFoundException("Account not found");
             return account;
         }
@@ -29,10 +28,10 @@ namespace LitBlog.DAL.Repositories
         public Account GetRefreshToken(string token) =>  _context.Accounts.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
 
 
-        public async Task<Account> GetAccountById(int accountId) => await _context.Accounts.FirstOrDefaultAsync();
+        public async Task<Account> GetAccountByIdAsync(int accountId) => await _context.Accounts.FirstOrDefaultAsync(x=>x.Id == accountId);
         
 
-        public async Task CreateAccount(Account account)
+        public async Task CreateAccountAsync(Account account)
         {
             if (account is null)
                 throw new NullReferenceException("Account can't be is null");
@@ -41,7 +40,7 @@ namespace LitBlog.DAL.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAccount(Account account)
+        public async Task UpdateAccountAsync(Account account)
         {
             if (account is null)
                 throw new NullReferenceException("Account can't be is null");
@@ -50,14 +49,14 @@ namespace LitBlog.DAL.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public void Delete(int accountId)
+        public async Task DeleteAsync(int accountId)
         {
-            var user = _context.Accounts.FirstOrDefault(x => x.Id == accountId);
+            var user = _context.Accounts.FirstOrDefaultAsync(x => x.Id == accountId);
             if (user is null)
                 throw new NullReferenceException("Account is not found");
 
             _context.Remove(user);
-            _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
     }
 }

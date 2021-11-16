@@ -1,6 +1,6 @@
 ﻿namespace LitBlog.BLL.Jwt
 {
-    public class JWToptions
+    public class JWtOptions
     {
         public string Secret { get; set; }
         public int TokenLifeTime { get; set; }
