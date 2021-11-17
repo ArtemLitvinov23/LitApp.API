@@ -17,7 +17,7 @@ namespace LitBlog.BLL.Services
     public class AccountService : IAccountService
     {
         private readonly IAccountRepository _accountRepository;
-        private readonly IFriendsRepository _friendsRepository;
+        private readonly IFavoritesRepository _favoritesRepository;
         private readonly IEmailService _emailService;
         private readonly IJwtOptions _jwtOptions;
         private readonly IMapper _mapper;
@@ -28,10 +28,10 @@ namespace LitBlog.BLL.Services
             IEmailService emailService,
             IJwtOptions jwtOptions,
             IMapper mapper, IPasswordHasher password,
-            IFriendsRepository friendsRepository)
+            IFavoritesRepository favoritesRepository)
         {
             _accountRepository = accountRepository;
-            _friendsRepository = friendsRepository;
+            _favoritesRepository = favoritesRepository;
             _emailService = emailService;
             _jwtOptions = jwtOptions;
             _mapper = mapper;
@@ -219,6 +219,34 @@ namespace LitBlog.BLL.Services
         public bool ExistsAccount(AccountDto model)
         {
              return _accountRepository.GetAllAccounts().Any(x => x.Email == model.Email);
-        } 
+        }
+
+        public async Task<List<FavoritesResponseDto>> GetAllFavoritesAsync()
+        {
+            var allFavorites = await _favoritesRepository.GetAllFavorites().ToListAsync();
+            var responseDto = _mapper.Map<List<FavoritesResponseDto>>(allFavorites);
+            return responseDto;
+        }
+
+        public async Task<FavoritesResponseDto> GetFavoritesByEmail(FavoritesDto favorites)
+        {
+            var favoritesDto = _mapper.Map<FavoritesList>(favorites);
+            var result = await _favoritesRepository.FindUserByEmail(favoritesDto);
+            var responseDto = _mapper.Map<FavoritesResponseDto>(result);
+            return responseDto;
+            
+        }
+
+        public async Task AddUserToFavoritesAsync(FavoritesDto favorites)
+        {
+            var modelDto = _mapper.Map<FavoritesList>(favorites);
+            await _favoritesRepository.AddUserToFavorites(modelDto);
+        }
+
+        public async Task DeleteUserFromFavoritesAsync(FavoritesDto favorites)
+        {
+            var modelDto = _mapper.Map<FavoritesList>(favorites);
+            await _favoritesRepository.DeleteUserFromFavorites(modelDto);
+        }
     }
 }

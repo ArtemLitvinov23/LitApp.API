@@ -1,9 +1,9 @@
 ﻿namespace LitBlog.BLL.ModelsDto
 {
-    class FriendResponseDto
+    public class FavoritesResponseDto
     {
         public int UserId { get; set; }
 
-        public string FriendEmail { get; set; }
+        public string UserEmail { get; set; }
     }
 }

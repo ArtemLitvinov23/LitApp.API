@@ -19,7 +19,10 @@ namespace LitBlog.BLL.Services.Interfaces
         Task<AccountResponseDto> GetAccountByIdAsync(int accountId);
         Task<AccountResponseDto> CreateAsync(AccountDto model);
         Task<AccountResponseDto> UpdateAsync(int id, UpdateAccountDto model);
-        Task<List<FriendResponseDto>>
+        Task<List<FavoritesResponseDto>> GetAllFavoritesAsync();
+        Task<FavoritesResponseDto> GetFavoritesByEmail(FavoritesDto favorites);
+        Task AddUserToFavoritesAsync(FavoritesDto favorites);
+        Task DeleteUserFromFavoritesAsync(FavoritesDto favorites);
         Task DeleteAsync(int id);
         public bool ExistsAccount(AccountDto model);
 

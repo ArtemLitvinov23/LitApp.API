@@ -42,7 +42,7 @@ namespace LitBlog.DAL.Models
 
         public List<RefreshToken> RefreshTokens { get; set; }
 
-        public virtual ICollection<FriendsList> Friends { get; set; }
+        public virtual ICollection<FavoritesList> Friends { get; set; }
 
         public bool OwnsToken(string token)
         {

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LitBlog.DAL.Models
 {
-    public class FriendsList
+    public class FavoritesList
     {
         [Key]
         public int FriendId { get; set; }
@@ -12,7 +12,7 @@ namespace LitBlog.DAL.Models
         public int AccountId { get; set; }
         public Account Account { get; set; }
 
-        public string FriendEmail { get; set; }
+        public string UserEmail { get; set; }
 
     }
 }
