@@ -121,23 +121,17 @@ namespace LitBlog.API.Controllers
             if (accountsPermission.Role == "Admin")
             {
                 var result = await _accountService.GetAllAsync();
-                return Ok(result);
+                var mapDto = _mapper.Map<List<AccountResponseDto>>(result);
+                return Ok(mapDto);
             }
             return Unauthorized(new { message = "Unauthorized" });
         }
-
-        [Authorize]
         [HttpGet("get-users")]
         public async Task<ActionResult<List<UserResponseViewModel>>> GetAllUsers()
         {
-            var id = IdContext.GetUserId(HttpContext);
-            var accountsPermission =await _accountService.GetAccountByIdAsync(id);
-            if (accountsPermission.Role == "Admin")
-            {
-                var result = _accountService.GetUsersAsync();
-                return Ok(result);
-            }
-            return Unauthorized(new { message = "Unauthorized" });
+            var result = await _accountService.GetUsersAsync();
+            var mapDto = _mapper.Map<List<UsersResponseDto>>(result);
+            return Ok(mapDto);
         }
 
         [Authorize]

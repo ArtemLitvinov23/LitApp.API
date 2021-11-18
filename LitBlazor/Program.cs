@@ -2,6 +2,7 @@ using LitBlazor.Services;
 using LitBlazor.Services.Interfaces;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Syncfusion.Blazor;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace LitBlazor
             {
                 var builder = WebAssemblyHostBuilder.CreateDefault(args);
                 builder.RootComponents.Add<App>("#app");
-
+            builder.Services.AddSyncfusionBlazor();
             builder.Services
                .AddScoped<IAccountService, AccountService>()
                .AddScoped<IHttpService, HttpService>()

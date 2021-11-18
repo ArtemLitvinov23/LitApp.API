@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using LitBlazor.Models;
 using System.Threading.Tasks;
 
@@ -15,10 +14,9 @@ namespace LitBlazor
         Task ResetPassword(ResetPassword model);
         Task ForgotPassword(ForgotPassword model);
         Task Verify(VerifyAccount model);
-        Task<IList<Account>> GetAll();
+        Task<List<Account>> GetAll();
         Task<Account> GetById(int id);
         Task Update(int id, UpdateAccount model);
         Task Delete(int id);
-        Task<IList<Users>> GetAllUsers();
     }
 }

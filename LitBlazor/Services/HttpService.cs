@@ -81,6 +81,7 @@ namespace LitBlazor.Services
             return request;
         }
 
+
         private async Task AddJwtHeader(HttpRequestMessage request)
         {
             // add jwt auth header if user is logged in and request is to the api url
@@ -119,7 +120,7 @@ namespace LitBlazor.Services
 
         private async Task<T> SendRequest<T>(HttpRequestMessage request)
         {
-            //await AddJwtHeader(request);
+            await AddJwtHeader(request);
 
             // send request
             using var response = await _httpClient.SendAsync(request);

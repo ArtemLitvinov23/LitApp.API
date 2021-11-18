@@ -39,9 +39,9 @@ namespace LitBlazor.Services
             await _httpService.Post("api/Account/forgot-password", model);
         }
 
-        public async Task<IList<Account>> GetAll()
+        public async Task<List<Account>> GetAll()
         {
-            return await _httpService.Get<IList<Account>>("api/Account");
+            return await _httpService.Get<List<Account>>("api/Account");
         }
 
         public async Task<Account> GetById(int id)
@@ -86,11 +86,6 @@ namespace LitBlazor.Services
         public async Task Verify(VerifyAccount model)
         {
             await _httpService.Post("api/Account/verify", model);
-        }
-
-        public async Task<IList<Users>> GetAllUsers()
-        {
-            return await _httpService.Get<IList<Users>>("api/Account/get-users");
         }
 
         public async Task ResetPassword(ResetPassword model)

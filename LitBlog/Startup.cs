@@ -58,20 +58,6 @@ namespace LitBlog.API
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(x =>
             {
-                x.Events = new JwtBearerEvents
-                {
-                    OnTokenValidated = context =>
-                    {
-                        var accountService = context.HttpContext.RequestServices.GetRequiredService<IAccountService>();
-                        var userId = int.Parse(context.Principal.Identity.Name);
-                        var account = accountService.GetAccountByIdAsync(userId);
-                        if (account == null)
-                        {
-                            context.Fail("Unauthorized");
-                        }
-                        return Task.CompletedTask;
-                    }
-                };
                 x.RequireHttpsMetadata = false;
                 x.SaveToken = true;
                 x.TokenValidationParameters = new TokenValidationParameters

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace LitBlazor.Models
+﻿namespace LitBlazor.Models
 {
     public class Account
     {
