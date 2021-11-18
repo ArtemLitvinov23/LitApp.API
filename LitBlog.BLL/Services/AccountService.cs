@@ -40,8 +40,11 @@ namespace LitBlog.BLL.Services
 
 
         public async Task<AuthenticateResponseDto> AuthenticateAsync(AuthenticateRequestDto authRequest, string ipAddress)
-        { 
+        {
             var account = _accountRepository.GetAllAccounts().FirstOrDefault(x => x.Email == authRequest.Email);
+            if (account is null)
+                throw new ApplicationException();
+         
             if (account != null && account.IsVerified)
                 _password.Verify( authRequest.Password,account.PasswordHash);
             var accountDto = _mapper.Map<AccountDto>(account);

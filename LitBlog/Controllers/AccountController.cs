@@ -34,6 +34,8 @@ namespace LitBlog.API.Controllers
         {
             var requestDto = _mapper.Map<AuthenticateRequestDto>(request);
             var response = await _accountService.AuthenticateAsync(requestDto, IpAddress());
+            if (response is null)
+                return BadRequest($"An account with this {request.Email} does not exist, please register your account");
             SetTokenCookie(response.RefreshToken);
             var mapper = _mapper.Map<AuthenticateResponseViewModel>(response);
             return Ok(mapper);
@@ -53,7 +55,7 @@ namespace LitBlog.API.Controllers
             var account = _mapper.Map<AccountDto>(request);
 
             await _accountService.RegisterAsync(account, Request.Headers["origin"]);
-            return Ok(new { message = "Registration successful" });
+            return Ok(new { message = "Registration successful, please check your email for verify instructions" });
         }
 
         [AllowAnonymous]

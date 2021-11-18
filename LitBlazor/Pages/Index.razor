@@ -6,6 +6,54 @@
     <div class="container">
         <h1>Hi @AccountService.Account.UserName!</h1>
         <p>You're logged in with Blazor WebAssembly!!</p>
-        <p><NavLink href="account/settings">Edit account</NavLink></p>
+
+        <h3>AllUsers</h3>
+        <table class="table table-striped">
+           
+                @foreach (var user in users)
+                {
+                    <tr>
+                        <td>@user.Email</td>
+                        <td>@user.UserName</td>
+                        <td>@user.LastName</td>
+                        <td style="white-space: nowrap">
+                            <button @onclick="@(() => ChatWithUser(user.Email))" class="btn btn-sm btn-outline-success"></button>
+                            <button @onclick="@(() => AddUserToFavorite(user.Email))" class="btn btn-sm btn-outline-success"></button>
+                        </td>
+                    </tr>
+                 }
+            @if (loading)
+            {
+                <tr>
+                    <td colspan="4" class="text-center">
+                        <span class="spinner-border spinner-border-lg align-center"></span>
+                    </td>
+                </tr>
+            }
+        </table>
+
+        @code {
+            private bool loading;
+            private IList<Users> users;
+
+            protected override async Task OnInitializedAsync()
+            {
+                loading = true;
+                users = await AccountService.GetAllUsers();
+                loading = false;
+            }
+
+            private async void ChatWithUser(string email)
+            {
+                var user = users.First(x => x.Email == email);
+                StateHasChanged();
+            }
+
+            private async void AddUserToFavorite(string email)
+            {
+                var user = users.First(x => x.Email == email);
+                StateHasChanged();
+            }
+        }
     </div>
 </div>

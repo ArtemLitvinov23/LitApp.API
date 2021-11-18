@@ -46,12 +46,12 @@ namespace LitBlog.BLL.Services
             string message;
             if (!string.IsNullOrEmpty(origin))
             {
-                var verifyUrl = $"{origin}/Account/verify-email?token={account.VerificationToken}";
+                var verifyUrl = $"{origin}/Account/verify?token={account.VerificationToken}";
                 message = $@"<p>Please click the below link to verify your email address:</p>
                              <p><a href=""{verifyUrl}"">{verifyUrl}</a></p>";
             }
             else
-                message = $@"<p>Please use the below token to verify your email address with the <code>{origin}/Account/verify</code> api route:</p>
+                message = $@"<p>Please use the below token to verify your email address with the <code>{origin}/account/verify</code> api route:</p>
                              <p><code>{account.VerificationToken}</code></p>";
 
             await SendAsync(account.Email, "Sign-up Verification API - Verify Email",
@@ -65,9 +65,9 @@ namespace LitBlog.BLL.Services
         {
             string message;
             if (!string.IsNullOrEmpty(origin))
-                message = $@"<p>If you don't know your password please visit the <a href=""{origin}/Account/forgot-password"">forgot password</a> page.</p>";
+                message = $@"<p>If you don't know your password please visit the <a href=""{origin}/account/forgot-password"">forgot password</a> page.</p>";
             else
-                message = "<p>If you don't know your password you can reset it via the <code>/Account//forgot-password</code> api route.</p>";
+                message = "<p>If you don't know your password you can reset it via the <code>/account/forgot-password</code> api route.</p>";
 
             await SendAsync(
                 email,
@@ -83,12 +83,12 @@ namespace LitBlog.BLL.Services
             string message;
             if (!string.IsNullOrEmpty(origin))
             {
-                var resetUrl = $"{origin}/Account/reset-password?token={account.ResetToken}";
+                var resetUrl = $"{origin}/account/reset-password?token={account.ResetToken}";
                 message = $@"<p>Please click the below link to reset your password, the link will be valid for 1 day:</p>
                              <p><a href=""{resetUrl}"">{resetUrl}</a></p>";
             }
             else
-                message = $@"<p>Please use the below token to reset your password with the <code>/accounts/reset-password</code> api route:</p>
+                message = $@"<p>Please use the below token to reset your password with the <code>/account/reset-password</code> api route:</p>
                              <p><code>{account.ResetToken}</code></p>";
 
             await SendAsync(

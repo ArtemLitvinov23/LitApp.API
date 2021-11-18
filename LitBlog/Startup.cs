@@ -47,6 +47,7 @@ namespace LitBlog.API
             services.AddTransient<IJwtOptions, JwtService>();
             services.AddTransient<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IFavoritesRepository, FavoritesRepository>();
             services.AddScoped<IChatRepository, ChatRepository>();
             services.AddScoped<IChatService, ChatService>();
 
