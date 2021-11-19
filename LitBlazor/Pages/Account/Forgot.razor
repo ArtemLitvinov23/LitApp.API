@@ -49,7 +49,7 @@
         try
         {
             await AccountService.ForgotPassword(forgotPassword);
-            NavigationManager.NavigateTo("account/login");
+            NavigationManager.NavigateTo("account/reset-password");
         }
         catch (Exception ex)
         {

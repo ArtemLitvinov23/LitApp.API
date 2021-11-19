@@ -85,10 +85,10 @@ namespace LitBlazor.Services
         private async Task AddJwtHeader(HttpRequestMessage request)
         {
             // add jwt auth header if user is logged in and request is to the api url
-            var token = await _localStorageService.GetItem<Account>("account");
+            var savedToken = await _localStorageService.GetItemAsync<Account>("account");
             var isApiUrl = !request.RequestUri.IsAbsoluteUri;
-            if (token != null && isApiUrl)
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
+            if (savedToken != null && isApiUrl)
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", savedToken.jwtToken);
         }
 
         private static async Task HandlerError(HttpResponseMessage response)

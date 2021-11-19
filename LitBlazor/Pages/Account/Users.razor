@@ -3,6 +3,8 @@
 @layout MainLayout
 @inject IAccountService AccountService
 @inject HttpClient HttpClient
+@inject ILocalStorageService localStorageService 
+@using System.Net.Http.Headers
 
 <div class="container">
     <h3 class="p-3 text-center">Blazor WebAssembly - Display a list of all users</h3>
@@ -49,6 +51,8 @@
         try
         {
             var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost:44311/api/Account/get-users");
+            var savedToken = await localStorageService.GetItemAsync<Models.Account>("account");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", savedToken.jwtToken);
             using var httpResponse = await HttpClient.SendAsync(request);
             users = await httpResponse.Content.ReadFromJsonAsync<Models.Users[]>();
         }

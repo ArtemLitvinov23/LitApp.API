@@ -1,6 +1,6 @@
 ﻿using LitBlazor.Services.Interfaces;
 using Microsoft.JSInterop;
-using System.Collections.Generic;
+using Newtonsoft.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -15,19 +15,19 @@ namespace LitBlazor.Services
             _jsRuntime = jSRuntime;
         }
 
-        public async Task<T> GetItem<T>(string key)
+        public async Task<T> GetItemAsync<T>(string key)
         {
             var json = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", key);
 
             if (json == null)
                 return default;
 
-            return JsonSerializer.Deserialize<T>(json);
+            return System.Text.Json.JsonSerializer.Deserialize<T>(json);
         }
 
         public async Task SetItem<T>(string key, T value)
         {
-            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", key, JsonSerializer.Serialize(value));
+            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", key, System.Text.Json.JsonSerializer.Serialize(value));
         }
 
         public async Task RemoveItem(string key)

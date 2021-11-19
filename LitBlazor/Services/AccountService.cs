@@ -39,9 +39,9 @@ namespace LitBlazor.Services
             await _httpService.Post("api/Account/forgot-password", model);
         }
 
-        public async Task<List<Account>> GetAll()
+        public async Task<IList<Account>> GetAll()
         {
-            return await _httpService.Get<List<Account>>("api/Account");
+            return await _httpService.Get<IList<Account>>("api/Account");
         }
 
         public async Task<Account> GetById(int id)
@@ -51,7 +51,7 @@ namespace LitBlazor.Services
 
         public async Task Initialize()
         {
-            Account = await _localStorageService.GetItem<Account>("account");
+            Account = await _localStorageService.GetItemAsync<Account>("account");
         }
 
         public async Task Login(AuthAccount model)
@@ -72,15 +72,13 @@ namespace LitBlazor.Services
             await _httpService.Post("api/Account/register", model);
         }
 
-        public async Task Update(int id,UpdateAccount model)
+        public async Task Update(UpdateAccount model)
         {
-            await _httpService.Put("api/Account/{id}", model);
-            if (id == Account.Id)
-            {
-                Account.UserName = model.UserName;
-                Account.LastName = model.LastName;
-                await _localStorageService.SetItem("account", Account);
-            }
+            await _httpService.Put("api/Account", model);
+
+            Account.UserName = model.UserName;
+            Account.LastName = model.LastName;
+            await _localStorageService.SetItem("Token", Account.jwtToken);
         }
 
         public async Task Verify(VerifyAccount model)
@@ -92,5 +90,6 @@ namespace LitBlazor.Services
         {
             await _httpService.Post("api/Account/forgot-password", model);
         }
+
     }
 }

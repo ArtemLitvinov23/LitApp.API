@@ -1,5 +1,6 @@
-﻿@page "/account/settings/{Id}"
+﻿@page "/account/settings"
 @attribute [Authorize]
+@layout MainLayout
 @inject IAccountService AccountService
 @inject NavigationManager NavigationManager
 
@@ -9,7 +10,7 @@
 {
     <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
         <DataAnnotationsValidator />
-        <div class="form-row">
+        <div class="form-group">
             <div class="form-group col">
                 <label>First Name</label>
                 <InputText @bind-Value="model.UserName" class="form-control" />
@@ -29,14 +30,7 @@
                 }
                 Save
             </button>
-            <button disabled="@loading" class="btn btn-primary">
-                @if (loading)
-                {
-                    <span class="spinner-border spinner-border-sm mr-1"></span>
-                }
-                Login
-            </button>
-            <NavLink href="users" class="btn btn-link">Cancel</NavLink>
+            <NavLink href="" class="btn btn-link">Cancel</NavLink>
         </div>
     </EditForm>
 }
@@ -50,13 +44,10 @@ else
     private UpdateAccount model;
     private bool loading;
 
-    [Parameter]
-    public int Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        var user = await AccountService.GetById(Id);
-        model = new UpdateAccount(user);
+        model = new UpdateAccount();
     }
 
     private async void OnValidSubmit()
@@ -64,9 +55,9 @@ else
         loading = true;
         try
         {
-            await AccountService.Update(Id, model);
+            await AccountService.Update(model);
         
-            NavigationManager.NavigateTo("/account");
+            NavigationManager.NavigateTo("");
         }
         catch 
         {

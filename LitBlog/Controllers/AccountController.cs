@@ -126,6 +126,8 @@ namespace LitBlog.API.Controllers
             }
             return Unauthorized(new { message = "Unauthorized" });
         }
+
+        [Authorize]
         [HttpGet("get-users")]
         public async Task<ActionResult<List<UserResponseViewModel>>> GetAllUsers()
         {
@@ -166,14 +168,15 @@ namespace LitBlog.API.Controllers
         }
 
         [Authorize]
-        [HttpPut("{id:int}")]
-        public async Task<ActionResult<AccountResponseViewModel>> UpdateAccount(int id,UpdateAccountViewModel create)
+        [HttpPut]
+        public async Task<ActionResult<AccountResponseViewModel>> UpdateAccount(UpdateAccountViewModel create)
         {
-            var accountsPermission = await _accountService.GetAccountByIdAsync(id);
+            var idContext = IdContext.GetUserId(HttpContext);
+            var accountsPermission = await _accountService.GetAccountByIdAsync(idContext);
             if (accountsPermission.Role == "Admin")
             {
                 var mapModel = _mapper.Map<UpdateAccountDto>(create);
-                await _accountService.UpdateAsync(id,mapModel);
+                await _accountService.UpdateAsync(idContext,mapModel);
              
                 return Ok("Updated");
             }
