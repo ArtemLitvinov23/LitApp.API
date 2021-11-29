@@ -28,6 +28,10 @@ namespace LitBlazor.Services
         {
             return await _httpClient.GetFromJsonAsync<List<ApplicationUser>>($"api/chat/users");
         }
+        public async Task<Users> GetUsersId()
+        {
+            return await _httpClient.GetFromJsonAsync<Users>($"api/chat");
+        }
 
         public async Task SaveMessageAsync(ChatMessage chatMessage)
         {

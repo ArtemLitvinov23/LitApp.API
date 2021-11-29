@@ -23,6 +23,12 @@ namespace LitBlog.API.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
+        public IActionResult GetUserId()
+        {
+            var user = IdContext.GetUserId(HttpContext);
+            return Ok(user);
+        }
 
         [HttpGet("users")]
         public async Task<IActionResult> GetAllUser()

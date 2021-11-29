@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
 
 namespace LitBlazor.Models
 {
-    public class ApplicationUser
+    public class ApplicationUser : IdentityUser
     {
         public int Id { get; set; }
         public virtual ICollection<ChatMessage> ChatMessagesFromUsers { get; set; }

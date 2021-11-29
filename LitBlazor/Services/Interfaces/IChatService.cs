@@ -10,5 +10,6 @@ namespace LitBlazor.Services.Interfaces
         Task SaveMessageAsync(ChatMessage chatMessage);
         Task<List<ChatMessage>> GetConversationAsync(string contactId);
         Task<ApplicationUser> GetUserDetailsAsync(string userId);
+        Task<Users> GetUsersId();
     }
 }

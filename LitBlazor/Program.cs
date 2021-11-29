@@ -5,16 +5,17 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using MudBlazor;
+using MudBlazor.Services;
 
 namespace LitBlazor
 {
     public class Program
     {
-   
-            public static async Task Main(string[] args)
-            {
-                var builder = WebAssemblyHostBuilder.CreateDefault(args);
-                builder.RootComponents.Add<App>("#app");
+        public static async Task Main(string[] args)
+        {
+            var builder = WebAssemblyHostBuilder.CreateDefault(args);
+            builder.RootComponents.Add<App>("#app");
             builder.Services
                .AddScoped<IAccountService, AccountService>()
                .AddScoped<IHttpService, HttpService>()
@@ -23,17 +24,18 @@ namespace LitBlazor
 
             // configure http client
             builder.Services.AddScoped(x => {
-                    var apiUrl = new Uri(builder.Configuration["apiUrl"]);
+                var apiUrl = new Uri(builder.Configuration["apiUrl"]);
 
-                    return new HttpClient() { BaseAddress = apiUrl };
-                });
+                return new HttpClient() { BaseAddress = apiUrl };
+            });
 
-                var host = builder.Build();
+            builder.Services.AddMudServices(c => { c.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight; });
+            var host = builder.Build();
 
-                var accountService = host.Services.GetRequiredService<IAccountService>();
-                await accountService.Initialize();
+            var accountService = host.Services.GetRequiredService<IAccountService>();
+            await accountService.Initialize();
 
-                await host.RunAsync();
-            }
+            await host.RunAsync();
+        }
     }
 }
