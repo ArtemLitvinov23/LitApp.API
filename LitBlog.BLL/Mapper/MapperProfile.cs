@@ -21,6 +21,7 @@ namespace LitBlog.BLL.Mapper
             CreateMap<ResetPasswordRequestDto, object>().ReverseMap();
             CreateMap<ForgotPasswordRequestDto, object>().ReverseMap();
             CreateMap<ChatMessage, ChatMessageDto>();
+            CreateMap<ApplicationUser, ApplicationUserDto>();
 
         }
     }

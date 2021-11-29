@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using LitBlog.API.Models;
 using LitBlog.BLL.ModelsDto;
 
@@ -21,6 +17,7 @@ namespace LitBlog.API.Helpers
             CreateMap<ResetPasswordRequestDto, ResetPasswordRequestViewModel>().ReverseMap();
             CreateMap<ForgotPasswordRequestDto, ForgotPasswordRequestViewModel>().ReverseMap();
             CreateMap<ChatMessageDto, ChatMessageModel>().ReverseMap();
+            CreateMap<ApplicationUserDto, ApplicationUserViewModel>().ReverseMap();
         }
     }
 }

@@ -24,14 +24,14 @@ namespace LitBlog.API.Controllers
         }
 
 
-        [HttpGet("User")]
+        [HttpGet("users")]
         public async Task<IActionResult> GetAllUser()
         {
             var accounts = await _chatService.GetAllUsersAsync();
             return Ok(accounts);
         }
 
-        [HttpGet("User/{id}")]
+        [HttpGet("users/{id}")]
         public async Task<IActionResult> GetUserDetails(int id)
         {
             var accounts = await _chatService.GetUserAsync(id);

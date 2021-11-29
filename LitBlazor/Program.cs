@@ -18,7 +18,8 @@ namespace LitBlazor
             builder.Services
                .AddScoped<IAccountService, AccountService>()
                .AddScoped<IHttpService, HttpService>()
-               .AddScoped<ILocalStorageService, LocalStorageService>();
+               .AddScoped<ILocalStorageService, LocalStorageService>()
+               .AddTransient<IChatService, ChatService>();
 
             // configure http client
             builder.Services.AddScoped(x => {
