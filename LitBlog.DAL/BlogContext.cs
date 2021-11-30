@@ -11,7 +11,7 @@ namespace LitBlog.DAL
         public BlogContext(DbContextOptions<BlogContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);
+
             builder.Entity<ChatMessage>(entity =>
             {
                 entity.HasOne(d => d.FromUser)

@@ -4,6 +4,7 @@ namespace LitBlog.BLL.ModelsDto
 {
     public class ApplicationUserDto
     {
+        public int Id { get; set; }
         public virtual ICollection<ChatMessageDto> ChatMessagesFromUsers { get; set; }
         public virtual ICollection<ChatMessageDto> ChatMessagesToUsers { get; set; }
         public ApplicationUserDto()

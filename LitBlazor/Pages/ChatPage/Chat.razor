@@ -5,6 +5,7 @@
 
 @page "/chat/{ContactId}"
 @page "/chat"
+@using Microsoft.AspNetCore.Components.Authorization
 <div class="d-flex flex-grow-1 flex-row">
     <MudPaper Elevation="25" Class="py-4 flex-grow-1">
         <MudToolBar Dense="true">
@@ -93,7 +94,7 @@
                 ToUserId = ContactId,
                 CreatedDate = DateTime.Now
             };
-            await _chatService.SaveMessageAsync(chatHistory);
+            await _chatService.SaveMessageAsync(chatHistory,ContactId);
             chatHistory.FromUserId = CurrentUserId;
             await hubConnection.SendAsync("SendMessageAsync", chatHistory, CurrentUserEmail);
             CurrentMessage = string.Empty;
@@ -103,7 +104,7 @@
     {
         if (hubConnection == null)
         {
-            hubConnection = new HubConnectionBuilder().WithUrl(_navigationManager.ToAbsoluteUri("/signalRHub")).Build();
+            hubConnection = new HubConnectionBuilder().WithUrl("https://localhost:44311/signalRHub").Build();
         }
         if (hubConnection.State == HubConnectionState.Disconnected)
         {
@@ -127,7 +128,8 @@
             }
         });
         await GetUsersAsync();
-        var user = await _chatService.GetUsersId();
+
+        var user = await accountService.GetUserDataFromLocalStorage();
         CurrentUserId = user.Id.ToString();
         CurrentUserEmail = user.Email;
         if (!string.IsNullOrEmpty(ContactId))
@@ -145,7 +147,7 @@
         ContactEmail = contact.Email;
         _navigationManager.NavigateTo($"chat/{ContactId}");
         messages = new List<ChatMessage>();
-        messages = await _chatService.GetConversationAsync(ContactId);
+        messages = await _chatService.GetConversationAsync(CurrentUserId,ContactId);
     }
     private async Task GetUsersAsync()
     {

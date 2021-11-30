@@ -91,5 +91,7 @@ namespace LitBlazor.Services
             await _httpService.Post("api/Account/forgot-password", model);
         }
 
+        public async Task<Account> GetUserDataFromLocalStorage()=> await _localStorageService.GetItemAsync<Account>("account");
+
     }
 }

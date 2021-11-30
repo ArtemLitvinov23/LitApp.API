@@ -13,7 +13,7 @@ namespace LitBlog.DAL.Repositories
             _blogContext = blogContext;
         }
 
-        public async Task GetConversationAsync(int userId, int contactId)
+        public async Task GetConversationAsync(string userId, string contactId)
         {
             var message = await _blogContext.ChatMessages
                 .Where(h => (h.FromUserId == contactId && h.ToUserId == userId) || (h.FromUserId == userId && h.ToUserId == contactId))
@@ -31,7 +31,7 @@ namespace LitBlog.DAL.Repositories
                 }).ToListAsync();
         }
 
-        public async Task SaveMessageAsync(ChatMessage message)
+        public async Task SaveMessageAsync(ChatMessage message,string userId)
         {
             await _blogContext.ChatMessages.AddAsync(message);
             await _blogContext.SaveChangesAsync();

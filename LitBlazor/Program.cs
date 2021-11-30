@@ -31,7 +31,7 @@ namespace LitBlazor
 
             builder.Services.AddMudServices(c => { c.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight; });
             var host = builder.Build();
-
+            builder.Services.AddApiAuthorization();
             var accountService = host.Services.GetRequiredService<IAccountService>();
             await accountService.Initialize();
 

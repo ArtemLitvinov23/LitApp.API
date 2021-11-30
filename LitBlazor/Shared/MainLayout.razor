@@ -2,6 +2,8 @@
 @using Microsoft.AspNetCore.SignalR.Client
 @inject IAccountService AccountService
 @inject NavigationManager NavigationManager
+@inject ISnackbar _snackBar
+@inject IChatService _chatService
 
 
 @if (LoggedIn)
@@ -47,5 +49,32 @@
     public bool LoggedIn
     {
         get { return AccountService.Account != null; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder().WithUrl("https://localhost:44311/signalRHub").Build();
+        await hubConnection.StartAsync();
+        hubConnection.On<string, string, string>("ReceiveChatNotification", (message, receiverUserId, senderUserId) =>
+        {
+            if (CurrentUserId == receiverUserId)
+            {
+                _snackBar.Add(message, Severity.Info, config =>
+                {
+                    config.VisibleStateDuration = 10000;
+                    config.HideTransitionDuration = 500;
+                    config.ShowTransitionDuration = 500;
+                    config.Action = "Chat?";
+                    config.ActionColor = Color.Info;
+                    config.Onclick = snackbar =>
+                    {
+                        NavigationManager.NavigateTo($"chat/{senderUserId}");
+                        return Task.CompletedTask;
+                    };
+                });
+            }
+        });
+        var user = await AccountService.GetUserDataFromLocalStorage();
+        CurrentUserId = user.Id.ToString();
     }
 }

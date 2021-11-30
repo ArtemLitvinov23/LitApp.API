@@ -6,7 +6,7 @@ namespace LitBlog.DAL.Models
     public class ApplicationUser
     {
         [Key]
-        public int Id { get; set; }
+        public string Id { get; set; }
         public virtual ICollection<ChatMessage> ChatMessagesFromUsers { get; set; }
         public virtual ICollection<ChatMessage> ChatMessagesToUsers { get; set; }
         public ApplicationUser()

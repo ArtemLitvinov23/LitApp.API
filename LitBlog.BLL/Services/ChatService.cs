@@ -30,26 +30,26 @@ namespace LitBlog.BLL.Services
             
         }
 
-        public async Task GetConversationAsync(int userId, int contactId)
+        public async Task GetConversationAsync(string userId, string contactId)
         {
             await _chatRepository.GetConversationAsync(userId, contactId);
         }
 
-        public async Task<UsersResponseDto> GetUserAsync(int userId)
+        public async Task<UsersResponseDto> GetUserAsync(string userId)
         {
-            var account = await _accountRepository.GetAllAccounts().Where(x => x.Id == userId).FirstOrDefaultAsync();
+            var account = await _accountRepository.GetAllAccounts().Where(x => x.Id == Convert.ToInt32(userId)).FirstOrDefaultAsync();
             var user = _mapper.Map<UsersResponseDto>(account);
             return user;
 
         }
 
-        public async Task SaveMessageAsync(int userId,ChatMessageDto chatMessage)
+        public async Task SaveMessageAsync(string userId,ChatMessageDto chatMessage)
         {
             chatMessage.FromUserId = userId;
             chatMessage.CreatedDate = DateTime.UtcNow;
-            chatMessage.ToUser = _mapper.Map<ApplicationUserDto>(_accountRepository.GetAllAccounts().Where(user => user.Id == chatMessage.ToUserId).FirstOrDefault());
+            chatMessage.ToUser = _mapper.Map<ApplicationUserDto>(_accountRepository.GetAllAccounts().Where(user => user.Id == Convert.ToInt32(chatMessage.ToUserId)).FirstOrDefault());
             var messageDto = _mapper.Map<ChatMessage>(chatMessage);
-            await _chatRepository.SaveMessageAsync(messageDto);
+            await _chatRepository.SaveMessageAsync(messageDto, userId);
         }
     }
 }

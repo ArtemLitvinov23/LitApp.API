@@ -7,9 +7,8 @@ namespace LitBlazor.Services.Interfaces
     public interface IChatService
     {
         Task<List<ApplicationUser>> GetUsersAsync();
-        Task SaveMessageAsync(ChatMessage chatMessage);
-        Task<List<ChatMessage>> GetConversationAsync(string contactId);
+        Task SaveMessageAsync(ChatMessage chatMessage,string contactId);
+        Task<List<ChatMessage>> GetConversationAsync(string contactId, string userId);
         Task<ApplicationUser> GetUserDetailsAsync(string userId);
-        Task<Users> GetUsersId();
     }
 }

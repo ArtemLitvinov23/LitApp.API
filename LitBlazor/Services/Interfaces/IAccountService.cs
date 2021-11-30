@@ -18,5 +18,6 @@ namespace LitBlazor
         Task<Account> GetById(int id);
         Task Update(UpdateAccount model);
         Task Delete(int id);
+        Task<Account> GetUserDataFromLocalStorage();
     }
 }
