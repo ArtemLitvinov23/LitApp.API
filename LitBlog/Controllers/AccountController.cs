@@ -98,13 +98,7 @@ namespace LitBlog.API.Controllers
         [HttpPost("revoke-token")]
         public IActionResult RevokeToken(RevokeTokenRequestViewModel model)
         {
-            var id = IdContext.GetUserId(HttpContext);
-            var userPermission = _accountService.GetAccountByIdAsync(id);
-            if (userPermission.Result.Role != "Admin")
-                return Unauthorized(new { message = "Unauthorized" });
-
             var token = model.Token ?? Request.Cookies["refreshToken"];
-
             if (string.IsNullOrEmpty(token))
                 return BadRequest(new { message = "Token is required" });
 
@@ -116,15 +110,9 @@ namespace LitBlog.API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<AccountResponseViewModel>>> GetAllAccount()
         {
-            var id = IdContext.GetUserId(HttpContext);
-            var accountsPermission = await _accountService.GetAccountByIdAsync(id);
-            if (accountsPermission.Role == "Admin")
-            {
-                var result = await _accountService.GetAllAsync();
-                var mapDto = _mapper.Map<List<AccountResponseDto>>(result);
-                return Ok(mapDto);
-            }
-            return Unauthorized(new { message = "Unauthorized" });
+            var result = await _accountService.GetAllAsync();
+            var mapDto = _mapper.Map<List<AccountResponseDto>>(result);
+            return Ok(mapDto);
         }
 
         [Authorize]
@@ -132,13 +120,20 @@ namespace LitBlog.API.Controllers
         public async Task<ActionResult<List<UserResponseViewModel>>> GetAllUsers()
         {
             var result = await _accountService.GetUsersAsync();
-            var mapDto = _mapper.Map<List<UsersResponseDto>>(result);
-            return Ok(mapDto);
+            return Ok(_mapper.Map<List<UserResponseViewModel>>(result));
+        }
+
+        [Authorize]
+        [HttpGet("get-users/{id}")]
+        public async Task<ActionResult<UserResponseViewModel>> GetUserById(int id)
+        {
+            var result = await _accountService.GetUserByIdAsync(id);
+            return Ok(_mapper.Map<UserResponseViewModel>(result));
         }
 
         [Authorize]
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<List<AccountResponseViewModel>>> GetAllAccountById(int id)
+        public async Task<ActionResult<List<AccountResponseViewModel>>> GetAccountById(int id)
         {
             var idContext = IdContext.GetUserId(HttpContext);
             var accountsPermission = await _accountService.GetAccountByIdAsync(idContext);
@@ -157,14 +152,13 @@ namespace LitBlog.API.Controllers
         {
             var idContext = IdContext.GetUserId(HttpContext);
             var accountsPermission = await _accountService.GetAccountByIdAsync(idContext);
-            if (accountsPermission.Role == "Admin")
-            {
-                var mapModel = _mapper.Map<AccountDto>(create);
-                var createdAccount = await _accountService.CreateAsync(mapModel);
-                var response = _mapper.Map<AccountResponseViewModel>(createdAccount);
-                return Ok(response);
-            }
-            return Unauthorized(new { message = "Unauthorized" }); 
+            if (accountsPermission.Role != "Admin")
+                return BadRequest(new { message = "You don't have permissions" });
+
+            var mapModel = _mapper.Map<AccountDto>(create);
+            var createdAccount = await _accountService.CreateAsync(mapModel);
+            var response = _mapper.Map<AccountResponseViewModel>(createdAccount);
+            return Ok(response);
         }
 
         [Authorize]
@@ -173,14 +167,12 @@ namespace LitBlog.API.Controllers
         {
             var idContext = IdContext.GetUserId(HttpContext);
             var accountsPermission = await _accountService.GetAccountByIdAsync(idContext);
-            if (accountsPermission.Role == "Admin")
-            {
-                var mapModel = _mapper.Map<UpdateAccountDto>(create);
-                await _accountService.UpdateAsync(idContext,mapModel);
-             
-                return Ok("Updated");
-            }
-            return Unauthorized(new { message = "Unauthorized" });
+            if (accountsPermission.Role != "Admin")
+                return BadRequest(new { message = "You don't have permissions" });
+
+            var mapModel = _mapper.Map<UpdateAccountDto>(create);
+            await _accountService.UpdateAsync(idContext,mapModel);
+            return Ok("Updated");
         }
 
         [Authorize]
@@ -189,12 +181,11 @@ namespace LitBlog.API.Controllers
         {
             var idContext = IdContext.GetUserId(HttpContext);
             var accountsPermission = await _accountService.GetAccountByIdAsync(idContext);
-            if (accountsPermission.Role == "Admin")
-            {
-                  await _accountService.DeleteAsync(id);
-                return Ok();
-            }
-            return Unauthorized(new { message = "Unauthorized" });
+            if (accountsPermission.Role != "Admin")
+                return BadRequest(new { message = "You don't have permissions" });
+
+            await _accountService.DeleteAsync(id);
+            return Ok();
         }
         private void SetTokenCookie(string token)
         {

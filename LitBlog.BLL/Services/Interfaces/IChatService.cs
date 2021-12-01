@@ -4,11 +4,9 @@ using System.Threading.Tasks;
 
 namespace LitBlog.BLL.Services
 {
-   public interface IChatService
+    public interface IChatService
     {
-        public Task GetConversationAsync(string userId, string contactId);
-        public Task<UsersResponseDto> GetUserAsync(string userId);
-        public Task<List<UsersResponseDto>> GetAllUsersAsync();
-        public Task SaveMessageAsync(string id,ChatMessageDto chatMessage);
+        public Task<List<ChatMessageDto>> GetConversationAsync(int userId, int contactId);
+        public Task SaveMessageAsync(int userId,ChatMessageDto chatMessage);
     }
 }

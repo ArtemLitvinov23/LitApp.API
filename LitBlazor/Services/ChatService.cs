@@ -19,36 +19,36 @@ namespace LitBlazor.Services
             _httpClient = httpClient;
             _localStorageService = localStorageService;
         }
-        public async Task<List<ChatMessage>> GetConversationAsync(string userId, string contactId)
+        public async Task<List<ChatMessage>> GetConversationAsync(string contactId)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"api/chat/{userId}/{contactId}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/Chat/{contactId}");
             var savedToken = await _localStorageService.GetItemAsync<Account>("account");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", savedToken.jwtToken);
             var httpResponse = await _httpClient.SendAsync(request);
             return await httpResponse.Content.ReadFromJsonAsync<List<ChatMessage>>();
         }
 
-        public async Task<ApplicationUser> GetUserDetailsAsync(string userId)
+        public async Task<Users> GetUserDetailsAsync(string userId)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"api/chat/users/{userId}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/Account/get-users/{userId}");
             var savedToken = await _localStorageService.GetItemAsync<Account>("account");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", savedToken.jwtToken);
             var httpResponse = await _httpClient.SendAsync(request);
-            return await httpResponse.Content.ReadFromJsonAsync<ApplicationUser>();
+            return await httpResponse.Content.ReadFromJsonAsync<Users>();
         }
 
-        public async Task<List<ApplicationUser>> GetUsersAsync()
+        public async Task<List<Users>> GetAllUsersAsync()
         { 
-            var request = new HttpRequestMessage(HttpMethod.Get, "api/chat/users");
+            var request = new HttpRequestMessage(HttpMethod.Get, "api/Account/get-users");
             var savedToken = await _localStorageService.GetItemAsync<Account>("account");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", savedToken.jwtToken);
             var httpResponse = await _httpClient.SendAsync(request);
-            return await httpResponse.Content.ReadFromJsonAsync<List<ApplicationUser>>();
+            return await httpResponse.Content.ReadFromJsonAsync<List<Users>>();
         }
 
-        public async Task SaveMessageAsync(ChatMessage chatMessage,string currentUserId)
+        public async Task SaveMessageAsync(ChatMessage chatMessage)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, $"api/chat/{currentUserId}");
+            var request = new HttpRequestMessage(HttpMethod.Post, $"api/Chat");
             var savedToken = await _localStorageService.GetItemAsync<Account>("account");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", savedToken.jwtToken);
             request.Content = new StringContent(JsonSerializer.Serialize(chatMessage), Encoding.UTF8, "application/json");

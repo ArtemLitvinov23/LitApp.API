@@ -15,6 +15,7 @@ namespace LitBlog.BLL.Services.Interfaces
         Task ValidateResetTokenAsync(RevokeTokenRequestDto model);
         Task ResetPasswordAsync(ResetPasswordRequestDto model);
         Task<List<UsersResponseDto>> GetUsersAsync();
+        Task<UsersResponseDto> GetUserByIdAsync(int id);
         Task<List<AccountResponseDto>> GetAllAsync();
         Task<AccountResponseDto> GetAccountByIdAsync(int accountId);
         Task<AccountResponseDto> CreateAsync(AccountDto model);

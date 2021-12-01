@@ -169,6 +169,12 @@ namespace LitBlog.BLL.Services
             return _mapper.Map<List<UsersResponseDto>>(accounts);
         }
 
+        public async Task<UsersResponseDto> GetUserByIdAsync(int id)
+        {
+            var account = await _accountRepository.GetAccountByIdAsync(id);
+            return _mapper.Map<UsersResponseDto>(account);
+        }
+
         public async Task<List<AccountResponseDto>> GetAllAsync()
         {
             var account = await _accountRepository.GetAllAccounts().ToListAsync();
@@ -233,7 +239,7 @@ namespace LitBlog.BLL.Services
 
         public async Task<FavoritesResponseDto> GetFavoritesByEmail(FavoritesDto favorites)
         {
-            var favoritesDto = _mapper.Map<FavoritesList>(favorites);
+            var favoritesDto = _mapper.Map<List>(favorites);
             var result = await _favoritesRepository.FindUserByEmail(favoritesDto);
             var responseDto = _mapper.Map<FavoritesResponseDto>(result);
             return responseDto;
@@ -242,13 +248,13 @@ namespace LitBlog.BLL.Services
 
         public async Task AddUserToFavoritesAsync(FavoritesDto favorites)
         {
-            var modelDto = _mapper.Map<FavoritesList>(favorites);
+            var modelDto = _mapper.Map<List>(favorites);
             await _favoritesRepository.AddUserToFavorites(modelDto);
         }
 
         public async Task DeleteUserFromFavoritesAsync(FavoritesDto favorites)
         {
-            var modelDto = _mapper.Map<FavoritesList>(favorites);
+            var modelDto = _mapper.Map<List>(favorites);
             await _favoritesRepository.DeleteUserFromFavorites(modelDto);
         }
     }

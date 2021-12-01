@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LitBlog.API.Helpers;
 using LitBlog.API.Models;
 using LitBlog.BLL.ModelsDto;
 using LitBlog.BLL.Services;
@@ -22,34 +23,21 @@ namespace LitBlog.API.Controllers
             _mapper = mapper;
         }
 
-
-        [HttpGet("users")]
-        public async Task<IActionResult> GetAllUser()
+        [HttpPost]
+        public async Task<IActionResult> SaveMessageAsync(ChatMessageModel message)
         {
-            var accounts = await _chatService.GetAllUsersAsync();
-            return Ok(accounts);
-        }
-
-        [HttpGet("users/{id}")]
-        public async Task<IActionResult> GetUserDetails(string id)
-        {
-            var accounts = await _chatService.GetUserAsync(id);
-            return Ok(accounts);
-        }
-
-        [HttpPost("{currentUserId}")]
-        public async Task<IActionResult> SaveMessageAsync(ChatMessageModel message,string currentUserId)
-        {
+            var currentUserId = IdContext.GetUserId(HttpContext);
             var messageDto = _mapper.Map<ChatMessageDto>(message);
             await _chatService.SaveMessageAsync(currentUserId,messageDto);
             return Ok();
         }
 
-        [HttpGet("{userId}/{contactId}")]
-        public async Task<IActionResult> GetConversationAsync(string userId ,string contactId)
+        [HttpGet("{contactId}")]
+        public async Task<IActionResult> GetConversationAsync(int contactId)
         {
-            await _chatService.GetConversationAsync(userId, contactId);
-            return Ok();
+            var currentUserId = IdContext.GetUserId(HttpContext);
+            var result = await _chatService.GetConversationAsync(currentUserId, contactId);
+            return Ok(result);
         }
     }
 }

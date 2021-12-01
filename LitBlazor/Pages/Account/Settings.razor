@@ -5,34 +5,43 @@
 @inject NavigationManager NavigationManager
 
 
-<h1>Edit User</h1>
 @if (model != null)
 {
+<MudContainer Style="display: inline-block; position: relative; top: 0; bottom: 0; left: 0; right: 0; width: 400px; height: 100px; margin: auto; ">
     <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
         <DataAnnotationsValidator />
-        <div class="form-group">
-            <div class="form-group col">
-                <label>First Name</label>
-                <InputText @bind-Value="model.UserName" class="form-control" />
-                <ValidationMessage For="@(() => model.UserName)" />
-            </div>
-            <div class="form-group col">
-                <label>Last Name</label>
-                <InputText @bind-Value="model.LastName" class="form-control" />
-                <ValidationMessage For="@(() => model.LastName)" />
-            </div>
-        </div>
-        <div class="form-group">
-            <button disabled="@loading" class="btn btn-primary">
-                @if (loading)
+        <MudCard>
+            <MudCardContent>
+                <MudTextField Label="First name" HelperText="Max. 2 characters"
+                              @bind-Value="model.UserName" For="@(() => model.UserName)" />
+                <MudTextField Label="Last name" Class="mt-3"
+                              @bind-Value="model.LastName" For="@(() => model.LastName)" />
+                <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
+                              @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
+                <MudTextField Label="Confirm password" HelperText="Repeat the password" Class="mt-3"
+                              @bind-Value="model.ConfirmPassword" For="@(() => model.ConfirmPassword)" InputType="InputType.Password" />
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Edit user</MudButton>
+            </MudCardActions>
+        </MudCard>
+
+        <MudExpansionPanels>
+            <MudExpansionPanel Text="Show Validation Summary">
+                @if (success)
                 {
-                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                    <MudText Color="Color.Success">Success</MudText>
                 }
-                Save
-            </button>
-            <NavLink href="" class="btn btn-link">Cancel</NavLink>
-        </div>
+                else
+                {
+                    <MudText Color="@Color.Error">
+                        <ValidationSummary />
+                    </MudText>
+                }
+            </MudExpansionPanel>
+        </MudExpansionPanels>
     </EditForm>
+</MudContainer>
 }
 else
 {
@@ -41,15 +50,9 @@ else
     </div>
 }
 @code {
-    private UpdateAccount model;
+    private UpdateAccount model = new UpdateAccount();
     private bool loading;
-
-
-    protected override async Task OnInitializedAsync()
-    {
-        model = new UpdateAccount();
-    }
-
+    private bool success;
     private async void OnValidSubmit()
     {
         loading = true;

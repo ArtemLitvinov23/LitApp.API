@@ -1,7 +1,6 @@
 ﻿using LitBlog.DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,7 +20,7 @@ namespace LitBlog.DAL.Repositories
         public async Task<Account> GetAccountAsync(int id)
         {
             var account = await _context.Accounts.FindAsync(id);
-            if (account == null) throw new KeyNotFoundException("Account not found");
+            if (account == null) throw new NullReferenceException("Account not found");
             return account;
         }
 

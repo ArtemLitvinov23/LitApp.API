@@ -1,4 +1,4 @@
-﻿@page "/favorite"
+﻿@page "/users"
 @attribute [Authorize]
 @layout MainLayout
 @inject IAccountService AccountService
@@ -6,37 +6,54 @@
 @inject ILocalStorageService localStorageService 
 @using System.Net.Http.Headers
 
-<MudTable Items="@users.Take(4)" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@loading" LoadingProgressColor="Color.Info">
+<MudTable Items="@users" Filter="new Func<Models.Users,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1" Breakpoint="Breakpoint.Sm" Loading="@loading" LoadingProgressColor="Color.Info" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Users</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
     <HeaderContent>
-        <MudTh>Nr</MudTh>
+        <MudTh>Id</MudTh>
         <MudTh>Email</MudTh>
         <MudTh>Name</MudTh>
         <MudTh>Last name</MudTh>
         <MudTh> </MudTh>
     </HeaderContent>
     <RowTemplate>
-        @foreach(var user in users)
-        {  
-         <MudTd DataLabel="Nr">@user.Id</MudTd>
-        <MudTd DataLabel="Email">@user.Email</MudTd>
-        <MudTd DataLabel="Name">@user.UserName</MudTd>
-        <MudTd DataLabel="Last name"> @user.LastName </MudTd>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Email">@context.Email</MudTd>
+        <MudTd DataLabel="Name">@context.UserName</MudTd>
+        <MudTd DataLabel="Last name"> @context.LastName </MudTd>
         <MudTd>
-            <MudNavLink Href = "/chat" Icon="@Icons.Filled.Chat"/>
+            <MudNavLink Href = "/chat/{ContactId}" Icon="@Icons.Filled.Chat"/>
+            <MudNavLink Href = "api/account/favorite" Icon="@Icons.Filled.Favorite"/>
         </MudTd>
-        }
-       
-          @if (!string.IsNullOrEmpty(errorMessage))
-            {
-                <div class="alert alert-danger mt-3 mb-0">@errorMessage</div>
-            }
     </RowTemplate>
 </MudTable>
-<MudSwitch @bind-Checked="loading">Show Loading</MudSwitch>
+<div class="d-flex flex-wrap mt-4">
+    <MudSwitch @bind-Checked="@loading" Color="Color.Info">Loading</MudSwitch>
+    <MudSwitch @bind-Checked="@hover" Color="Color.Primary">Hover</MudSwitch>
+    <MudSwitch @bind-Checked="@dense" Color="Color.Secondary">Dense</MudSwitch>
+    <MudSwitch @bind-Checked="@striped" Color="Color.Tertiary">Striped</MudSwitch>
+    <MudSwitch @bind-Checked="@bordered" Color="Color.Warning">Bordered</MudSwitch>
+    <MudSpacer />
+    <div style="min-width:200px;">
+        <MudText Inline="true" Class="align-self-center">Selected1: @selectedItem1?.UserName</MudText>
+        <MudText Inline="true" Class="align-self-center">Selected2: @selectedItem2?.UserName</MudText>
+    </div>
+</div>
 @code {
-    private bool loading;
-    private Models.Users[] users = new Models.Users[] { };
-    private string errorMessage;
+    private bool loading = false;
+    private IEnumerable<Models.Users> users = new List<Models.Users>();
+    private bool dense = false;
+    private bool hover = true;
+    private bool striped = false;
+    private bool bordered = false;
+    private string searchString1 = "";
+    private string searchString2 = "";
+    private Models.Users selectedItem1 = null;
+    private Models.Users selectedItem2 = null;
+    private HashSet<Users> selectedItems = new HashSet<Users>();
     protected override async Task OnInitializedAsync()
     {
         loading = true;
@@ -46,14 +63,27 @@
             var savedToken = await localStorageService.GetItemAsync<Models.Account>("account");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", savedToken.jwtToken);
             using var httpResponse = await HttpClient.SendAsync(request);
-            users = await httpResponse.Content.ReadFromJsonAsync<Models.Users[]>();
+            users = await httpResponse.Content.ReadFromJsonAsync<List<Models.Users>>();
+            loading = false;
         }
         catch (Exception ex)
         {
-
-            errorMessage = ex.Message;
             loading = false;
             StateHasChanged();
         }
+    }
+
+    private bool FilterFunc1(Models.Users users) => FilterFunc(users, searchString1);
+    private bool FilterFunc2(Models.Users users) => FilterFunc(users, searchString2);
+
+    private bool FilterFunc(Models.Users users, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (users.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{users.Id} {users.UserName} {users.LastName} {users.Email}".Contains(searchString))
+            return true;
+        return false;
     }
 }

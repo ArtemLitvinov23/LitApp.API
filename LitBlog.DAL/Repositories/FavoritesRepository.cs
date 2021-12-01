@@ -13,25 +13,25 @@ namespace LitBlog.DAL.Repositories
             _blogContext = blogContext;
         }
 
-        public async Task AddUserToFavorites(FavoritesList email)
+        public async Task AddUserToFavorites(List email)
         {
             await _blogContext.Favorites.AddAsync(email);
             await _blogContext.SaveChangesAsync();
         }
 
-        public async Task DeleteUserFromFavorites(FavoritesList email)
+        public async Task DeleteUserFromFavorites(List email)
         {
             _blogContext.Favorites.Remove(email);
             await _blogContext.SaveChangesAsync();
         } 
       
-        public async Task<FavoritesList> FindUserByEmail(FavoritesList email)
+        public async Task<List> FindUserByEmail(List email)
         {
            var response = await _blogContext.Favorites.FindAsync(email);
             return response;
         }
 
 
-        public IQueryable<FavoritesList> GetAllFavorites() => _blogContext.Favorites.AsQueryable();
+        public IQueryable<List> GetAllFavorites() => _blogContext.Favorites.AsQueryable();
     }
 }

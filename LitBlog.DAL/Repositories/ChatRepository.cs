@@ -1,5 +1,6 @@
 ﻿using LitBlog.DAL.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,7 +14,7 @@ namespace LitBlog.DAL.Repositories
             _blogContext = blogContext;
         }
 
-        public async Task GetConversationAsync(string userId, string contactId)
+        public async Task<List<ChatMessage>> GetConversationAsync(int userId,int contactId)
         {
             var message = await _blogContext.ChatMessages
                 .Where(h => (h.FromUserId == contactId && h.ToUserId == userId) || (h.FromUserId == userId && h.ToUserId == contactId))
@@ -29,9 +30,10 @@ namespace LitBlog.DAL.Repositories
                     ToUser = x.ToUser,
                     FromUser = x.FromUser
                 }).ToListAsync();
+            return message;
         }
 
-        public async Task SaveMessageAsync(ChatMessage message,string userId)
+        public async Task SaveMessageAsync(ChatMessage message)
         {
             await _blogContext.ChatMessages.AddAsync(message);
             await _blogContext.SaveChangesAsync();

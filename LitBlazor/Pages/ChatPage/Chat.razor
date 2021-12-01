@@ -1,7 +1,6 @@
 ﻿@inject IChatService _chatService
 @inject NavigationManager _navigationManager
 @inject IAccountService accountService
-@attribute [Authorize]
 
 @page "/chat/{ContactId}"
 @page "/chat"
@@ -94,7 +93,7 @@
                 ToUserId = ContactId,
                 CreatedDate = DateTime.Now
             };
-            await _chatService.SaveMessageAsync(chatHistory,ContactId);
+            await _chatService.SaveMessageAsync(chatHistory);
             chatHistory.FromUserId = CurrentUserId;
             await hubConnection.SendAsync("SendMessageAsync", chatHistory, CurrentUserEmail);
             CurrentMessage = string.Empty;
@@ -104,7 +103,7 @@
     {
         if (hubConnection == null)
         {
-            hubConnection = new HubConnectionBuilder().WithUrl("https://localhost:44311/signalRHub").Build();
+            hubConnection = new HubConnectionBuilder().WithUrl(_navigationManager.ToAbsoluteUri("https://localhost:44311/signalRHub")).Build();
         }
         if (hubConnection.State == HubConnectionState.Disconnected)
         {
@@ -137,7 +136,7 @@
             await LoadUserChat(ContactId);
         }
     }
-    public List<ApplicationUser> ChatUsers = new List<ApplicationUser>();
+    public List<Models.Users> ChatUsers = new List<Models.Users>();
     [Parameter] public string ContactEmail { get; set; }
     [Parameter] public string ContactId { get; set; }
     async Task LoadUserChat(string userId)
@@ -147,11 +146,11 @@
         ContactEmail = contact.Email;
         _navigationManager.NavigateTo($"chat/{ContactId}");
         messages = new List<ChatMessage>();
-        messages = await _chatService.GetConversationAsync(CurrentUserId,ContactId);
+        messages = await _chatService.GetConversationAsync(CurrentUserId);
     }
     private async Task GetUsersAsync()
     {
-        ChatUsers = await _chatService.GetUsersAsync();
+        ChatUsers = await _chatService.GetAllUsersAsync();
     }
 }
 }

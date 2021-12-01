@@ -6,9 +6,9 @@ namespace LitBlog.DAL.Repositories
 {
     public interface IFavoritesRepository
     {
-        IQueryable<FavoritesList> GetAllFavorites();
-        Task<FavoritesList> FindUserByEmail(FavoritesList email);
-        Task AddUserToFavorites(FavoritesList email);
-        Task DeleteUserFromFavorites(FavoritesList email);
+        IQueryable<List> GetAllFavorites();
+        Task<List> FindUserByEmail(List email);
+        Task AddUserToFavorites(List email);
+        Task DeleteUserFromFavorites(List email);
     }
 }
