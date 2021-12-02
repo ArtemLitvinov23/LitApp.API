@@ -67,6 +67,7 @@
                                 </div>
                                 <div>
                                     <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.Email</MudText>
+                                    <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.UserName @user.LastName </MudText>
                                     <MudText Typo="Typo.caption" Style="font-size: xx-small!important;">@user.Id</MudText>
                                 </div>
                             </div>
@@ -91,11 +92,14 @@
             {
                 Message = CurrentMessage,
                 ToUserId = ContactId,
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTime.Now,
+                FromUser = new ApplicationUser(){Email = CurrentUserEmail},
+                ToUser = new ApplicationUser(){Email = ContactEmail}
             };
-            await _chatService.SaveMessageAsync(chatHistory);
+            //await _chatService.SaveMessageAsync(chatHistory);
             chatHistory.FromUserId = CurrentUserId;
             await hubConnection.SendAsync("SendMessageAsync", chatHistory, CurrentUserEmail);
+            messages.Add(chatHistory);
             CurrentMessage = string.Empty;
         }
     }
@@ -103,7 +107,7 @@
     {
         if (hubConnection == null)
         {
-            hubConnection = new HubConnectionBuilder().WithUrl(_navigationManager.ToAbsoluteUri("https://localhost:44311/signalRHub")).Build();
+            hubConnection = new HubConnectionBuilder().WithUrl("https://localhost:44311/signalRHub").Build();
         }
         if (hubConnection.State == HubConnectionState.Disconnected)
         {
