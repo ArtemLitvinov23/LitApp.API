@@ -1,13 +1,13 @@
-﻿using LitBlog.DAL.Models;
+﻿
+using LitBlog.API.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace LitBlog.BLL.ModelsDto
+namespace LitChat.API.Models
 {
-    public class AccountDto
+    public class AccountViewModel
     {
-        public int Id { get; set; }
         [Required]
         [EmailAddress]
         public string Email { get; set; }
@@ -17,7 +17,7 @@ namespace LitBlog.BLL.ModelsDto
         public string FirstName { get; set; }
         [Required]
         public string LastName { get; set; }
-        public RoleDto Role { get; set; }
+        public RoleViewModel Role { get; set; }
         public string VerificationToken { get; set; }
         public DateTime? Verified { get; set; }
         public bool IsVerified { get; set; }
@@ -26,12 +26,7 @@ namespace LitBlog.BLL.ModelsDto
         public DateTime? PasswordReset { get; set; }
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
-        public ICollection<ChatMessagesDto> MessagesFromUser { get; set; }
-        public ICollection<ChatMessagesDto> MessagesToUser { get; set; }
-        public List<RefreshToken> RefreshTokens { get; set; }
-        public bool OwnsToken(string token)
-        {
-            return this.RefreshTokens?.Find(x => x.Token == token) != null;
-        }
+        public ICollection<ChatMessageModel> MessagesFromUser { get; set; }
+        public ICollection<ChatMessageModel> MessagesToUser { get; set; }
     }
 }

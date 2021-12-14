@@ -1,4 +1,5 @@
-﻿using LitBlazor.Models;
+﻿using LitBlazor.Helpers;
+using LitBlazor.Models;
 using LitBlazor.Services.Interfaces;
 using Microsoft.AspNetCore.Components;
 using System;
@@ -10,8 +11,6 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using LitBlazor.Helpers;
-using Microsoft.Extensions.Configuration;
 
 namespace LitBlazor.Services
 {
@@ -20,15 +19,13 @@ namespace LitBlazor.Services
         private readonly HttpClient _httpClient;
         private readonly NavigationManager _navigationManager;
         private readonly ILocalStorageService _localStorageService;
-        private IConfiguration _configuration;
 
 
-        public HttpService(HttpClient httpClient, NavigationManager navigationManager,ILocalStorageService localStorageService,IConfiguration configuration)
+        public HttpService(HttpClient httpClient, NavigationManager navigationManager,ILocalStorageService localStorageService)
         {
             _httpClient = httpClient;
             _navigationManager = navigationManager;
             _localStorageService = localStorageService;
-            _configuration = configuration;
         }
 
         public async Task Delete(string uri)
@@ -88,7 +85,7 @@ namespace LitBlazor.Services
             var savedToken = await _localStorageService.GetItemAsync<Account>("account");
             var isApiUrl = !request.RequestUri.IsAbsoluteUri;
             if (savedToken != null && isApiUrl)
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", savedToken.jwtToken);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", savedToken.JwtToken);
         }
 
         private static async Task HandlerError(HttpResponseMessage response)

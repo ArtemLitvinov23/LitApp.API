@@ -26,7 +26,6 @@ namespace LitBlog.DAL.Repositories
 
         public Account GetRefreshToken(string token) =>  _context.Accounts.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
 
-
         public async Task<Account> GetAccountByIdAsync(int accountId) => await _context.Accounts.FirstOrDefaultAsync(x=>x.Id == accountId);
         
 

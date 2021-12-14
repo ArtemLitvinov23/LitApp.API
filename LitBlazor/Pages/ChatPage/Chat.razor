@@ -49,7 +49,7 @@
                 <MudList Clickable="true">
                     @foreach (var user in ChatUsers)
                     {
-                        <MudListItem Class="pa-0 px-2" OnClick="@(() => LoadUserChat(Convert.ToString(user.Id)))">
+                        <MudListItem Class="pa-0 px-2" OnClick="@(() => LoadUserChat(user.Id.ToString()))">
                             <div class="d-flex flex-row mt-n1 mb-n1">
                                 <div class="mr-4">
                                     <MudBadge Class="my-2">
@@ -67,7 +67,7 @@
                                 </div>
                                 <div>
                                     <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.Email</MudText>
-                                    <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.UserName @user.LastName </MudText>
+                                    <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.FirstName @user.LastName </MudText>
                                     <MudText Typo="Typo.caption" Style="font-size: xx-small!important;">@user.Id</MudText>
                                 </div>
                             </div>
@@ -93,10 +93,10 @@
                 Message = CurrentMessage,
                 ToUserId = ContactId,
                 CreatedDate = DateTime.Now,
-                FromUser = new ApplicationUser(){Email = CurrentUserEmail},
-                ToUser = new ApplicationUser(){Email = ContactEmail}
+                FromUser = new Account{Email = CurrentUserEmail},
+                ToUser = new Account{Email = ContactEmail}
             };
-            //await _chatService.SaveMessageAsync(chatHistory);
+            await _chatService.SaveMessageAsync(CurrentUserId,chatHistory);
             chatHistory.FromUserId = CurrentUserId;
             await hubConnection.SendAsync("SendMessageAsync", chatHistory, CurrentUserEmail);
             messages.Add(chatHistory);
@@ -120,12 +120,12 @@
 
                 if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId))
                 {
-                    messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate, FromUser = new ApplicationUser() { Email = CurrentUserEmail } } );
+                    messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate, FromUser = new Account { Email = CurrentUserEmail } });
                     await hubConnection.SendAsync("ChatNotificationAsync", $"New Message From {userName}", ContactId, CurrentUserId);
                 }
                 else if ((ContactId == message.FromUserId && CurrentUserId == message.ToUserId))
                 {
-                    messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate, FromUser = new ApplicationUser() { Email = ContactEmail } });
+                    messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate, FromUser = new Account{Email = ContactEmail} });
                 }
                 StateHasChanged();
             }
@@ -150,7 +150,7 @@
         ContactEmail = contact.Email;
         _navigationManager.NavigateTo($"chat/{ContactId}");
         messages = new List<ChatMessage>();
-        messages = await _chatService.GetConversationAsync(CurrentUserId);
+        messages = await _chatService.GetConversationAsync(userId,CurrentUserId);
     }
     private async Task GetUsersAsync()
     {

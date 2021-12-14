@@ -14,14 +14,14 @@ namespace LitBlog.DAL.Repositories
             _blogContext = blogContext;
         }
 
-        public async Task<List<ChatMessage>> GetConversationAsync(int userId,int contactId)
+        public async Task<List<ChatMessages>> GetConversationAsync(int userId,int contactId)
         {
-            var message = await _blogContext.ChatMessages
+            var message = await _blogContext.Messages
                 .Where(h => (h.FromUserId == contactId && h.ToUserId == userId) || (h.FromUserId == userId && h.ToUserId == contactId))
                 .OrderBy(a => a.CreatedDate)
                 .Include(a => a.FromUser)
-                .Include(a => a.ToUser)
-                .Select(x => new ChatMessage
+                .Include(a=>a.ToUser)
+                .Select(x => new ChatMessages
                 {
                     FromUserId = x.FromUserId,
                     Message = x.Message,
@@ -33,9 +33,9 @@ namespace LitBlog.DAL.Repositories
             return message;
         }
 
-        public async Task SaveMessageAsync(ChatMessage message)
+        public async Task SaveMessageAsync(ChatMessages message)
         {
-            await _blogContext.ChatMessages.AddAsync(message);
+            await _blogContext.Messages.AddAsync(message);
             await _blogContext.SaveChangesAsync();
         }
     }

@@ -6,7 +6,7 @@ namespace LitBlog.DAL.Repositories
 {
     public interface IChatRepository
     {
-        public Task<List<ChatMessage>> GetConversationAsync(int userId, int contactId);
-        public Task SaveMessageAsync(ChatMessage message);
+        public Task<List<ChatMessages>> GetConversationAsync(int userId, int contactId);
+        public Task SaveMessageAsync(ChatMessages message);
     }
 }

@@ -5,9 +5,10 @@ namespace LitBlog.API.Models
     public class AccountRegisterViewModel
     {
         [Required]
-        public string UserName { get; set; }
-
+        [MinLength(2)]
+        public string FirstName { get; set; }
         [Required]
+        [MinLength(2)]
         public string LastName { get; set; }
 
         [Required]

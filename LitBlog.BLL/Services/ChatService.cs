@@ -14,25 +14,23 @@ namespace LitBlog.BLL.Services
         private readonly IAccountRepository _accountRepository;
         private readonly IMapper _mapper;
 
-        public ChatService(IChatRepository chatRepository,IAccountRepository accountRepository, IMapper mapper)
+        public ChatService(
+            IChatRepository chatRepository,
+            IAccountRepository accountRepository,
+            IMapper mapper)
         {
             _chatRepository = chatRepository;
             _accountRepository = accountRepository;
             _mapper = mapper;
         }
-
-        public async Task<List<ChatMessageDto>> GetConversationAsync(int userId, int contactId) => _mapper.Map<List<ChatMessageDto>>(await _chatRepository.GetConversationAsync(userId, contactId));
-       
-        public async Task SaveMessageAsync(int userId,ChatMessageDto chatMessage)
+        public async Task<List<ChatMessagesDto>> GetConversationAsync(int userId, int contactId) => _mapper.Map<List<ChatMessagesDto>>(await _chatRepository.GetConversationAsync(userId, contactId));
+        public async Task SaveMessageAsync(int userId,ChatMessagesDto chatMessage)
         {
             chatMessage.FromUserId = userId;
-            var fromUser = await _accountRepository.GetAccountByIdAsync(userId);
-            chatMessage.FromUser = _mapper.Map<ApplicationUserDto>(fromUser.Email);
             chatMessage.CreatedDate = DateTime.UtcNow;
             var toUser = await _accountRepository.GetAccountByIdAsync(chatMessage.ToUserId);
-            var userEmail = _mapper.Map<ApplicationUserDto>(toUser.Email);
-            chatMessage.ToUser = userEmail;
-            var messageDto = _mapper.Map<ChatMessage>(chatMessage);
+            chatMessage.ToUserId = toUser.Id;
+            var messageDto = _mapper.Map<ChatMessages>(chatMessage);
             await _chatRepository.SaveMessageAsync(messageDto);
         }
     }

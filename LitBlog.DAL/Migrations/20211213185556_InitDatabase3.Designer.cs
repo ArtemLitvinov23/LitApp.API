@@ -7,26 +7,30 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace LitBlog.DAL.Migrations
+#nullable disable
+
+namespace LitChat.DAL.Migrations
 {
     [DbContext(typeof(BlogContext))]
-    [Migration("20211118075011_FavoriteList")]
-    partial class FavoriteList
+    [Migration("20211213185556_InitDatabase3")]
+    partial class InitDatabase3
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.11")
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "6.0.0")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
             modelBuilder.Entity("LitBlog.DAL.Models.Account", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -37,10 +41,6 @@ namespace LitBlog.DAL.Migrations
 
                     b.Property<bool>("IsVerified")
                         .HasColumnType("bit");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -61,9 +61,8 @@ namespace LitBlog.DAL.Migrations
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.Property<string>("VerificationToken")
                         .HasColumnType("nvarchar(max)");
@@ -73,27 +72,19 @@ namespace LitBlog.DAL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
                     b.ToTable("Accounts");
                 });
 
-            modelBuilder.Entity("LitBlog.DAL.Models.ApplicationUser", b =>
+            modelBuilder.Entity("LitBlog.DAL.Models.ChatMessages", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("ApplicationUser");
-                });
-
-            modelBuilder.Entity("LitBlog.DAL.Models.ChatMessage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -113,37 +104,45 @@ namespace LitBlog.DAL.Migrations
 
                     b.HasIndex("ToUserId");
 
-                    b.ToTable("ChatMessages");
+                    b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("LitBlog.DAL.Models.FavoritesList", b =>
+            modelBuilder.Entity("LitChat.DAL.Models.User", b =>
                 {
-                    b.Property<int>("FriendId")
+                    b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("AccountId")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserEmail")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"), 1L, 1);
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("FriendId");
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("AccountId");
+                    b.HasKey("UserId");
 
-                    b.ToTable("Favorites");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("LitBlog.DAL.Models.Account", b =>
                 {
+                    b.HasOne("LitChat.DAL.Models.User", "User")
+                        .WithOne("Account")
+                        .HasForeignKey("LitBlog.DAL.Models.Account", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.OwnsMany("LitBlog.DAL.Models.RefreshToken", "RefreshTokens", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("int")
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"), 1L, 1);
 
                             b1.Property<int>("AccountId")
                                 .HasColumnType("int");
@@ -182,18 +181,22 @@ namespace LitBlog.DAL.Migrations
                         });
 
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LitBlog.DAL.Models.ChatMessage", b =>
+            modelBuilder.Entity("LitBlog.DAL.Models.ChatMessages", b =>
                 {
-                    b.HasOne("LitBlog.DAL.Models.ApplicationUser", "FromUser")
-                        .WithMany("ChatMessagesFromUsers")
+                    b.HasOne("LitBlog.DAL.Models.Account", "FromUser")
+                        .WithMany("MessagesFromUser")
                         .HasForeignKey("FromUserId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("LitBlog.DAL.Models.ApplicationUser", "ToUser")
-                        .WithMany("ChatMessagesToUsers")
+                    b.HasOne("LitBlog.DAL.Models.Account", "ToUser")
+                        .WithMany("MessagesToUser")
                         .HasForeignKey("ToUserId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("FromUser");
@@ -201,27 +204,16 @@ namespace LitBlog.DAL.Migrations
                     b.Navigation("ToUser");
                 });
 
-            modelBuilder.Entity("LitBlog.DAL.Models.FavoritesList", b =>
-                {
-                    b.HasOne("LitBlog.DAL.Models.Account", "Account")
-                        .WithMany("Friends")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Account");
-                });
-
             modelBuilder.Entity("LitBlog.DAL.Models.Account", b =>
                 {
-                    b.Navigation("Friends");
+                    b.Navigation("MessagesFromUser");
+
+                    b.Navigation("MessagesToUser");
                 });
 
-            modelBuilder.Entity("LitBlog.DAL.Models.ApplicationUser", b =>
+            modelBuilder.Entity("LitChat.DAL.Models.User", b =>
                 {
-                    b.Navigation("ChatMessagesFromUsers");
-
-                    b.Navigation("ChatMessagesToUsers");
+                    b.Navigation("Account");
                 });
 #pragma warning restore 612, 618
         }

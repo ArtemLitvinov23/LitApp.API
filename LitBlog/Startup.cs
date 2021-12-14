@@ -9,14 +9,12 @@ using LitBlog.DAL;
 using LitBlog.DAL.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace LitBlog.API
 {
@@ -32,7 +30,9 @@ namespace LitBlog.API
         {
             services.AddDbContext<BlogContext>(opt=> opt.UseSqlServer(Configuration.GetConnectionString("WebApiDatabase")));
             services.AddCors();
-            services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.IgnoreNullValues = true);
+            services.AddControllers().AddNewtonsoftJson(options =>
+            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "LitBlog.WebApi", Version = "v1" });
@@ -47,7 +47,6 @@ namespace LitBlog.API
             services.AddTransient<IJwtOptions, JwtService>();
             services.AddTransient<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IEmailService, EmailService>();
-            services.AddScoped<IFavoritesRepository, FavoritesRepository>();
             services.AddScoped<IChatRepository, ChatRepository>();
             services.AddScoped<IChatService, ChatService>();
 
@@ -68,10 +67,7 @@ namespace LitBlog.API
                     ValidateAudience = false,
                 };
             });
-
-
         }
-
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {

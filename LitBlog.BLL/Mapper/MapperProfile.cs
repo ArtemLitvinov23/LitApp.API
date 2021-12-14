@@ -8,10 +8,13 @@ namespace LitBlog.BLL.Mapper
     {
         public MapperProfile()
         {
-            CreateMap<Account, AccountDto>().ReverseMap();
+            CreateMap<object, AccountDto>();
+            CreateMap<AccountDto, Account>()
+                .ForMember(x => x.MessagesFromUser, opt => opt.MapFrom(src => src.MessagesFromUser))
+                .ForMember(x => x.MessagesToUser, opt => opt.MapFrom(src => src.MessagesToUser))
+                .ReverseMap();
             CreateMap<AccountDto, AuthenticateResponseDto>();
             CreateMap<Account, AccountResponseDto>();
-            CreateMap<Account, ApplicationUserDto>();
             CreateMap<Account, UsersResponseDto>();
             CreateMap<Account, AuthenticateRequestDto>();
             CreateMap<Account, AuthenticateResponseDto>();
@@ -20,11 +23,16 @@ namespace LitBlog.BLL.Mapper
             CreateMap<AccountDto, ResetPasswordRequestDto>();
             CreateMap<ResetPasswordRequestDto, object>().ReverseMap();
             CreateMap<ForgotPasswordRequestDto, object>().ReverseMap();
-            CreateMap<ChatMessage, ChatMessageDto>();
-            CreateMap<object, ChatMessage>();
-            CreateMap<object, ApplicationUserDto>().ReverseMap();
-            CreateMap<ApplicationUser, ApplicationUserDto>();
-
+            CreateMap<object,ChatMessagesDto>();
+            CreateMap<ChatMessagesDto, ChatMessages>()
+                .ForMember(x => x.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(x => x.FromUserId, opt => opt.MapFrom(src => src.FromUserId))
+                .ForMember(x => x.ToUserId, opt => opt.MapFrom(dst => dst.ToUserId))
+                .ForMember(x => x.FromUser, opt => opt.MapFrom(src => src.FromUser))
+                .ForMember(x => x.ToUser, opt => opt.MapFrom(src => src.ToUser))
+                .ForMember(x => x.Message, opt => opt.MapFrom(src => src.Message))
+                .ReverseMap();
+            CreateMap<object, ChatMessages>();
         }
     }
 }

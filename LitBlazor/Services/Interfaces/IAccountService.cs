@@ -2,7 +2,7 @@
 using LitBlazor.Models;
 using System.Threading.Tasks;
 
-namespace LitBlazor
+namespace LitBlazor.Services.Interfaces
 {
     public interface IAccountService
     {
@@ -14,9 +14,7 @@ namespace LitBlazor
         Task ResetPassword(ResetPassword model);
         Task ForgotPassword(ForgotPassword model);
         Task Verify(VerifyAccount model);
-        Task<IList<Account>> GetAll();
-        Task<Account> GetById(int id);
-        Task Update(UpdateAccount model);
+        Task Update(int userId, UpdateAccount model);
         Task Delete(int id);
         Task<Account> GetUserDataFromLocalStorage();
     }

@@ -22,7 +22,7 @@
     <RowTemplate>
         <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="Email">@context.Email</MudTd>
-        <MudTd DataLabel="Name">@context.UserName</MudTd>
+        <MudTd DataLabel="Name">@context.FirstName</MudTd>
         <MudTd DataLabel="Last name"> @context.LastName </MudTd>
         <MudTd>
             <MudNavLink Href = "/chat/{ContactId}" Icon="@Icons.Filled.Chat"/>
@@ -37,8 +37,8 @@
     <MudSwitch @bind-Checked="@bordered" Color="Color.Warning">Bordered</MudSwitch>
     <MudSpacer />
     <div style="min-width:200px;">
-        <MudText Inline="true" Class="align-self-center">Selected1: @selectedItem1?.UserName</MudText>
-        <MudText Inline="true" Class="align-self-center">Selected2: @selectedItem2?.UserName</MudText>
+        <MudText Inline="true" Class="align-self-center">Selected1: @selectedItem1?.FirstName</MudText>
+        <MudText Inline="true" Class="align-self-center">Selected2: @selectedItem2?.FirstName</MudText>
     </div>
 </div>
 @code {
@@ -59,12 +59,12 @@
         {
             var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost:44311/api/Account/get-users");
             var savedToken = await localStorageService.GetItemAsync<Models.Account>("account");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", savedToken.jwtToken);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", savedToken.JwtToken);
             using var httpResponse = await HttpClient.SendAsync(request);
             users = await httpResponse.Content.ReadFromJsonAsync<List<Models.Users>>();
             loading = false;
         }
-        catch (Exception ex)
+        catch
         {
             loading = false;
             StateHasChanged();
@@ -78,10 +78,11 @@
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (users.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (users.FirstName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if ($"{users.Id} {users.UserName} {users.LastName} {users.Email}".Contains(searchString))
+        if ($"{users.Id} {users.FirstName} {users.LastName} {users.Email}".Contains(searchString))
             return true;
         return false;
     }
 }
+

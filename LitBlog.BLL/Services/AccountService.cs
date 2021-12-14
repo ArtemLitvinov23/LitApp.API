@@ -6,18 +6,17 @@ using LitBlog.BLL.PasswordHasher;
 using LitBlog.BLL.Services.Interfaces;
 using LitBlog.DAL.Models;
 using LitBlog.DAL.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
 
 namespace LitBlog.BLL.Services
 {
     public class AccountService : IAccountService
     {
         private readonly IAccountRepository _accountRepository;
-        private readonly IFavoritesRepository _favoritesRepository;
         private readonly IEmailService _emailService;
         private readonly IJwtOptions _jwtOptions;
         private readonly IMapper _mapper;
@@ -27,11 +26,9 @@ namespace LitBlog.BLL.Services
             IAccountRepository accountRepository, 
             IEmailService emailService,
             IJwtOptions jwtOptions,
-            IMapper mapper, IPasswordHasher password,
-            IFavoritesRepository favoritesRepository)
+            IMapper mapper, IPasswordHasher password)
         {
             _accountRepository = accountRepository;
-            _favoritesRepository = favoritesRepository;
             _emailService = emailService;
             _jwtOptions = jwtOptions;
             _mapper = mapper;
@@ -43,7 +40,7 @@ namespace LitBlog.BLL.Services
         {
             var account = _accountRepository.GetAllAccounts().FirstOrDefault(x => x.Email == authRequest.Email);
             if (account is null)
-                throw new ApplicationException();
+                throw new AppException($"An account with this {authRequest.Email } does not exist, please register your account");
          
             if (account != null && account.IsVerified)
                 _password.Verify( authRequest.Password,account.PasswordHash);
@@ -53,13 +50,10 @@ namespace LitBlog.BLL.Services
             if (account != null)
             {
                 account.RefreshTokens.Add(refreshToken);
-
                 //remove old refresh tokens from account
                 _jwtOptions.RemoveOldRefreshTokens(accountDto);
-
                 await _accountRepository.UpdateAccountAsync(account);
             }
-
             var response = _mapper.Map<AuthenticateResponseDto>(accountDto);
             response.JwtToken = jwtToken;
             response.RefreshToken = refreshToken.Token;
@@ -98,44 +92,37 @@ namespace LitBlog.BLL.Services
 
         public async Task RegisterAsync(AccountDto model, string origin)
         {
+            var existAccount = _accountRepository.GetAllAccounts().Any(x => x.Email == model.Email);
+            if (existAccount)
+                throw new AppException($"Email '{model.Email}' is already registered, please checked your email");
             var account = _mapper.Map<Account>(model);
             account.IsVerified = false;
             account.Role = Role.Admin;
             account.Created = DateTime.Now;
             account.VerificationToken = _jwtOptions.RandomTokenString();
-
             account.PasswordHash = _password.HashPassword(model.Password);
-
             await _accountRepository.CreateAccountAsync(account);
-            
-             var result = _mapper.Map<AccountDto>(account);
-             await _emailService.SendVerificationEmailAsync(result,origin);
-
+            var result = _mapper.Map<AccountDto>(account);
+            await _emailService.SendVerificationEmailAsync(result,origin);
         }
 
         public async Task VerifyEmailAsync(string token)
         {
             var account = _accountRepository.GetAllAccounts().SingleOrDefault(x => x.VerificationToken == token);
             if (account == null) throw new AppException("Verification failed");
-
             account.Verified = DateTime.UtcNow;
             account.IsVerified = true;
             account.VerificationToken = null;
-
             await _accountRepository.UpdateAccountAsync(account);
-
         }
 
         public async Task ForgotPasswordAsync(ForgotPasswordRequestDto model, string origin)
         {
             var account = _accountRepository.GetAllAccounts().SingleOrDefault(x => x.Email == model.Email);
             if (account == null) return;
-
             account.ResetToken = _jwtOptions.RandomTokenString();
             account.ResetTokenExpires = DateTime.UtcNow.AddDays(1);
-
             await _accountRepository.UpdateAccountAsync(account);
-
             var accountDto = _mapper.Map<AccountDto>(account);
             await _emailService.SendPasswordResetEmailAsync(accountDto,origin);
         }
@@ -163,19 +150,19 @@ namespace LitBlog.BLL.Services
             await _accountRepository.UpdateAccountAsync(account);
         }
 
-        public async Task<List<UsersResponseDto>> GetUsersAsync()
+        public async Task<List<UsersResponseDto>> GetAllUsersAsync()
         {
-            var accounts = await _accountRepository.GetAllAccounts().ToListAsync();
-            return _mapper.Map<List<UsersResponseDto>>(accounts);
+            var users = await _accountRepository.GetAllAccounts().ToListAsync();
+            var userDto = _mapper.Map<List<UsersResponseDto>>(users);
+            return userDto;
         }
-
         public async Task<UsersResponseDto> GetUserByIdAsync(int id)
         {
-            var account = await _accountRepository.GetAccountByIdAsync(id);
-            return _mapper.Map<UsersResponseDto>(account);
+            var user = await _accountRepository.GetAccountByIdAsync(id);
+            var userDto = _mapper.Map<UsersResponseDto>(user);
+            return userDto;
         }
-
-        public async Task<List<AccountResponseDto>> GetAllAsync()
+        public async Task<List<AccountResponseDto>> GetAllAccountsAsync()
         {
             var account = await _accountRepository.GetAllAccounts().ToListAsync();
             return _mapper.Map<List<AccountResponseDto>>(account);
@@ -187,7 +174,7 @@ namespace LitBlog.BLL.Services
             return _mapper.Map<AccountResponseDto>(account);
         }
 
-        public async Task<AccountResponseDto> CreateAsync(AccountDto model)
+        public async Task<AccountResponseDto> CreateAccountAsync(AccountDto model)
         {
             if (_accountRepository.GetAllAccounts().Any(x => x.Email == model.Email))
                 throw new AppException($"Email '{model.Email}' is already registered, please checked your email");
@@ -204,7 +191,7 @@ namespace LitBlog.BLL.Services
             return _mapper.Map<AccountResponseDto>(account);
         }
 
-        public async Task<AccountResponseDto> UpdateAsync(int id, UpdateAccountDto model)
+        public async Task<AccountResponseDto> UpdateAccountAsync(int id, UpdateAccountDto model)
         {
             var getAccount = await _accountRepository.GetAccountAsync(id);
 
@@ -219,43 +206,7 @@ namespace LitBlog.BLL.Services
             return _mapper.Map<AccountResponseDto>(getAccount);
         }
 
-        public async Task DeleteAsync(int id)
-        {
-            await _accountRepository.DeleteAsync(id);
+        public async Task DeleteAccountAsync(int id)=> await _accountRepository.DeleteAsync(id);
 
-        }
-
-        public bool ExistsAccount(AccountDto model)
-        {
-             return _accountRepository.GetAllAccounts().Any(x => x.Email == model.Email);
-        }
-
-        public async Task<List<FavoritesResponseDto>> GetAllFavoritesAsync()
-        {
-            var allFavorites = await _favoritesRepository.GetAllFavorites().ToListAsync();
-            var responseDto = _mapper.Map<List<FavoritesResponseDto>>(allFavorites);
-            return responseDto;
-        }
-
-        public async Task<FavoritesResponseDto> GetFavoritesByEmail(FavoritesDto favorites)
-        {
-            var favoritesDto = _mapper.Map<List>(favorites);
-            var result = await _favoritesRepository.FindUserByEmail(favoritesDto);
-            var responseDto = _mapper.Map<FavoritesResponseDto>(result);
-            return responseDto;
-            
-        }
-
-        public async Task AddUserToFavoritesAsync(FavoritesDto favorites)
-        {
-            var modelDto = _mapper.Map<List>(favorites);
-            await _favoritesRepository.AddUserToFavorites(modelDto);
-        }
-
-        public async Task DeleteUserFromFavoritesAsync(FavoritesDto favorites)
-        {
-            var modelDto = _mapper.Map<List>(favorites);
-            await _favoritesRepository.DeleteUserFromFavorites(modelDto);
-        }
     }
 }

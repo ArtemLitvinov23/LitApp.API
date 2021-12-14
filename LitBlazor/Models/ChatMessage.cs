@@ -8,7 +8,7 @@ namespace LitBlazor.Models
         public string ToUserId { get; set; }
         public string Message { get; set; }
         public DateTime CreatedDate { get; set; }
-        public ApplicationUser FromUser { get; set; }
-        public ApplicationUser ToUser { get; set; }
+        public Account FromUser { get; set; }
+        public Account ToUser { get; set; }
     }
 }

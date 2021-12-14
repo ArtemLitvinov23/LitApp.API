@@ -58,7 +58,7 @@
         loading = true;
         try
         {
-            await AccountService.Login(loginRequest);
+        await AccountService.Login(loginRequest);
             var returnUrl = NavigationManager.QueryString("returnUrl") ?? "/";
             NavigationManager.NavigateTo(returnUrl);
         }

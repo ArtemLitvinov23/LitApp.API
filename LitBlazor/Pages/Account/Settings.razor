@@ -1,4 +1,4 @@
-﻿@page "/account/settings"
+﻿@page "/account/settings/{UserId}"
 @attribute [Authorize]
 @layout MainLayout
 @inject IAccountService AccountService
@@ -51,6 +51,7 @@ else
 }
 @code {
     private UpdateAccount model = new UpdateAccount();
+    [Parameter] public int UserId {get;set;}
     private bool loading;
     private bool success;
     private async void OnValidSubmit()
@@ -58,7 +59,7 @@ else
         loading = true;
         try
         {
-            await AccountService.Update(model);
+            await AccountService.Update(UserId,model);
         
             NavigationManager.NavigateTo("");
         }

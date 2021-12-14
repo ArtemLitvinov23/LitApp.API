@@ -6,22 +6,21 @@ namespace LitBlog.DAL
     public class BlogContext : DbContext
     {
         public DbSet<Account> Accounts { get; set; }
-        public DbSet<List> Favorites { get; set; }
-        public DbSet<ChatMessage> ChatMessages { get; set; }
+        public DbSet<ChatMessages> Messages { get; set; }
         public BlogContext(DbContextOptions<BlogContext> options) : base(options) { }
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
 
-            builder.Entity<ChatMessage>(entity =>
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ChatMessages>(entity =>
             {
-                entity.HasOne(d => d.FromUser)
-                    .WithMany(p => p.ChatMessagesFromUsers)
-                    .HasForeignKey(d => d.FromUserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-                entity.HasOne(d => d.ToUser)
-                    .WithMany(p => p.ChatMessagesToUsers)
-                    .HasForeignKey(d => d.ToUserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
+                entity.HasOne(p => p.FromUser)
+                .WithMany(p => p.MessagesFromUser)
+                .HasForeignKey(d => d.FromUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(p => p.ToUser)
+                .WithMany(p => p.MessagesToUser)
+                .HasForeignKey(d => d.ToUserId)
+                .OnDelete(DeleteBehavior.NoAction);
             });
         }
     }

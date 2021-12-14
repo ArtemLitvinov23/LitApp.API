@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
+using LitBlog.API.Helpers;
 using LitBlog.API.Models;
 using LitBlog.BLL.ModelsDto;
 using LitBlog.BLL.Services.Interfaces;
+using LitChat.API.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using LitBlog.API.Helpers;
-using LitBlog.BLL.Services;
 
 namespace LitBlog.API.Controllers
 {
@@ -19,48 +19,38 @@ namespace LitBlog.API.Controllers
     {
         private readonly IAccountService _accountService;
         private readonly IMapper _mapper;
-        private readonly IEmailService _emailService;
 
-        public AccountController(IAccountService accountService, IMapper mapper, IEmailService emailService)
+        public AccountController(
+            IAccountService accountService,
+            IMapper mapper)
         {
             _accountService = accountService;
             _mapper = mapper;
-            _emailService = emailService;
         }
 
         [AllowAnonymous]
-        [HttpPost("auth")]
+        [HttpPost("sign-in")]
         public async Task<ActionResult<AuthenticateResponseViewModel>> Authenticate(AuthenticateRequestViewModel request)
         {
             var requestDto = _mapper.Map<AuthenticateRequestDto>(request);
             var response = await _accountService.AuthenticateAsync(requestDto, IpAddress());
-            if (response is null)
-                return BadRequest($"An account with this {request.Email} does not exist, please register your account");
             SetTokenCookie(response.RefreshToken);
             var mapper = _mapper.Map<AuthenticateResponseViewModel>(response);
             return Ok(mapper);
         }
 
         [AllowAnonymous]
-        [HttpPost("register")]
+        [HttpPost("sign-up")]
         public async Task<ActionResult> SignUp(AccountRegisterViewModel request)
         {
-            var accountDto = _mapper.Map<AccountDto>(request);
-            if (_accountService.ExistsAccount(accountDto))
-            {
-                await _emailService.SendAlreadyRegisteredEmailAsync(accountDto.Email, Request.Headers["origin"]);
-                return BadRequest(new { message = $"User with this mail {accountDto.Email} already exists" });
-            }
-
             var account = _mapper.Map<AccountDto>(request);
-
             await _accountService.RegisterAsync(account, Request.Headers["origin"]);
             return Ok(new { message = "Registration successful, please check your email for verify instructions" });
         }
 
         [AllowAnonymous]
         [HttpPost("verify")]
-        public async Task<ActionResult> Verify(VerifyRequestViewModel verifyRequest)
+        public async Task<ActionResult> Verify([FromQuery]VerifyRequestViewModel verifyRequest)
         {
             await _accountService.VerifyEmailAsync(verifyRequest.Token);
             return Ok(new { message = "Verification successful, you can now login" });
@@ -110,7 +100,7 @@ namespace LitBlog.API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<AccountResponseViewModel>>> GetAllAccount()
         {
-            var result = await _accountService.GetAllAsync();
+            var result = await _accountService.GetAllAccountsAsync();
             var mapDto = _mapper.Map<List<AccountResponseDto>>(result);
             return Ok(mapDto);
         }
@@ -119,7 +109,7 @@ namespace LitBlog.API.Controllers
         [HttpGet("get-users")]
         public async Task<ActionResult<List<UserResponseViewModel>>> GetAllUsers()
         {
-            var result = await _accountService.GetUsersAsync();
+            var result = await _accountService.GetAllUsersAsync();
             return Ok(_mapper.Map<List<UserResponseViewModel>>(result));
         }
 
@@ -135,43 +125,26 @@ namespace LitBlog.API.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult<List<AccountResponseViewModel>>> GetAccountById(int id)
         {
-            var idContext = IdContext.GetUserId(HttpContext);
-            var accountsPermission = await _accountService.GetAccountByIdAsync(idContext);
-            if (accountsPermission.Role == "Admin")
-            {
-                var result = await _accountService.GetAccountByIdAsync(id);
-                return Ok(result);
-            }
-            return Unauthorized(new { message = "Unauthorized" });
-           
+            var result = await _accountService.GetAccountByIdAsync(id);
+            return Ok(result);
         }
 
         [Authorize]
         [HttpPost("create")]
-        public async Task<ActionResult<AccountResponseViewModel>> CreateAccount(AccountRegisterViewModel create)
+        public async Task<ActionResult<AccountResponseViewModel>> CreateAccount(AccountViewModel create)
         {
-            var idContext = IdContext.GetUserId(HttpContext);
-            var accountsPermission = await _accountService.GetAccountByIdAsync(idContext);
-            if (accountsPermission.Role != "Admin")
-                return BadRequest(new { message = "You don't have permissions" });
-
             var mapModel = _mapper.Map<AccountDto>(create);
-            var createdAccount = await _accountService.CreateAsync(mapModel);
+            var createdAccount = await _accountService.CreateAccountAsync(mapModel);
             var response = _mapper.Map<AccountResponseViewModel>(createdAccount);
             return Ok(response);
         }
 
         [Authorize]
         [HttpPut]
-        public async Task<ActionResult<AccountResponseViewModel>> UpdateAccount(UpdateAccountViewModel create)
+        public async Task<ActionResult<AccountResponseViewModel>> UpdateAccount(int CurrentUserId,UpdateAccountViewModel create)
         {
-            var idContext = IdContext.GetUserId(HttpContext);
-            var accountsPermission = await _accountService.GetAccountByIdAsync(idContext);
-            if (accountsPermission.Role != "Admin")
-                return BadRequest(new { message = "You don't have permissions" });
-
             var mapModel = _mapper.Map<UpdateAccountDto>(create);
-            await _accountService.UpdateAsync(idContext,mapModel);
+            await _accountService.UpdateAccountAsync(CurrentUserId,mapModel);
             return Ok("Updated");
         }
 
@@ -179,12 +152,7 @@ namespace LitBlog.API.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteAccount(int id)
         {
-            var idContext = IdContext.GetUserId(HttpContext);
-            var accountsPermission = await _accountService.GetAccountByIdAsync(idContext);
-            if (accountsPermission.Role != "Admin")
-                return BadRequest(new { message = "You don't have permissions" });
-
-            await _accountService.DeleteAsync(id);
+            await _accountService.DeleteAccountAsync(id);
             return Ok();
         }
         private void SetTokenCookie(string token)

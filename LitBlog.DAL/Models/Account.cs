@@ -5,45 +5,30 @@ using System.ComponentModel.DataAnnotations;
 namespace LitBlog.DAL.Models
 {
     public class Account
-    {
+    { 
         [Key]
         public int Id  { get; set; }
-
         [Required]
         [EmailAddress]
         public string Email { get; set; }
-
         [Required]
         public string PasswordHash { get; set; }
-
         [Required]
-        public string UserName { get; set; }
-
+        public string FirstName { get; set; }
         [Required]
         public string LastName { get; set; }
-
         public Role Role { get; set; }
-
         public string VerificationToken { get; set; }
-
         public DateTime? Verified { get; set; }
-
         public bool IsVerified { get; set; }
-
         public string ResetToken { get; set; }
-
         public DateTime? ResetTokenExpires { get; set; }
-
         public DateTime? PasswordReset { get; set; }
-
         public DateTime Created { get; set; }
-
         public DateTime? Updated { get; set; }
-
+        public ICollection<ChatMessages> MessagesFromUser { get; set; }
+        public ICollection<ChatMessages> MessagesToUser { get; set; }
         public List<RefreshToken> RefreshTokens { get; set; }
-
-        public virtual ICollection<List> Friends { get; set; }
-
         public bool OwnsToken(string token)
         {
             return this.RefreshTokens?.Find(x => x.Token == token) != null;

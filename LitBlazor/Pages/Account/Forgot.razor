@@ -47,7 +47,7 @@
     {
         loading = true;
         try
-        {
+    {
             await AccountService.ForgotPassword(forgotPassword);
             NavigationManager.NavigateTo("account/reset-password");
         }

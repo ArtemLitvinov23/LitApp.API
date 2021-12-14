@@ -14,18 +14,12 @@ namespace LitBlog.BLL.Services.Interfaces
         Task ForgotPasswordAsync(ForgotPasswordRequestDto model, string origin);
         Task ValidateResetTokenAsync(RevokeTokenRequestDto model);
         Task ResetPasswordAsync(ResetPasswordRequestDto model);
-        Task<List<UsersResponseDto>> GetUsersAsync();
-        Task<UsersResponseDto> GetUserByIdAsync(int id);
-        Task<List<AccountResponseDto>> GetAllAsync();
+        Task<List<AccountResponseDto>> GetAllAccountsAsync();
         Task<AccountResponseDto> GetAccountByIdAsync(int accountId);
-        Task<AccountResponseDto> CreateAsync(AccountDto model);
-        Task<AccountResponseDto> UpdateAsync(int id, UpdateAccountDto model);
-        Task<List<FavoritesResponseDto>> GetAllFavoritesAsync();
-        Task<FavoritesResponseDto> GetFavoritesByEmail(FavoritesDto favorites);
-        Task AddUserToFavoritesAsync(FavoritesDto favorites);
-        Task DeleteUserFromFavoritesAsync(FavoritesDto favorites);
-        Task DeleteAsync(int id);
-        public bool ExistsAccount(AccountDto model);
-
+        Task<AccountResponseDto> CreateAccountAsync(AccountDto model);
+        Task<AccountResponseDto> UpdateAccountAsync(int id, UpdateAccountDto model);
+        Task<UsersResponseDto> GetUserByIdAsync(int id);
+        Task<List<UsersResponseDto>> GetAllUsersAsync();
+        Task DeleteAccountAsync(int id);
     }
 }
