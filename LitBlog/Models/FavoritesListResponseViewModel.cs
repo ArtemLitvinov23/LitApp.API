@@ -1,6 +1,6 @@
-﻿namespace LitBlog.BLL.ModelsDto
+﻿namespace LitChat.API.Models
 {
-    public class UsersResponseDto
+    public class FavoritesListResponseViewModel
     {
         public int Id { get; set; }
         public int AccountId { get; set; }

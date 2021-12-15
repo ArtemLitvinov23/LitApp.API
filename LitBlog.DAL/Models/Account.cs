@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LitChat.DAL.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -28,6 +29,7 @@ namespace LitBlog.DAL.Models
         public DateTime? Updated { get; set; }
         public ICollection<ChatMessages> MessagesFromUser { get; set; }
         public ICollection<ChatMessages> MessagesToUser { get; set; }
+        public ICollection<FavoritesList> Favorites { get; set; }
         public List<RefreshToken> RefreshTokens { get; set; }
         public bool OwnsToken(string token)
         {

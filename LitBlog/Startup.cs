@@ -7,6 +7,10 @@ using LitBlog.BLL.Services.Interfaces;
 using LitBlog.BLL.Settings;
 using LitBlog.DAL;
 using LitBlog.DAL.Repositories;
+using LitChat.BLL.Services;
+using LitChat.BLL.Services.Interfaces;
+using LitChat.DAL.Repositories;
+using LitChat.DAL.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +53,8 @@ namespace LitBlog.API
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IChatRepository, ChatRepository>();
             services.AddScoped<IChatService, ChatService>();
+            services.AddScoped<IFavoritesRepository, FavoritesRepository>();
+            services.AddScoped<IFavoritesService, FavoritesService>();
 
 
             services.AddAuthentication(options =>

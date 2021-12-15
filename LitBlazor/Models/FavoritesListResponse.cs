@@ -1,6 +1,6 @@
-﻿namespace LitBlog.BLL.ModelsDto
+﻿namespace LitBlazor.Models
 {
-    public class UsersResponseDto
+    public class FavoritesListResponse
     {
         public int Id { get; set; }
         public int AccountId { get; set; }

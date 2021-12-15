@@ -2,6 +2,7 @@
 using LitBlog.API.Models;
 using LitBlog.BLL.ModelsDto;
 using LitChat.API.Models;
+using LitChat.BLL.ModelsDto;
 
 namespace LitBlog.API.Helpers
 {
@@ -27,6 +28,8 @@ namespace LitBlog.API.Helpers
                 .ReverseMap();
             CreateMap<AccountDto, UserResponseViewModel>().ReverseMap();
             CreateMap<RoleDto, RoleViewModel>();
+            CreateMap<FavoritesListViewModel, FavoritesListDto>();
+            CreateMap<FavoritesListResponseDto, FavoritesListResponseViewModel>();
         }
     }
 }

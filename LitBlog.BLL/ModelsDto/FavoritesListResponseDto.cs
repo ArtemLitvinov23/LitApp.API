@@ -1,6 +1,6 @@
-﻿namespace LitBlog.BLL.ModelsDto
+﻿namespace LitChat.BLL.ModelsDto
 {
-    public class UsersResponseDto
+    public class FavoritesListResponseDto
     {
         public int Id { get; set; }
         public int AccountId { get; set; }

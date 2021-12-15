@@ -35,7 +35,6 @@ namespace LitBlog.BLL.Services
             _password = password;
         }
 
-
         public async Task<AuthenticateResponseDto> AuthenticateAsync(AuthenticateRequestDto authRequest, string ipAddress)
         {
             var account = _accountRepository.GetAllAccounts().FirstOrDefault(x => x.Email == authRequest.Email);

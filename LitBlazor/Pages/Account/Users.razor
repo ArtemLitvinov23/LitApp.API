@@ -3,6 +3,7 @@
 @layout MainLayout
 @inject IAccountService AccountService
 @inject IChatService _chatService
+@inject IFavoritesListService _favoritesList
 @inject NavigationManager _navigationManager
 @inject HttpClient HttpClient
 @inject ILocalStorageService localStorageService 
@@ -28,6 +29,22 @@
         <MudTd DataLabel="Last name"> @context.LastName </MudTd>
         <MudTd>
             <MudButton OnClick="@(() => LoadUserChat(context.Id.ToString()))" StartIcon="@Icons.Material.Filled.Chat" Color="Color.Secondary" ButtonType="ButtonType.Button">Chat</MudButton>
+            @if (!added)
+            {
+                <MudButton OnClick="@(() => AddUserToFavorite(context))" StartIcon="@Icons.Filled.Favorite" Color="Color.Inherit" ButtonType="ButtonType.Button">Favorite</MudButton>
+            }
+            else
+            {
+                <MudButton OnClick="@(() => AddUserToFavorite(context))" StartIcon="@Icons.Filled.FavoriteBorder" Color="Color.Dark" ButtonType="ButtonType.Button">Favorite</MudButton>
+            }
+            @if (!deleted)
+            {
+                <MudButton OnClick="@(() => RemoveUserFromFavorite(context))" StartIcon="@Icons.Filled.Delete" Color="Color.Tertiary" ButtonType="ButtonType.Button">Delete</MudButton>
+            }
+            else
+            {
+                <MudButton OnClick="@(() => RemoveUserFromFavorite(context))" StartIcon="@Icons.Filled.DeleteOutline" Color="Color.Dark" ButtonType="ButtonType.Button">Delete</MudButton>
+            }
         </MudTd>
     </RowTemplate>
 </MudTable>
@@ -48,11 +65,14 @@
     private bool dense = false;
     private bool striped = false;
     private bool bordered = false;
+    private bool added = false;
+    private bool deleted = false;
     private string searchString1 = "";
     private string searchString2 = "";
     private Models.Users selectedItem1 = null;
     private Models.Users selectedItem2 = null;
     private HashSet<Users> selectedItems = new HashSet<Users>();
+    [Parameter] public string CurrentUserId{ get; set; }
     [Parameter] public string ContactId{ get; set; }
 
     async Task LoadUserChat(string userId)
@@ -60,6 +80,34 @@
         var contact = await _chatService.GetUserDetailsAsync(userId);
         ContactId = contact.Id.ToString();
         _navigationManager.NavigateTo($"chat/{ContactId}");
+    }
+    async Task AddUserToFavorite(Models.Users users)
+    {
+        if(!added)
+        {
+            var user = await AccountService.GetUserDataFromLocalStorage();
+            CurrentUserId = user.Id.ToString();
+            var favoriteUser = new FavoritesList
+        {
+            AccountId = CurrentUserId,
+            Email = users.Email,
+            FirstName = users.FirstName,
+            LastName = users.LastName
+        };
+            await _favoritesList.AddUserToFavoriteAsync(favoriteUser);
+            added = true;
+        }
+        else
+        {
+            added = false;
+        }
+    }
+    async Task RemoveUserFromFavorite(Models.Users users)
+    {
+        var contact = await _chatService.GetUserDetailsAsync(users.Id.ToString());
+        var userAccountId = await _favoritesList.GetAllFavoritesAsync();
+        await _favoritesList.RemoveUserFromFavoriteAsync(ContactId);
+        deleted = true;
     }
     protected override async Task OnInitializedAsync()
     {

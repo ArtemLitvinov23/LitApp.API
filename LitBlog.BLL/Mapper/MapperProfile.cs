@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using LitBlog.BLL.ModelsDto;
 using LitBlog.DAL.Models;
+using LitChat.BLL.ModelsDto;
+using LitChat.DAL.Models;
 
 namespace LitBlog.BLL.Mapper
 {
@@ -33,6 +35,8 @@ namespace LitBlog.BLL.Mapper
                 .ForMember(x => x.Message, opt => opt.MapFrom(src => src.Message))
                 .ReverseMap();
             CreateMap<object, ChatMessages>();
+            CreateMap<FavoritesListDto, FavoritesList>().ReverseMap();
+            CreateMap<FavoritesList, FavoritesListResponseDto>();
         }
     }
 }

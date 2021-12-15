@@ -1,4 +1,5 @@
 ﻿@inject IChatService _chatService
+@inject IFavoritesListService _favoriteService
 @inject NavigationManager _navigationManager
 @inject IAccountService accountService
 @attribute [Authorize]
@@ -43,17 +44,17 @@
         <MudPaper Elevation="25" Class="pa-3 ml-6" MinWidth="350px">
             <MudToolBar Dense="true">
                 <MudText Typo="Typo.h6" Inline="true" Class="mr-2">#</MudText>
-                <MudText Typo="Typo.h6">contacts</MudText>
+                <MudText Typo="Typo.h6">my contacts</MudText>
             </MudToolBar>
             <div class="d-flex flex-column px-4" style="max-height:70vh;min-height:70vh; overflow:scroll;">
                 <MudList Clickable="true">
                     @foreach (var user in ChatUsers)
                     {
-                        <MudListItem Class="pa-0 px-2" OnClick="@(() => LoadUserChat(user.Id.ToString()))">
+                        <MudListItem Class="pa-0 px-2" OnClick="@(() => LoadUserChat(user.AccountId.ToString()))">
                             <div class="d-flex flex-row mt-n1 mb-n1">
                                 <div class="mr-4">
                                     <MudBadge Class="my-2">
-                                        @if (user.Id.ToString() == ContactId)
+                                        @if (user.AccountId.ToString() == ContactId)
                                         {
                                             <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">
                                                 @user.Email.ToUpper().FirstOrDefault()
@@ -68,7 +69,7 @@
                                 <div>
                                     <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.Email</MudText>
                                     <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.FirstName @user.LastName </MudText>
-                                    <MudText Typo="Typo.caption" Style="font-size: xx-small!important;">@user.Id</MudText>
+                                    <MudText Typo="Typo.caption" Style="font-size: xx-small!important;">@user.AccountId</MudText>
                                 </div>
                             </div>
                         </MudListItem>
@@ -140,7 +141,7 @@
             await LoadUserChat(ContactId);
         }
     }
-    public List<Models.Users> ChatUsers = new List<Models.Users>();
+    public List<Models.FavoritesListResponse> ChatUsers = new List<Models.FavoritesListResponse>();
     [Parameter] public string ContactEmail { get; set; }
     [Parameter] public string ContactId { get; set; }
     async Task LoadUserChat(string userId)
@@ -154,7 +155,7 @@
     }
     private async Task GetUsersAsync()
     {
-        ChatUsers = await _chatService.GetAllUsersAsync();
+        ChatUsers = await _favoriteService.GetAllFavoritesAsync();
     }
 }
 }
