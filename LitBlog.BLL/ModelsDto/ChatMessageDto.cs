@@ -9,7 +9,7 @@ namespace LitBlog.BLL.ModelsDto
         public int ToUserId { get; set; }
         public string Message { get; set; }
         public DateTime CreatedDate { get; set; }
-        public AccountDto FromUser { get; set; }
-        public AccountDto ToUser { get; set; }
+        public string FromEmail { get; set; }
+        public string ToEmail { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿@page "/account/settings/{UserId}"
+﻿@page "/account/settings"
 @attribute [Authorize]
 @layout MainLayout
 @inject IAccountService AccountService
@@ -56,12 +56,13 @@ else
     private bool success;
     private async void OnValidSubmit()
     {
+        var user = await AccountService.GetUserDataFromLocalStorage();
+        UserId = user.Id;
         loading = true;
         try
         {
             await AccountService.Update(UserId,model);
-        
-            NavigationManager.NavigateTo("");
+            NavigationManager.NavigateTo("/chat");
         }
         catch 
         {

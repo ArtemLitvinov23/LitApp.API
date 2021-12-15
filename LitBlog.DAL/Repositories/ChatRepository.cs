@@ -28,6 +28,8 @@ namespace LitBlog.DAL.Repositories
                     Id = x.Id,
                     ToUserId = x.ToUserId,
                     ToUser = x.ToUser,
+                    FromEmail = x.FromEmail,
+                    ToEmail = x.ToEmail,
                     FromUser = x.FromUser
                 }).ToListAsync();
             return message;

@@ -20,7 +20,7 @@ namespace LitBlog.DAL
                 entity.HasOne(p => p.ToUser)
                 .WithMany(p => p.MessagesToUser)
                 .HasForeignKey(d => d.ToUserId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

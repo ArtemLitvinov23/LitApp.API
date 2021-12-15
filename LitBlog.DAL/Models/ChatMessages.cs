@@ -11,12 +11,15 @@ namespace LitBlog.DAL.Models
         public string Message { get; set; }
         public DateTime CreatedDate { get; set; }
         public int FromUserId { get; set; }
+        public string FromEmail { get; set; }
 
         [ForeignKey("FromUserId")]
         public Account FromUser { get; set; }
 
         [ForeignKey("ToUserId")]
         public int ToUserId { get; set; }
+
+        public string ToEmail { get; set; }
         public Account ToUser { get; set; }
     }
 }

@@ -48,7 +48,7 @@
         // redirect to home if already logged in
         if (AccountService.Account != null)
         {
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/chat");
         }
     }
 
@@ -59,7 +59,7 @@
         try
         {
         await AccountService.Login(loginRequest);
-            var returnUrl = NavigationManager.QueryString("returnUrl") ?? "/";
+            var returnUrl = NavigationManager.QueryString("returnUrl") ?? "/chat";
             NavigationManager.NavigateTo(returnUrl);
         }
         catch (Exception ex)

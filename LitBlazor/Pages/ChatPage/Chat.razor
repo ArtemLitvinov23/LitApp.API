@@ -1,7 +1,7 @@
 ﻿@inject IChatService _chatService
 @inject NavigationManager _navigationManager
 @inject IAccountService accountService
-
+@attribute [Authorize]
 @page "/chat/{ContactId}"
 @page "/chat"
 @using Microsoft.AspNetCore.Components.Authorization
@@ -24,10 +24,10 @@
             {
                 <div class="d-flex flex-row my-4">
                     <div class="mr-4">
-                        <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">@message.FromUser.Email.ToUpper().FirstOrDefault()</MudAvatar>
+                        <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">@message.FromEmail.ToUpper().FirstOrDefault()</MudAvatar>
                     </div>
                     <div>
-                        <MudText Typo="Typo.body1">@message.FromUser.Email</MudText>
+                        <MudText Typo="Typo.body1">@message.ToEmail</MudText>
                         <MudText Typo="Typo.caption" Style="font-size: xx-small!important;">@message.CreatedDate.ToString("dd MMM, yyyy hh:mm tt")</MudText>
                         <MudText Typo="Typo.body2" Style=" padding: 15px;background-color: var(--mud-palette-background-grey);border-radius: 5px;margin-top:5px">@message.Message</MudText>
                     </div>
@@ -83,18 +83,18 @@
     [Parameter] public string CurrentMessage { get; set; }
     [Parameter] public string CurrentUserId { get; set; }
     [Parameter] public string CurrentUserEmail { get; set; }
-    private List<ChatMessage> messages = new List<ChatMessage>();
+    private List<Models.ChatMessages> messages = new List<Models.ChatMessages>();
     private async Task SubmitAsync()
     {
         if (!string.IsNullOrEmpty(CurrentMessage) && !string.IsNullOrEmpty(ContactId))
         {
-            var chatHistory = new ChatMessage()
+            var chatHistory = new ChatMessages()
             {
                 Message = CurrentMessage,
                 ToUserId = ContactId,
                 CreatedDate = DateTime.Now,
-                FromUser = new Account{Email = CurrentUserEmail},
-                ToUser = new Account{Email = ContactEmail}
+                FromEmail = CurrentUserEmail,
+                ToEmail = ContactEmail
             };
             await _chatService.SaveMessageAsync(CurrentUserId,chatHistory);
             chatHistory.FromUserId = CurrentUserId;
@@ -113,19 +113,19 @@
         {
             await hubConnection.StartAsync();
         }
-        hubConnection.On<ChatMessage, string>("ReceiveMessage", async (message, userName) =>
+        hubConnection.On<ChatMessages, string>("ReceiveMessage", async (message, userName) =>
         {
             if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId) || (ContactId == message.FromUserId && CurrentUserId == message.ToUserId))
             {
 
                 if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId))
                 {
-                    messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate, FromUser = new Account { Email = CurrentUserEmail } });
+                    messages.Add(new ChatMessages { Message = message.Message, CreatedDate = message.CreatedDate, FromEmail = CurrentUserEmail});
                     await hubConnection.SendAsync("ChatNotificationAsync", $"New Message From {userName}", ContactId, CurrentUserId);
                 }
                 else if ((ContactId == message.FromUserId && CurrentUserId == message.ToUserId))
                 {
-                    messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate, FromUser = new Account{Email = ContactEmail} });
+                    messages.Add(new ChatMessages { Message = message.Message, CreatedDate = message.CreatedDate, FromEmail = ContactEmail});
                 }
                 StateHasChanged();
             }
@@ -149,7 +149,7 @@
         ContactId = contact.Id.ToString();
         ContactEmail = contact.Email;
         _navigationManager.NavigateTo($"chat/{ContactId}");
-        messages = new List<ChatMessage>();
+        messages = new List<Models.ChatMessages>();
         messages = await _chatService.GetConversationAsync(userId,CurrentUserId);
     }
     private async Task GetUsersAsync()

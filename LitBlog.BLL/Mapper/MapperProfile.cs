@@ -28,8 +28,8 @@ namespace LitBlog.BLL.Mapper
                 .ForMember(x => x.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(x => x.FromUserId, opt => opt.MapFrom(src => src.FromUserId))
                 .ForMember(x => x.ToUserId, opt => opt.MapFrom(dst => dst.ToUserId))
-                .ForMember(x => x.FromUser, opt => opt.MapFrom(src => src.FromUser))
-                .ForMember(x => x.ToUser, opt => opt.MapFrom(src => src.ToUser))
+                .ForMember(x=>x.FromEmail, opt=>opt.MapFrom(src => src.FromEmail))
+                .ForMember(x => x.ToEmail, opt => opt.MapFrom(src => src.ToEmail))
                 .ForMember(x => x.Message, opt => opt.MapFrom(src => src.Message))
                 .ReverseMap();
             CreateMap<object, ChatMessages>();

@@ -27,9 +27,9 @@ namespace LitBlog.BLL.Services
         public async Task SaveMessageAsync(int userId,ChatMessagesDto chatMessage)
         {
             chatMessage.FromUserId = userId;
+            var fromUser = await _accountRepository.GetAccountByIdAsync(userId);
+            chatMessage.FromEmail = fromUser.Email;
             chatMessage.CreatedDate = DateTime.UtcNow;
-            var toUser = await _accountRepository.GetAccountByIdAsync(chatMessage.ToUserId);
-            chatMessage.ToUserId = toUser.Id;
             var messageDto = _mapper.Map<ChatMessages>(chatMessage);
             await _chatRepository.SaveMessageAsync(messageDto);
         }

@@ -24,8 +24,6 @@ namespace LitBlog.API.Helpers
                 .ForMember(x => x.FromUserId, opt => opt.MapFrom(src => src.FromUserId))
                 .ForMember(x => x.ToUserId, opt => opt.MapFrom(dst => dst.ToUserId))
                 .ForMember(x => x.Message, opt => opt.MapFrom(src => src.Message))
-                .ForMember(x=>x.FromUser,opt=>opt.MapFrom(src => src.FromUser))
-                .ForMember(x => x.ToUser, opt => opt.MapFrom(src => src.ToUser))
                 .ReverseMap();
             CreateMap<AccountDto, UserResponseViewModel>().ReverseMap();
             CreateMap<RoleDto, RoleViewModel>();

@@ -1,12 +1,9 @@
 ﻿  <MudNavMenu>
-      <MudNavLink Href = "" Icon="@Icons.Material.Outlined.Home">
-          Home
+      <MudNavLink Href ="/chat" Icon="@Icons.Filled.Chat">
+          Chat
       </MudNavLink>
       <MudNavLink Href = "/users" Icon="@Icons.Filled.People">
           All users
-      </MudNavLink>
-        <MudNavLink Href = "/chat" Icon="@Icons.Filled.Chat">
-          Chat
       </MudNavLink>
     <MudNavMenu>
         <MudNavGroup Title="Settings" Icon = "@Icons.Filled.Settings">
@@ -14,11 +11,5 @@
             <MudNavLink Href="/account/reset-password" Icon="@Icons.Filled.Delete">Delete account</MudNavLink>
         </MudNavGroup>
     </MudNavMenu>
-     <MudNavLink Href = "/account/logout" Icon="@Icons.Rounded.Logout">
-          Logout
-      </MudNavLink>
   </MudNavMenu>
-}
-@code{
-    bool _isExpanded = true;
 }

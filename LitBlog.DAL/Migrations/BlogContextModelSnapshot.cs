@@ -89,10 +89,16 @@ namespace LitChat.DAL.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("FromEmail")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("FromUserId")
                         .HasColumnType("int");
 
                     b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ToEmail")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ToUserId")
@@ -167,7 +173,7 @@ namespace LitChat.DAL.Migrations
                     b.HasOne("LitBlog.DAL.Models.Account", "ToUser")
                         .WithMany("MessagesToUser")
                         .HasForeignKey("ToUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("FromUser");

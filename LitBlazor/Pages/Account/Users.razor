@@ -2,6 +2,8 @@
 @attribute [Authorize]
 @layout MainLayout
 @inject IAccountService AccountService
+@inject IChatService _chatService
+@inject NavigationManager _navigationManager
 @inject HttpClient HttpClient
 @inject ILocalStorageService localStorageService 
 @using System.Net.Http.Headers
@@ -25,8 +27,7 @@
         <MudTd DataLabel="Name">@context.FirstName</MudTd>
         <MudTd DataLabel="Last name"> @context.LastName </MudTd>
         <MudTd>
-            <MudNavLink Href = "/chat/{ContactId}" Icon="@Icons.Filled.Chat"/>
-            <MudNavLink Href = "api/account/favorite" Icon="@Icons.Filled.Favorite"/>
+            <MudButton OnClick="@(() => LoadUserChat(context.Id.ToString()))" StartIcon="@Icons.Material.Filled.Chat" Color="Color.Secondary" ButtonType="ButtonType.Button">Chat</MudButton>
         </MudTd>
     </RowTemplate>
 </MudTable>
@@ -52,6 +53,14 @@
     private Models.Users selectedItem1 = null;
     private Models.Users selectedItem2 = null;
     private HashSet<Users> selectedItems = new HashSet<Users>();
+    [Parameter] public string ContactId{ get; set; }
+
+    async Task LoadUserChat(string userId)
+    {
+        var contact = await _chatService.GetUserDetailsAsync(userId);
+        ContactId = contact.Id.ToString();
+        _navigationManager.NavigateTo($"chat/{ContactId}");
+    }
     protected override async Task OnInitializedAsync()
     {
         loading = true;

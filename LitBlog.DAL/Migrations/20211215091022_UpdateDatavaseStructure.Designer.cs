@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LitChat.DAL.Migrations
 {
     [DbContext(typeof(BlogContext))]
-    [Migration("20211213185556_InitDatabase3")]
-    partial class InitDatabase3
+    [Migration("20211215091022_UpdateDatavaseStructure")]
+    partial class UpdateDatavaseStructure
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -39,8 +39,16 @@ namespace LitChat.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsVerified")
                         .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -61,9 +69,6 @@ namespace LitChat.DAL.Migrations
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.Property<string>("VerificationToken")
                         .HasColumnType("nvarchar(max)");
 
@@ -71,9 +76,6 @@ namespace LitChat.DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.ToTable("Accounts");
                 });
@@ -89,10 +91,16 @@ namespace LitChat.DAL.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("FromEmail")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("FromUserId")
                         .HasColumnType("int");
 
                     b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ToEmail")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ToUserId")
@@ -107,35 +115,8 @@ namespace LitChat.DAL.Migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("LitChat.DAL.Models.User", b =>
-                {
-                    b.Property<int>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"), 1L, 1);
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("Users");
-                });
-
             modelBuilder.Entity("LitBlog.DAL.Models.Account", b =>
                 {
-                    b.HasOne("LitChat.DAL.Models.User", "User")
-                        .WithOne("Account")
-                        .HasForeignKey("LitBlog.DAL.Models.Account", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.OwnsMany("LitBlog.DAL.Models.RefreshToken", "RefreshTokens", b1 =>
                         {
                             b1.Property<int>("Id")
@@ -181,8 +162,6 @@ namespace LitChat.DAL.Migrations
                         });
 
                     b.Navigation("RefreshTokens");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("LitBlog.DAL.Models.ChatMessages", b =>
@@ -190,13 +169,13 @@ namespace LitChat.DAL.Migrations
                     b.HasOne("LitBlog.DAL.Models.Account", "FromUser")
                         .WithMany("MessagesFromUser")
                         .HasForeignKey("FromUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("LitBlog.DAL.Models.Account", "ToUser")
                         .WithMany("MessagesToUser")
                         .HasForeignKey("ToUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("FromUser");
@@ -209,11 +188,6 @@ namespace LitChat.DAL.Migrations
                     b.Navigation("MessagesFromUser");
 
                     b.Navigation("MessagesToUser");
-                });
-
-            modelBuilder.Entity("LitChat.DAL.Models.User", b =>
-                {
-                    b.Navigation("Account");
                 });
 #pragma warning restore 612, 618
         }

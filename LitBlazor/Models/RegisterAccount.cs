@@ -5,9 +5,11 @@ namespace LitBlazor.Models
     public class RegisterAccount
     {
         [Required]
-        public string UserName { get; set; }
+        [MinLength(2)]
+        public string FirstName { get; set; }
 
         [Required]
+        [MinLength(2)]
         public string LastName { get; set; }
 
         [Required]

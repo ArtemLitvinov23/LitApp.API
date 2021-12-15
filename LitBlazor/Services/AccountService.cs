@@ -1,6 +1,10 @@
 ﻿using LitBlazor.Models;
 using LitBlazor.Services.Interfaces;
 using Microsoft.AspNetCore.Components;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace LitBlazor.Services
@@ -9,7 +13,6 @@ namespace LitBlazor.Services
     public class AccountService : IAccountService
     {
         public Account Account { get; private set; }
-
         private readonly IHttpService _httpService;
         private readonly NavigationManager _navigationManager;
         private readonly ILocalStorageService _localStorageService;
@@ -52,7 +55,7 @@ namespace LitBlazor.Services
         {
             Account = null;
             await _localStorageService.RemoveItem("account");
-            _navigationManager.NavigateTo("api/Account/auth");
+            _navigationManager.NavigateTo("/account/login");
         }
 
         public async Task Register(RegisterAccount model)

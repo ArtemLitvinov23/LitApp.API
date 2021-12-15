@@ -19,13 +19,13 @@ namespace LitBlazor.Services
             _httpClient = httpClient;
             _localStorageService = localStorageService;
         }
-        public async Task<List<ChatMessage>> GetConversationAsync(string userId,string contactId)
+        public async Task<List<ChatMessages>> GetConversationAsync(string userId,string contactId)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"api/Chat/{userId}/{contactId}");
             var savedToken = await _localStorageService.GetItemAsync<Account>("account");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", savedToken.JwtToken);
             var httpResponse = await _httpClient.SendAsync(request);
-            return await httpResponse.Content.ReadFromJsonAsync<List<ChatMessage>>();
+            return await httpResponse.Content.ReadFromJsonAsync<List<ChatMessages>>();
         }
 
         public async Task<Users> GetUserDetailsAsync(string userId)
@@ -46,7 +46,7 @@ namespace LitBlazor.Services
             return await httpResponse.Content.ReadFromJsonAsync<List<Users>>();
         }
 
-        public async Task SaveMessageAsync(string userId,ChatMessage chatMessage)
+        public async Task SaveMessageAsync(string userId,ChatMessages chatMessage)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, $"api/Chat/{userId}");
             var savedToken = await _localStorageService.GetItemAsync<Account>("account");
