@@ -6,19 +6,16 @@ namespace LitBlazor.Models
     {
         [Required]
         [MinLength(2, ErrorMessage = "Name must be at least 2 characters")]
-        public string UserName { get; set; }
+        public string FirstName { get; set; }
 
         [Required]
         [MinLength(2, ErrorMessage = "Last name must be at least 6 characters")]
         public string LastName { get; set; }
 
-        [Required]
-        [MinLength(6, ErrorMessage = "Password must be at least 6 characters")]
-        public string Password { get; set; }
+        [Phone]
+        public string Phone { get; set; }
+        [MaxLength(100)]
+        public string Description { get; set; }
 
-        [Required]
-        [Compare("Password")]
-        [Display(Name = "Confirm Password")]
-        public string ConfirmPassword { get; set; }
     }
 }

@@ -4,7 +4,8 @@ namespace LitBlazor.Models
 {
     public class FavoritesList
     {
-        public string AccountId { get; set; }
+        public string OwnerAccountId { get; set; }
+        public string FavoriteUserAccountId { get; set; }
         [Required]
         [EmailAddress]
         public string Email { get; set; }
@@ -12,5 +13,6 @@ namespace LitBlazor.Models
         public string FirstName { get; set; }
         [Required]
         public string LastName { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

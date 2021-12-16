@@ -1,0 +1,93 @@
+﻿@page "/card/{ContactId}"
+@inject IAccountService AccountService
+@inject IChatService _chatService
+@inject IFavoritesListService _favoritesList
+@layout MainLayout
+@inject NavigationManager _navigationManager
+@attribute [Authorize]
+
+<MudContainer Style="display: inline-block; position: relative; top: 0; bottom: 0; left: 0; right: 0; width: 600px; height: 200px; margin: auto; ">
+<MudCard>
+    <MudCardHeader>
+        <CardHeaderAvatar>
+            <MudAvatar Color="Color.Dark" Style="height:70px; width:70px;">@users.FirstName</MudAvatar>
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <MudText Typo="Typo.body1">@users.FirstName @users.LastName </MudText>
+            <MudText Typo="Typo.body2">@users.Email</MudText>
+            <MudText Typo="Typo.caption">@users.Phone</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+                     <MudIconButton OnClick="@(() => Return())" Icon="@Icons.TwoTone.ArrowBackIosNew" Color="Color.Inherit" ButtonType="ButtonType.Button">Return</MudIconButton>
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudText Typo="Typo.body2">@users.Description.</MudText>
+    </MudCardContent>
+    <MudCardActions>
+          @if (IsDeleted)
+            {
+                <MudIconButton OnClick="@(() => AddUserToFavorite(users))" Icon="@Icons.Filled.Favorite" Color="Color.Inherit" ButtonType="ButtonType.Button">Favorite</MudIconButton>
+                <MudIconButton OnClick="@(() => RemoveUserFromFavorite(users))" Icon="@Icons.Sharp.DeleteOutline" Color="Color.Tertiary" ButtonType="ButtonType.Button">Delete</MudIconButton>
+            }
+            else
+            {
+                <MudIconButton OnClick="@(() => AddUserToFavorite(users))" Icon="@Icons.Filled.FavoriteBorder" Color="Color.Inherit" ButtonType="ButtonType.Button">Favorite</MudIconButton>
+                <MudIconButton OnClick="@(() => RemoveUserFromFavorite(users))" Icon="@Icons.Filled.Delete" Color="Color.Tertiary" ButtonType="ButtonType.Button">Delete</MudIconButton>
+            }
+    </MudCardActions>
+</MudCard>
+</MudContainer>
+
+
+@code {
+    private Models.Users users = new Models.Users();
+    [Parameter] public string CurrentUserId{ get; set;}
+    [Parameter] public string ContactId{ get; set;}
+    [Parameter] public bool IsDeleted{ get; set; }
+
+    void Return()
+    {
+        _navigationManager.NavigateTo("/users");
+    }
+    async Task AddUserToFavorite(Models.Users users)
+    {
+        var user = await AccountService.GetUserDataFromLocalStorage();
+        CurrentUserId = user.Id.ToString();
+        ContactId = users.Id.ToString();
+        var favoriteUser = new FavoritesList
+            {
+             OwnerAccountId = CurrentUserId,
+             FavoriteUserAccountId = ContactId,
+             Email = users.Email,
+             FirstName = users.FirstName,
+             LastName = users.LastName,
+             IsDeleted = false
+            };
+        await _favoritesList.AddUserToFavoriteAsync(favoriteUser);
+        IsDeleted = favoriteUser.IsDeleted;
+
+    }
+    async Task RemoveUserFromFavorite(Models.Users users)
+    {
+        ContactId = users.Id.ToString();
+        var contact = await _favoritesList.GetFavoritesUserAsync(ContactId);
+        await _favoritesList.RemoveUserFromFavoriteAsync(contact.FavoriteUserAccountId.ToString());
+        IsDeleted = true;
+
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            users = await _chatService.GetUserDetailsAsync(ContactId);
+            var userBoolInfo = await _favoritesList.GetFavoritesUserAsync(ContactId);
+            IsDeleted = userBoolInfo.IsDeleted;
+        }
+        catch
+        {
+            IsDeleted = true;
+            StateHasChanged();
+        }
+    }
+    }

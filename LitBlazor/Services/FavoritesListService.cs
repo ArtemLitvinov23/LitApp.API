@@ -2,12 +2,11 @@
 using LitBlazor.Services.Interfaces;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Threading.Tasks;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System;
-using System.Text.Json;
 using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace LitBlazor.Services
 {
@@ -35,11 +34,20 @@ namespace LitBlazor.Services
 
         public async Task<List<FavoritesListResponse>> GetAllFavoritesAsync()
         {
-            var request = new HttpRequestMessage(HttpMethod.Get,"api/Favorites");
+            var request = new HttpRequestMessage(HttpMethod.Get,$"api/Favorites");
             var token = await _localStorageService.GetItemAsync<Account>("account");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer",token.JwtToken);
             var response = await _httpClient.SendAsync(request);
             return await response.Content.ReadFromJsonAsync<List<FavoritesListResponse>>();
+        }
+        public async Task<List<FavoritesListResponse>> GetAllFavoritesForAccountAsync(string id)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/Favorites/get-favorites/{id}");
+            var token = await _localStorageService.GetItemAsync<Account>("account");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.JwtToken);
+            var response = await _httpClient.SendAsync(request);
+            var result = await response.Content.ReadFromJsonAsync<List<FavoritesListResponse>>();
+            return result;
         }
 
         public async Task<FavoritesListResponse> GetFavoritesUserAsync(string userId)

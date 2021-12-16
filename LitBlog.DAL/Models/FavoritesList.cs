@@ -7,7 +7,8 @@ namespace LitChat.DAL.Models
     public class FavoritesList
     {
         public int Id { get; set; }
-        public int AccountId { get; set; }
+        public int OwnerAccountId { get; set; }
+        public int FavoriteUserAccountId { get; set; }
         [Required]
         [EmailAddress]
         public string Email { get; set; }
@@ -15,8 +16,9 @@ namespace LitChat.DAL.Models
         public string FirstName { get; set; }
         [Required]
         public string LastName { get; set; }
+        [ForeignKey("OwnerAccountId")]
+        public Account OwnerAccount { get; set; }
+        public bool IsDeleted { get; set; }
 
-        [ForeignKey("AccountId")]
-        public Account Account { get; set; }
     }
 }

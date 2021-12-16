@@ -13,11 +13,14 @@ namespace LitBlog.DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<FavoritesList>(x=>
-             x.HasOne(d=>d.Account)
-            .WithMany(d=>d.Favorites)
-            .HasForeignKey(d=>d.AccountId)
-            .OnDelete(DeleteBehavior.Cascade));
+            modelBuilder.Entity<FavoritesList>(x =>
+            {
+                x.HasOne(d => d.OwnerAccount)
+                .WithMany(d => d.Favorites)
+                .HasForeignKey(d => d.OwnerAccountId)
+                .OnDelete(DeleteBehavior.Cascade);
+            });
+      
            
             modelBuilder.Entity<ChatMessages>(entity =>
             {

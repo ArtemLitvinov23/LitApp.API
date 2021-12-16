@@ -5,6 +5,7 @@
 @attribute [Authorize]
 @page "/chat/{ContactId}"
 @page "/chat"
+@page "/"
 @using Microsoft.AspNetCore.Components.Authorization
 <div class="d-flex flex-grow-1 flex-row">
     <MudPaper Elevation="25" Class="py-4 flex-grow-1">
@@ -28,7 +29,7 @@
                         <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">@message.FromEmail.ToUpper().FirstOrDefault()</MudAvatar>
                     </div>
                     <div>
-                        <MudText Typo="Typo.body1">@message.ToEmail</MudText>
+                        <MudText Typo="Typo.body1">@message.FromEmail</MudText>
                         <MudText Typo="Typo.caption" Style="font-size: xx-small!important;">@message.CreatedDate.ToString("dd MMM, yyyy hh:mm tt")</MudText>
                         <MudText Typo="Typo.body2" Style=" padding: 15px;background-color: var(--mud-palette-background-grey);border-radius: 5px;margin-top:5px">@message.Message</MudText>
                     </div>
@@ -50,11 +51,11 @@
                 <MudList Clickable="true">
                     @foreach (var user in ChatUsers)
                     {
-                        <MudListItem Class="pa-0 px-2" OnClick="@(() => LoadUserChat(user.AccountId.ToString()))">
+                        <MudListItem Class="pa-0 px-2" OnClick="@(() => LoadUserChat(user.FavoriteUserAccountId.ToString()))">
                             <div class="d-flex flex-row mt-n1 mb-n1">
                                 <div class="mr-4">
                                     <MudBadge Class="my-2">
-                                        @if (user.AccountId.ToString() == ContactId)
+                                        @if (user.FavoriteUserAccountId.ToString() == ContactId)
                                         {
                                             <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">
                                                 @user.Email.ToUpper().FirstOrDefault()
@@ -62,14 +63,13 @@
                                         }
                                         else
                                         {
-                                            <MudAvatar Color="Color.Dark" Style="height:50px; width:50px;">@user.Email.ToUpper().FirstOrDefault()</MudAvatar>
+                                             <MudAvatar Color="Color.Dark" Style="height:70px; width:70px;">@user.FirstName</MudAvatar>
                                         }
                                     </MudBadge>
                                 </div>
                                 <div>
                                     <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.Email</MudText>
                                     <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.FirstName @user.LastName </MudText>
-                                    <MudText Typo="Typo.caption" Style="font-size: xx-small!important;">@user.AccountId</MudText>
                                 </div>
                             </div>
                         </MudListItem>
@@ -104,6 +104,7 @@
             CurrentMessage = string.Empty;
         }
     }
+
     protected override async Task OnInitializedAsync()
     {
         if (hubConnection == null)
@@ -131,8 +132,7 @@
                 StateHasChanged();
             }
         });
-        await GetUsersAsync();
-
+        await GetAllFavorites();
         var user = await accountService.GetUserDataFromLocalStorage();
         CurrentUserId = user.Id.ToString();
         CurrentUserEmail = user.Email;
@@ -153,7 +153,7 @@
         messages = new List<Models.ChatMessages>();
         messages = await _chatService.GetConversationAsync(userId,CurrentUserId);
     }
-    private async Task GetUsersAsync()
+    async Task GetAllFavorites()
     {
         ChatUsers = await _favoriteService.GetAllFavoritesAsync();
     }

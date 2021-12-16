@@ -32,11 +32,17 @@ namespace LitChat.API.Controllers
             var result = _mapper.Map<List<FavoritesListResponseViewModel>>(users);
             return Ok(result);
         }
-
+        [HttpGet("get-users/{id}")]
+        public async Task<ActionResult<List<FavoritesListResponseViewModel>>> GetAllFavoritesForAccountAsync(int id)
+        {
+            var users = await _favoritesService.GetAllFavoriteUserAsync();
+            var result = _mapper.Map<List<FavoritesListResponseViewModel>>(users);
+            return Ok(result);
+        }
         [HttpGet("{id}")]
         public async Task<ActionResult<FavoritesListResponseViewModel>> GetFavoriteUserAsync(int id)
         {
-            var users = await _favoritesService.GetFavoriteUserByIdAsync(id);
+            var users = await _favoritesService.GetFavoriteUserByAccountIdAsync(id);
             var result = _mapper.Map<FavoritesListResponseViewModel>(users);
             return Ok(result);
         }

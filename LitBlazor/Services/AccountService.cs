@@ -66,9 +66,10 @@ namespace LitBlazor.Services
         public async Task Update(int userId,UpdateAccount model)
         {
             await _httpService.Put($"api/Account/{userId}", model);
-
-            Account.FirstName = model.UserName;
+            Account.FirstName = model.FirstName;
             Account.LastName = model.LastName;
+            Account.Phone = model.Phone;
+            Account.Description = model.Description;
             await _localStorageService.SetItem("Token", Account.JwtToken);
         }
 

@@ -4,6 +4,7 @@ using LitBlog.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LitChat.DAL.Migrations
 {
     [DbContext(typeof(BlogContext))]
-    partial class BlogContextModelSnapshot : ModelSnapshot
+    [Migration("20211216082934_AddNewPropertyToFavoriteModel")]
+    partial class AddNewPropertyToFavoriteModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,10 +34,6 @@ namespace LitChat.DAL.Migrations
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -58,9 +56,6 @@ namespace LitChat.DAL.Migrations
 
                     b.Property<DateTime?>("PasswordReset")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ResetToken")
                         .HasColumnType("nvarchar(max)");
@@ -138,9 +133,6 @@ namespace LitChat.DAL.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()

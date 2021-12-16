@@ -140,7 +140,7 @@ namespace LitBlog.API.Controllers
         }
 
         [Authorize]
-        [HttpPut]
+        [HttpPut("{CurrentUserId}")]
         public async Task<ActionResult<AccountResponseViewModel>> UpdateAccount(int CurrentUserId,UpdateAccountViewModel create)
         {
             var mapModel = _mapper.Map<UpdateAccountDto>(create);

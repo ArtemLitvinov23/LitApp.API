@@ -18,6 +18,10 @@ namespace LitBlog.DAL.Models
         public string FirstName { get; set; }
         [Required]
         public string LastName { get; set; }
+        [Phone]
+        public string Phone { get; set; }
+        [MaxLength(100)]
+        public string Description { get; set; }
         public Role Role { get; set; }
         public string VerificationToken { get; set; }
         public DateTime? Verified { get; set; }

@@ -13,13 +13,13 @@
         <MudCard>
             <MudCardContent>
                 <MudTextField Label="First name" HelperText="Max. 2 characters"
-                              @bind-Value="model.UserName" For="@(() => model.UserName)" />
+                              @bind-Value="model.FirstName" For="@(() => model.FirstName)" />
                 <MudTextField Label="Last name" Class="mt-3"
                               @bind-Value="model.LastName" For="@(() => model.LastName)" />
-                <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
-                              @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
-                <MudTextField Label="Confirm password" HelperText="Repeat the password" Class="mt-3"
-                              @bind-Value="model.ConfirmPassword" For="@(() => model.ConfirmPassword)" InputType="InputType.Password" />
+                <MudTextField Label="Phone" HelperText="Invalid format" Class="mt-3"
+                              @bind-Value="model.Phone" For="@(() => model.Phone)" InputType="InputType.Telephone" />
+                <MudTextField Label="Description" HelperText="" Class="mt-3"
+                              @bind-Value="model.Description" For="@(() => model.Description)" InputType="InputType.Text" />
             </MudCardContent>
             <MudCardActions>
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Edit user</MudButton>
@@ -52,13 +52,11 @@ else
 @code {
     private UpdateAccount model = new UpdateAccount();
     [Parameter] public int UserId {get;set;}
-    private bool loading;
     private bool success;
     private async void OnValidSubmit()
     {
         var user = await AccountService.GetUserDataFromLocalStorage();
         UserId = user.Id;
-        loading = true;
         try
         {
             await AccountService.Update(UserId,model);
@@ -66,7 +64,6 @@ else
         }
         catch 
         {
-            loading = false;
             StateHasChanged();
         }
     }

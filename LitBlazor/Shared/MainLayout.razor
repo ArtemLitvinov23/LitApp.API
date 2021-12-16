@@ -11,7 +11,8 @@
 <MudSnackbarProvider />
 <MudLayout>
     <MudAppBar Elevation="0" Color="Color.Dark"> 
-        <MudText Typo="Typo.h6" Class="ml-4">Litchat</MudText>
+         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit"  OnClick="@((e) => DrawerToggle())" Edge="Edge.Start" />
+         <MudText Typo="Typo.h6" Class="ml-4">Litchat</MudText>
          <MudSpacer />
          <MudIconButton Icon="@Icons.Custom.Brands.LinkedIn" Color="Color.Inherit"/>
          <MudIconButton OnClick="@(() => Logout())" Icon="@Icons.Outlined.Logout" Color="Color.Inherit"></MudIconButton>
@@ -20,9 +21,6 @@
         <NavMenu />
     </MudDrawer>
     <MudMainContent>
-        <MudToolBar DisableGutters="true">
-            <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Dark" OnClick="@((e) => DrawerToggle())" Class="ml-3" />
-        </MudToolBar>
         <MudContainer MaxWidth="MaxWidth.False" Class="mt-4">
             <CascadingValue Value="hubConnection">
                 @Body
