@@ -1,10 +1,6 @@
 ﻿using LitBlazor.Models;
 using LitBlazor.Services.Interfaces;
 using Microsoft.AspNetCore.Components;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace LitBlazor.Services
@@ -68,8 +64,6 @@ namespace LitBlazor.Services
             await _httpService.Put($"api/Account/{userId}", model);
             Account.FirstName = model.FirstName;
             Account.LastName = model.LastName;
-            Account.Phone = model.Phone;
-            Account.Description = model.Description;
             await _localStorageService.SetItem("Token", Account.JwtToken);
         }
 

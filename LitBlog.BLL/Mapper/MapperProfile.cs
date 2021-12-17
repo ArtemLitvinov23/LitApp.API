@@ -20,6 +20,10 @@ namespace LitBlog.BLL.Mapper
             CreateMap<Account, UsersResponseDto>();
             CreateMap<Account, AuthenticateRequestDto>();
             CreateMap<Account, AuthenticateResponseDto>();
+            CreateMap<Account, UserInfoDto>()
+                .ForMember(x => x.Phone, opt => opt.MapFrom(x => x.Phone))
+                .ForMember(x => x.Description, opt => opt.MapFrom(x => x.Description))
+                .ReverseMap();
             CreateMap<Role, RoleDto>();
             CreateMap<UpdateAccountDto, Account>();
             CreateMap<AccountDto, ResetPasswordRequestDto>();

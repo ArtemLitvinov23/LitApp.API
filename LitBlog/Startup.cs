@@ -55,6 +55,7 @@ namespace LitBlog.API
             services.AddScoped<IChatService, ChatService>();
             services.AddScoped<IFavoritesRepository, FavoritesRepository>();
             services.AddScoped<IFavoritesService, FavoritesService>();
+            services.AddScoped<IUserProfileService, UserProfileService>();
 
 
             services.AddAuthentication(options =>

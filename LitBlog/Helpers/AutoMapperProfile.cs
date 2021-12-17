@@ -13,6 +13,14 @@ namespace LitBlog.API.Helpers
             CreateMap<AccountDto, AccountViewModel>()
                 .ForMember(x => x.MessagesFromUser, opt => opt.MapFrom(src => src.MessagesFromUser))
                 .ForMember(x => x.MessagesToUser, opt => opt.MapFrom(src => src.MessagesToUser));
+            CreateMap<AccountViewModel, UserInfoViewModel>()
+                .ForMember(x => x.Phone, opt => opt.MapFrom(x => x.Phone))
+                .ForMember(x => x.Description, opt => opt.MapFrom(x => x.Description))
+                .ReverseMap();
+            CreateMap<UserInfoDto, UserInfoViewModel>()
+                .ForMember(x => x.Phone, opt => opt.MapFrom(x => x.Phone))
+                .ForMember(x => x.Description, opt => opt.MapFrom(x => x.Description))
+                .ReverseMap();
             CreateMap<AccountDto, AccountRegisterViewModel>().ReverseMap();
             CreateMap<AuthenticateResponseDto, AccountRegisterViewModel>();
             CreateMap<UsersResponseDto, UserResponseViewModel>();

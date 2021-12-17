@@ -1,0 +1,107 @@
+﻿@page "/profile/{CurrentUserId}"
+@inject IProfileService _profileService
+@inject IChatService _chatService
+@inject IAccountService _accountService
+@layout MainLayout
+@inject NavigationManager _navigationManager
+@attribute [Authorize]
+
+<MudContainer Style="display: inline-block; position: relative; top: 0; bottom: 0; left: 0; right: 0; width: 800px; height: 200px; margin: auto; ">
+<MudCard>
+    <MudCardHeader>
+        <CardHeaderAvatar>
+            <MudAvatar Color="Color.Dark" Style="height:70px; width:70px;">@users.FirstName</MudAvatar>
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <MudText Typo="Typo.body1">@users.FirstName @users.LastName </MudText>
+            <MudText Typo="Typo.body2">@users.Email</MudText>
+            <MudText Typo="Typo.caption">@users.Phone</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+                     <MudIconButton OnClick="@(() => Return())" Icon="@Icons.TwoTone.ArrowBackIosNew" Color="Color.Inherit" ButtonType="ButtonType.Button">Return</MudIconButton>
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudText Typo="Typo.body2">@users.Description.</MudText>
+    </MudCardContent>
+    <MudCardActions>
+                <MudButton OnClick="@(() => EditAccount(users.Id.ToString()))" StartIcon="@Icons.Filled.Edit" Color="Color.Inherit" ButtonType="ButtonType.Button">Edit information</MudButton>
+                <MudButton OnClick="@(() => RemovePhoneFromAccount(users.Id.ToString()))" StartIcon="@Icons.Filled.PhoneDisabled" Color="Color.Inherit" ButtonType="ButtonType.Button">Delete phone</MudButton>
+                <MudButton OnClick="@(() => RemoveDescriptionFromAccount(users.Id.ToString()))" StartIcon="@Icons.Filled.Delete" Color="Color.Tertiary" ButtonType="ButtonType.Button">Delete description</MudButton>
+    </MudCardActions>
+</MudCard>
+<br />
+<br/>
+<MudCard>
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Color="Color.Dark" Style="height:40px; width:40px;">Edit profile</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+        <MudCardContent>
+            <MudTextField @bind-Value="model.FirstName" Label="First name" Variant="Variant.Text" Margin="Margin.Normal"  HelperText="Min. 2 characters"></MudTextField>
+            <MudTextField @bind-Value="model.LastName" Label="Last name" Variant="Variant.Text" Margin="Margin.Normal"  HelperText="Min. 2 characters"></MudTextField>
+            <MudTextField @bind-Value="model.Phone" Label="Phone" Variant="Variant.Text" Margin="Margin.Normal" ></MudTextField>
+            <MudTextField @bind-Value="model.Description" Label="Description" Variant="Variant.Text" Margin="Margin.Normal"  HelperText="Max. 100 characters"></MudTextField>
+        </MudCardContent>
+    <MudCardActions>
+                <MudButton OnClick="@(() => AddUserInfoAsync(users.Id.ToString(), model))" StartIcon="@Icons.Filled.Save" Color="Color.Inherit" ButtonType="ButtonType.Button">Save changes</MudButton>
+    </MudCardActions>
+</MudCard>
+</MudContainer>
+
+
+@code {
+    private Models.Users users = new Models.Users();
+    private Models.UpdateAccount model = new Models.UpdateAccount();
+    [Parameter] public string CurrentUserId{ get; set;}
+
+    void Return()
+    {
+        _navigationManager.NavigateTo("/users");
+    }
+
+
+    async Task AddUserInfoAsync(string userId,UpdateAccount updateAccount)
+    {
+        await _accountService.Update(Convert.ToInt32(CurrentUserId), updateAccount);
+        updateAccount.FirstName = string.Empty;
+        updateAccount.LastName = string.Empty;
+        updateAccount.Phone = string.Empty;
+        updateAccount.Description = string.Empty;
+        users = await _chatService.GetUserDetailsAsync(CurrentUserId);
+    }
+    async Task RemovePhoneFromAccount(string id)
+    {
+        await _profileService.RemovePhoneFromAccount(id);
+        users = await _chatService.GetUserDetailsAsync(CurrentUserId);
+    }
+    async Task EditAccount(string userId)
+    {
+        var userInfo =  await _chatService.GetUserDetailsAsync(CurrentUserId);
+        var editForms = new UpdateAccount
+            {
+                FirstName = userInfo.FirstName,
+                LastName = userInfo.LastName,
+                Phone = userInfo.Phone,
+                Description = userInfo.Description
+            };
+            model = editForms;
+    }
+     async Task RemoveDescriptionFromAccount(string id)
+    {
+       await _profileService.RemoveDescriptionFromAccount(id);
+       users = await _chatService.GetUserDetailsAsync(CurrentUserId);
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            users = await _chatService.GetUserDetailsAsync(CurrentUserId);
+        }
+        catch
+        {
+            StateHasChanged();
+        }
+    }
+    }

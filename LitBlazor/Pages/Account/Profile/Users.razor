@@ -25,7 +25,7 @@
         <MudTd>
             @if(CurrentUserId == @context.Id.ToString())
                 {
-                     <MudButton OnClick="@(() => ShowInformation(context))" StartIcon="@Icons.Material.Filled.Add" Color="Color.Warning" ButtonType="ButtonType.Button">Add info</MudButton>
+                     <MudButton OnClick="@(() => EditProfile(context))" StartIcon="@Icons.Material.Filled.Add" Color="Color.Warning" ButtonType="ButtonType.Button">Edit</MudButton>
                 }
                 <MudButton OnClick="@(() => ShowInformation(context))" StartIcon="@Icons.Material.Outlined.Info" Color="Color.Info" ButtonType="ButtonType.Button">Info</MudButton>
              <MudButton OnClick="@(() => LoadUserChat(context.Id.ToString()))" StartIcon="@Icons.Material.Filled.Chat" Color="Color.Primary" ButtonType="ButtonType.Button">Chat</MudButton>
@@ -51,12 +51,19 @@
     [Parameter] public string CurrentUserId{ get; set; }
     [Parameter] public string ContactId{ get; set; }
 
-         async Task ShowInformation(Models.Users users)
-        {
+    async Task EditProfile(Models.Users users)
+    {
+       var contact = await _chatService.GetUserDetailsAsync(users.Id.ToString());
+       ContactId = contact.Id.ToString();
+       _navigationManager.NavigateTo($"profile/{ContactId}");
+    }
+
+    async Task ShowInformation(Models.Users users)
+    {
        var contact = await _chatService.GetUserDetailsAsync(users.Id.ToString());
        ContactId = contact.Id.ToString();
        _navigationManager.NavigateTo($"card/{ContactId}");
-         }
+    }
 
         async Task LoadUserChat(string userId)
         {

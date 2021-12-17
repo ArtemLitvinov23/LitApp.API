@@ -2,6 +2,7 @@
 @inject IFavoritesListService _favoriteService
 @inject NavigationManager _navigationManager
 @inject IAccountService accountService
+@inject IFavoritesListService _favoritesList
 @attribute [Authorize]
 @page "/chat/{ContactId}"
 @page "/chat"
@@ -55,7 +56,7 @@
                             <div class="d-flex flex-row mt-n1 mb-n1">
                                 <div class="mr-4">
                                     <MudBadge Class="my-2">
-                                        @if (user.FavoriteUserAccountId.ToString() == ContactId)
+                                        @if (user.OwnerAccountId.ToString() == ContactId)
                                         {
                                             <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">
                                                 @user.Email.ToUpper().FirstOrDefault()
@@ -71,6 +72,7 @@
                                     <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.Email</MudText>
                                     <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.FirstName @user.LastName </MudText>
                                 </div>
+                                <MudIconButton OnClick="@(() => RemoveUserFromFavorite(user))" Icon="@Icons.Sharp.Delete" Color="Color.Warning" ButtonType="ButtonType.Button">Delete</MudIconButton>
                             </div>
                         </MudListItem>
                     }
@@ -151,10 +153,17 @@
         ContactEmail = contact.Email;
         _navigationManager.NavigateTo($"chat/{ContactId}");
         messages = new List<Models.ChatMessages>();
-        messages = await _chatService.GetConversationAsync(userId,CurrentUserId);
+        messages = await _chatService.GetConversationAsync(ContactId,CurrentUserId);
     }
     async Task GetAllFavorites()
     {
+        ChatUsers = await _favoriteService.GetAllFavoritesAsync();
+    }
+    async Task RemoveUserFromFavorite(Models.FavoritesListResponse models)
+    {
+        ContactId = models.FavoriteUserAccountId.ToString();
+        var contact = await _favoritesList.GetFavoritesUserAsync(ContactId);
+        await _favoritesList.RemoveUserFromFavoriteAsync(contact.FavoriteUserAccountId.ToString());
         ChatUsers = await _favoriteService.GetAllFavoritesAsync();
     }
 }

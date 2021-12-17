@@ -24,7 +24,7 @@
     <MudCardContent>
         <MudText Typo="Typo.body2">@users.Description.</MudText>
     </MudCardContent>
-    <MudCardActions>
+ <MudCardActions>
           @if (IsDeleted)
             {
                 <MudIconButton OnClick="@(() => AddUserToFavorite(users))" Icon="@Icons.Filled.Favorite" Color="Color.Inherit" ButtonType="ButtonType.Button">Favorite</MudIconButton>
@@ -35,7 +35,7 @@
                 <MudIconButton OnClick="@(() => AddUserToFavorite(users))" Icon="@Icons.Filled.FavoriteBorder" Color="Color.Inherit" ButtonType="ButtonType.Button">Favorite</MudIconButton>
                 <MudIconButton OnClick="@(() => RemoveUserFromFavorite(users))" Icon="@Icons.Filled.Delete" Color="Color.Tertiary" ButtonType="ButtonType.Button">Delete</MudIconButton>
             }
-    </MudCardActions>
+ </MudCardActions>
 </MudCard>
 </MudContainer>
 
@@ -74,7 +74,6 @@
         var contact = await _favoritesList.GetFavoritesUserAsync(ContactId);
         await _favoritesList.RemoveUserFromFavoriteAsync(contact.FavoriteUserAccountId.ToString());
         IsDeleted = true;
-
     }
     protected override async Task OnInitializedAsync()
     {

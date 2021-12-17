@@ -6,6 +6,7 @@ using LitBlog.BLL.PasswordHasher;
 using LitBlog.BLL.Services.Interfaces;
 using LitBlog.DAL.Models;
 using LitBlog.DAL.Repositories;
+using LitChat.BLL.ModelsDto;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -206,6 +207,5 @@ namespace LitBlog.BLL.Services
         }
 
         public async Task DeleteAccountAsync(int id)=> await _accountRepository.DeleteAsync(id);
-
     }
 }

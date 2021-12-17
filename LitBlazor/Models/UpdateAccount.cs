@@ -9,7 +9,7 @@ namespace LitBlazor.Models
         public string FirstName { get; set; }
 
         [Required]
-        [MinLength(2, ErrorMessage = "Last name must be at least 6 characters")]
+        [MinLength(2, ErrorMessage = "Last name must be at least 2 characters")]
         public string LastName { get; set; }
 
         [Phone]
