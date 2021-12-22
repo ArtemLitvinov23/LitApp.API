@@ -1,6 +1,7 @@
 ﻿using LitBlazor.Models;
 using LitBlazor.Services.Interfaces;
 using Microsoft.AspNetCore.Components;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace LitBlazor.Services
@@ -9,11 +10,11 @@ namespace LitBlazor.Services
     public class AccountService : IAccountService
     {
         public Account Account { get; private set; }
-        private readonly IHttpService _httpService;
+        private readonly IHttpServiceGeneric _httpService;
         private readonly NavigationManager _navigationManager;
         private readonly ILocalStorageService _localStorageService;
 
-        public AccountService(IHttpService httpService,
+        public AccountService(IHttpServiceGeneric httpService,
             NavigationManager navigationManager,
             ILocalStorageService localStorageService)
         {
@@ -21,7 +22,34 @@ namespace LitBlazor.Services
             _navigationManager = navigationManager;
             _localStorageService = localStorageService;
         }
-
+        public async Task<Users> GetUserDetailsAsync(string userId) => await _httpService.Get<Users>($"api/Account/get-users/{userId}");
+        public async Task<List<Users>> GetAllUsersAsync() => await _httpService.GetAll<Users>("api/Account/get-users");
+        public async Task Initialize()
+        {
+            Account = await _localStorageService.GetItemAsync<Account>("account");
+        }
+        public async Task Login(AuthAccount model)
+        {
+            Account = await _httpService.PostWithOutToken<Account>("api/Account/sign-in",model);
+            await _localStorageService.SetItem("account", Account);
+        }
+        public async Task Register(RegisterAccount model) => await _httpService.Post("api/Account/sign-up", model);
+        public async Task Verify(VerifyAccount model)=> await _httpService.Post("api/Account/verify", model);
+        public async Task ForgotPassword(ForgotPassword model) => await _httpService.Post("api/Account/forgot-password", model);
+        public async Task ResetPassword(ResetPassword model)=> await _httpService.Post("api/Account/forgot-password", model);
+        public async Task Logout()
+        {
+            Account = null;
+            await _localStorageService.RemoveItem("account");
+            _navigationManager.NavigateTo("/account/login");
+        }
+        public async Task Update(int userId, UpdateAccount model)
+        {
+            await _httpService.Put($"api/Account/{userId}", model);
+            Account.FirstName = model.FirstName;
+            Account.LastName = model.LastName;
+            await _localStorageService.SetItem("Token", Account.JwtToken);
+        }
         public async Task Delete(int id)
         {
             await _httpService.Delete($"api/Account/{id}");
@@ -31,52 +59,6 @@ namespace LitBlazor.Services
                 await Logout();
             }
         }
-
-        public async Task ForgotPassword(ForgotPassword model)
-        {
-            await _httpService.Post("api/Account/forgot-password", model);
-        }
-        public async Task Initialize()
-        {
-            Account = await _localStorageService.GetItemAsync<Account>("account");
-        }
-
-        public async Task Login(AuthAccount model)
-        {
-            Account = await _httpService.Post<Account>("api/Account/sign-in", model);
-            await _localStorageService.SetItem("account", Account);
-        }
-
-        public async Task Logout()
-        {
-            Account = null;
-            await _localStorageService.RemoveItem("account");
-            _navigationManager.NavigateTo("/account/login");
-        }
-
-        public async Task Register(RegisterAccount model)
-        {
-            await _httpService.Post("api/Account/sign-up", model);
-        }
-
-        public async Task Update(int userId,UpdateAccount model)
-        {
-            await _httpService.Put($"api/Account/{userId}", model);
-            Account.FirstName = model.FirstName;
-            Account.LastName = model.LastName;
-            await _localStorageService.SetItem("Token", Account.JwtToken);
-        }
-
-        public async Task Verify(VerifyAccount model)
-        {
-            await _httpService.Post("api/Account/verify", model);
-        }
-
-        public async Task ResetPassword(ResetPassword model)
-        {
-            await _httpService.Post("api/Account/forgot-password", model);
-        }
-
         public async Task<Account> GetUserDataFromLocalStorage()=> await _localStorageService.GetItemAsync<Account>("account");
 
     }

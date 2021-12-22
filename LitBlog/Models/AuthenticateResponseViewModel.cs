@@ -1,6 +1,4 @@
-﻿using LitChat.API.Models;
-using System;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace LitBlog.API.Models
 {
@@ -10,10 +8,6 @@ namespace LitBlog.API.Models
         public string Email { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public RoleViewModel Role { get; set; }
-        public DateTime Created { get; set; }
-        public DateTime? Updated { get; set; }
-        public DateTime? Verified { get; set; }
         public string JwtToken { get; set; }
 
         [JsonIgnore] // refresh token is returned in http only cookie

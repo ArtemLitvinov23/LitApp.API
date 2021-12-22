@@ -20,7 +20,7 @@ namespace LitBlazor
                .AddScoped<IAccountService, AccountService>()
                .AddScoped<IFavoritesListService, FavoritesListService>()
                .AddScoped<IProfileService, UserProfileService>()
-               .AddScoped<IHttpService, HttpService>()
+               .AddScoped<IHttpServiceGeneric, HttpServiceGeneric>()
                .AddScoped<ILocalStorageService, LocalStorageService>()
                .AddTransient<IChatService, ChatService>();
 

@@ -1,6 +1,5 @@
 ﻿@page "/card/{ContactId}"
-@inject IAccountService AccountService
-@inject IChatService _chatService
+@inject IAccountService _accountService
 @inject IFavoritesListService _favoritesList
 @layout MainLayout
 @inject NavigationManager _navigationManager
@@ -27,13 +26,11 @@
  <MudCardActions>
           @if (IsDeleted)
             {
-                <MudIconButton OnClick="@(() => AddUserToFavorite(users))" Icon="@Icons.Filled.Favorite" Color="Color.Inherit" ButtonType="ButtonType.Button">Favorite</MudIconButton>
-                <MudIconButton OnClick="@(() => RemoveUserFromFavorite(users))" Icon="@Icons.Sharp.DeleteOutline" Color="Color.Tertiary" ButtonType="ButtonType.Button">Delete</MudIconButton>
+                <MudButton OnClick="@(() => AddUserToFavorite(users))" StartIcon="@Icons.Filled.Favorite" Color="Color.Inherit" ButtonType="ButtonType.Button">Add to favorite</MudButton>
             }
             else
             {
-                <MudIconButton OnClick="@(() => AddUserToFavorite(users))" Icon="@Icons.Filled.FavoriteBorder" Color="Color.Inherit" ButtonType="ButtonType.Button">Favorite</MudIconButton>
-                <MudIconButton OnClick="@(() => RemoveUserFromFavorite(users))" Icon="@Icons.Filled.Delete" Color="Color.Tertiary" ButtonType="ButtonType.Button">Delete</MudIconButton>
+                <MudButton OnClick="@(() => RemoveUserFromFavorite(users))" StartIcon="@Icons.Filled.FavoriteBorder" Color="Color.Inherit" ButtonType="ButtonType.Button">Remove from favorite</MudButton>
             }
  </MudCardActions>
 </MudCard>
@@ -52,7 +49,7 @@
     }
     async Task AddUserToFavorite(Models.Users users)
     {
-        var user = await AccountService.GetUserDataFromLocalStorage();
+        var user = await _accountService.GetUserDataFromLocalStorage();
         CurrentUserId = user.Id.ToString();
         ContactId = users.Id.ToString();
         var favoriteUser = new FavoritesList
@@ -79,7 +76,7 @@
     {
         try
         {
-            users = await _chatService.GetUserDetailsAsync(ContactId);
+            users = await _accountService.GetUserDetailsAsync(ContactId);
             var userBoolInfo = await _favoritesList.GetFavoritesUserAsync(ContactId);
             IsDeleted = userBoolInfo.IsDeleted;
         }

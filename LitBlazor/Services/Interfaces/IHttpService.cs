@@ -1,15 +1,20 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace LitBlazor.Services.Interfaces
 {
-    public interface IHttpService
+    public interface IHttpServiceGeneric
     {
         Task<T> Get<T>(string uri);
+        Task<List<T>> GetAll<T>(string uri);
         Task Post(string uri, object value);
         Task<T> Post<T>(string uri, object value);
+        Task<T> PostWithOutToken<T>(string uri, object value);
         Task Put(string uri, object value);
         Task<T> Put<T>(string uri, object value);
+        Task Patch(string uri, object value);
+        Task Patch(string uri);
         Task Delete(string uri);
-        Task<T> Delete<T>(string uri);
+
     }
 }

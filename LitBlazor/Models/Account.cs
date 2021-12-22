@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace LitBlazor.Models
+﻿namespace LitBlazor.Models
 {
     public class Account
     {
@@ -8,9 +6,6 @@ namespace LitBlazor.Models
         public string Email { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Role { get; set; }
-        public string Phone { get; set; }
-        public string Description { get; set; }
         public string JwtToken { get; set; }
     }
 }

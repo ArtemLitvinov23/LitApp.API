@@ -1,7 +1,7 @@
 ﻿@inject IChatService _chatService
 @inject IFavoritesListService _favoriteService
 @inject NavigationManager _navigationManager
-@inject IAccountService accountService
+@inject IAccountService _accountService
 @inject IFavoritesListService _favoritesList
 @attribute [Authorize]
 @page "/chat/{ContactId}"
@@ -134,10 +134,10 @@
                 StateHasChanged();
             }
         });
-        await GetAllFavorites();
-        var user = await accountService.GetUserDataFromLocalStorage();
+        var user = await _accountService.GetUserDataFromLocalStorage();
         CurrentUserId = user.Id.ToString();
         CurrentUserEmail = user.Email;
+        await GetAllFavorites(CurrentUserId);
         if (!string.IsNullOrEmpty(ContactId))
         {
             await LoadUserChat(ContactId);
@@ -148,16 +148,16 @@
     [Parameter] public string ContactId { get; set; }
     async Task LoadUserChat(string userId)
     {
-        var contact = await _chatService.GetUserDetailsAsync(userId);
+        var contact = await _accountService.GetUserDetailsAsync(userId);
         ContactId = contact.Id.ToString();
         ContactEmail = contact.Email;
         _navigationManager.NavigateTo($"chat/{ContactId}");
         messages = new List<Models.ChatMessages>();
         messages = await _chatService.GetConversationAsync(ContactId,CurrentUserId);
     }
-    async Task GetAllFavorites()
+    async Task GetAllFavorites(string id)
     {
-        ChatUsers = await _favoriteService.GetAllFavoritesAsync();
+        ChatUsers = await _favoriteService.GetAllFavoritesForAccountAsync(CurrentUserId);
     }
     async Task RemoveUserFromFavorite(Models.FavoritesListResponse models)
     {
@@ -165,6 +165,8 @@
         var contact = await _favoritesList.GetFavoritesUserAsync(ContactId);
         await _favoritesList.RemoveUserFromFavoriteAsync(contact.FavoriteUserAccountId.ToString());
         ChatUsers = await _favoriteService.GetAllFavoritesAsync();
+        ContactEmail = string.Empty;
+        messages = new List<Models.ChatMessages>(); 
     }
 }
 }

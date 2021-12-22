@@ -1,6 +1,5 @@
 ﻿@page "/profile/{CurrentUserId}"
 @inject IProfileService _profileService
-@inject IChatService _chatService
 @inject IAccountService _accountService
 @layout MainLayout
 @inject NavigationManager _navigationManager
@@ -69,16 +68,16 @@
         updateAccount.LastName = string.Empty;
         updateAccount.Phone = string.Empty;
         updateAccount.Description = string.Empty;
-        users = await _chatService.GetUserDetailsAsync(CurrentUserId);
+        users = await _accountService.GetUserDetailsAsync(CurrentUserId);
     }
     async Task RemovePhoneFromAccount(string id)
     {
         await _profileService.RemovePhoneFromAccount(id);
-        users = await _chatService.GetUserDetailsAsync(CurrentUserId);
+        users = await _accountService.GetUserDetailsAsync(CurrentUserId);
     }
     async Task EditAccount(string userId)
     {
-        var userInfo =  await _chatService.GetUserDetailsAsync(CurrentUserId);
+        var userInfo =  await _accountService.GetUserDetailsAsync(CurrentUserId);
         var editForms = new UpdateAccount
             {
                 FirstName = userInfo.FirstName,
@@ -91,13 +90,13 @@
      async Task RemoveDescriptionFromAccount(string id)
     {
        await _profileService.RemoveDescriptionFromAccount(id);
-       users = await _chatService.GetUserDetailsAsync(CurrentUserId);
+       users = await _accountService.GetUserDetailsAsync(CurrentUserId);
     }
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            users = await _chatService.GetUserDetailsAsync(CurrentUserId);
+            users = await _accountService.GetUserDetailsAsync(CurrentUserId);
         }
         catch
         {
