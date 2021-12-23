@@ -150,9 +150,9 @@ namespace LitBlog.BLL.Services
             await _accountRepository.UpdateAccountAsync(account);
         }
 
-        public async Task<List<UsersResponseDto>> GetAllUsersAsync()
+        public async Task<List<UsersResponseDto>> GetAllUsersAsync(int currentUserId)
         {
-            var users = await _accountRepository.GetAllAccounts().ToListAsync();
+            var users = await _accountRepository.GetAllAccounts().Where(x=>x.Id != currentUserId).ToListAsync();
             var userDto = _mapper.Map<List<UsersResponseDto>>(users);
             return userDto;
         }

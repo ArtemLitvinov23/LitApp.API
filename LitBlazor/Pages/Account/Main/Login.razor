@@ -2,42 +2,31 @@
 @inject IAccountService AccountService
 @inject NavigationManager NavigationManager
 
-<div class="card">
-    <h4 class="card-header">Login</h4>
-    <div class="card-body">
-        <EditForm Model="@loginRequest" OnValidSubmit="HandleValidSubmit">
-            <DataAnnotationsValidator />
-            <div class="form-group">
-                <label>Email</label>
-                <InputText @bind-Value="loginRequest.Email" class="form-control" />
-                <ValidationMessage For="@(() => loginRequest.Password)" />
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <InputText @bind-Value="loginRequest.Password" type="password" class="form-control" />
-                <ValidationMessage For="@(() => loginRequest.Password)" />
-            </div>
-            <div class="form-check m-3">
-        <InputCheckbox id="inputRememberMe" class="form-check-input" @bind-Value="@loginRequest.RememberMe" />
-        <label class="form-check-label" for="inputRememberMe">Remember Me</label>
-            </div>
-            <button disabled="@loading" class="btn btn-primary">
-                @if (loading)
-                {
-                    <span class="spinner-border spinner-border-sm mr-1"></span>
-                }
-                Login
-            </button>
-            @if (!string.IsNullOrEmpty(error))
+<div style="max-width: 400px;">
+    <h4 class="card-header">Welcome to the LitChat!</h4>
+    <EditForm Model="@loginRequest" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <MudCard>
+            <MudCardContent>
+                <MudTextField Label="Email" Class="mt-3"
+                              @bind-Value="loginRequest.Email" For="@(() => loginRequest.Email)" />
+                <MudTextField Label="Password"  Class="mt-3"
+                              @bind-Value="loginRequest.Password" For="@(() => loginRequest.Password)" InputType="InputType.Password" />
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" Size=Size.Large Class="ml-auto">Login</MudButton>
+                <MudSpacer/>
+                <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick=@(()=>Forgott()) Color="Color.Warning" Size=Size.Small Class="ml-auto">Forgot password</MudButton>
+                <MudSpacer/>
+                <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick=@(()=>Register()) Color="Color.Primary" Size=Size.Small Class="ml-auto">Register</MudButton>
+            </MudCardActions>
+        </MudCard>
+         @if (!string.IsNullOrEmpty(error))
             {
                 <div class="alert alert-danger mt-3 mb-0">@error</div>
             }
-            <NavLink href="account/register" class="btn btn-link">Register</NavLink>
-            <NavLink href="account/forgot-password" class="btn btn-link">Forgot your password?</NavLink>
-        </EditForm>
-    </div>
+    </EditForm>
 </div>
-
 @code {
     private AuthAccount loginRequest { get; set; } = new AuthAccount();
     private bool loading;
@@ -51,8 +40,14 @@
             NavigationManager.NavigateTo("/chat");
         }
     }
-
-
+    protected void Register()
+    {
+       NavigationManager.NavigateTo("/account/register");
+    }
+    protected void Forgott()
+    {
+       NavigationManager.NavigateTo("/account/forgot-password");
+    }
     private async void HandleValidSubmit()
     {
         loading = true;

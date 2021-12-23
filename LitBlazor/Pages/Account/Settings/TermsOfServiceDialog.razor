@@ -1,0 +1,24 @@
+﻿@inject IAccountService _accountService
+@layout MainLayout
+@inject NavigationManager _navigationManager
+<MudDialog>
+    <DialogContent>
+        Are you sure you want to remove your account? This process cannot be undone.
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="()=>RemoveAccount()">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    void Cancel() => MudDialog.Cancel();
+
+    async Task RemoveAccount()
+    {
+        var user = await _accountService.GetUserDataFromLocalStorage();
+        await _accountService.Delete(user.Id);
+        MudDialog.Close(DialogResult.Ok(true));
+        _navigationManager.NavigateTo("/account/login");
+    }
+}

@@ -1,51 +1,51 @@
-﻿@page "/account/verify"
+﻿@page "/account/verify/{Token}"
 @inject IAccountService AccountService
 @inject NavigationManager NavigationManager
 
-<div class="card">
-    <h4 class="card-header">Sign Up</h4>
-    <div class="card-body">
-        <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
-            <DataAnnotationsValidator />
-            <div class="form-group">
-                <label>Please enter the token sent to your email </label>
-                <InputText @bind-Value="model.Token" class="form-control" />
-                <ValidationMessage For="@(() => model.Token)" />
-            </div>
-            <button disabled="@loading" class="btn btn-primary">
-                @if (loading)
-                {
-                    <span class="spinner-border spinner-border-sm mr-1"></span>
-                }
-                Verify account
-            </button>
-            @if (!string.IsNullOrEmpty(errors))
+<div style="max-width: 400px;">
+    <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudCard>
+            <MudCardContent>
+                <MudTextField Label="Email" Class="mt-3"
+                              @bind-Value="model.Token" For="@(() => model.Token)"/>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" Size=Size.Large Class="ml-auto">Verify</MudButton>
+                <MudSpacer/>
+                <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick=@(()=>Login()) Color="Color.Warning" Size=Size.Small Class="ml-auto">Cancel</MudButton>
+            </MudCardActions>
+        </MudCard>
+         @if (!string.IsNullOrEmpty(error))
             {
-                <div class="alert alert-danger mt-3 mb-0">@errors</div>
+                <div class="alert alert-danger mt-3 mb-0">@error</div>
             }
-            <NavLink href="account/register" class="btn btn-link">Cancel</NavLink>
-        </EditForm>
-    </div>
+    </EditForm>
 </div>
-
 @code{
     private VerifyAccount model = new();
-    private bool loading;
-    private string errors;
+    private string error;
+    [Parameter] public string Token { get; set; }
 
+    protected void Login()
+    {
+        NavigationManager.NavigateTo("/account/login");
+    }
     private async void OnValidSubmit()
     {
-        loading = true;
         try
         {
+            var newToken = new VerifyAccount()
+                {
+                    Token = Token
+                };
+            model = newToken;
             await AccountService.Verify(model);
-
             NavigationManager.NavigateTo("/account/login");
         }
         catch (Exception ex)
         {
-            errors = ex.Message;
-            loading = false;
+            error = ex.Message;
             StateHasChanged();
         }
     }

@@ -20,7 +20,7 @@ namespace LitBlog.BLL.Services.Interfaces
         Task<AccountResponseDto> CreateAccountAsync(AccountDto model);
         Task<AccountResponseDto> UpdateAccountAsync(int id, UpdateAccountDto model);
         Task<UsersResponseDto> GetUserByIdAsync(int id);
-        Task<List<UsersResponseDto>> GetAllUsersAsync();
+        Task<List<UsersResponseDto>> GetAllUsersAsync(int currentUserId);
         Task DeleteAccountAsync(int id);
     }
 }

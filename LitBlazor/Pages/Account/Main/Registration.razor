@@ -2,69 +2,53 @@
 @inject IAccountService AccountService
 @inject NavigationManager NavigationManager
 
-<div class="card">
-    <h4 class="card-header">Sign Up</h4>
-    <div class="card-body">
-        <EditForm Model="@_registerAccount" OnValidSubmit="OnValidSubmit">
-            <DataAnnotationsValidator />
-            <div class="form-group">
-                <label>First Name</label>
-                <InputText @bind-Value="_registerAccount.FirstName" class="form-control" />
-                <ValidationMessage For="@(() => _registerAccount.FirstName)" />
-            </div>
-            <div class="form-group">
-                <label>Last Name</label>
-                <InputText @bind-Value="_registerAccount.LastName" class="form-control" />
-                <ValidationMessage For="@(() => _registerAccount.LastName)" />
-            </div>
-            <div class="form-group">
-                <label>Email</label>
-                <InputText @bind-Value="_registerAccount.Email" class="form-control" />
-                <ValidationMessage For="@(() => _registerAccount.Email)" />
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <InputText @bind-Value="_registerAccount.Password" type="password" class="form-control" />
-                <ValidationMessage For="@(() => _registerAccount.Password)" />
-            </div>
-            <div class="form-group">
-                <label>Confirm password</label>
-                <InputText @bind-Value="_registerAccount.ConfirmPassword" type="password" class="form-control" />
-                <ValidationMessage For="@(() => _registerAccount.ConfirmPassword)" />
-            </div>
-            <div class="form-group form-check">
-                <InputCheckbox @bind-Value="_registerAccount.AcceptTerms" id="acceptTerms" class="form-check-input" />
-                <label for="acceptTerms" class="form-check-label">Accept Terms & Conditions</label>
-                <ValidationMessage For="@(() => _registerAccount.AcceptTerms)" />
-            </div>
-            <button disabled="@loading" class="btn btn-primary">
-                @if (loading)
-                {
-                    <span class="spinner-border spinner-border-sm mr-1"></span>
-                }
-                Register
-            </button>
-            <NavLink href="account/login" class="btn btn-link">Cancel</NavLink>
-        </EditForm>
-    </div>
+<div style="max-width: 400px;">
+    <EditForm Model="@_registerAccount" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudCard>
+            <MudCardContent>
+                <MudTextField Label="First name" Class="mt-3"
+                              @bind-Value="_registerAccount.FirstName" For="@(() => _registerAccount.FirstName)" HelperText="Min.2 characters" />
+                <MudTextField Label="Last name" Class="mt-3"
+                              @bind-Value="_registerAccount.LastName" For="@(() => _registerAccount.LastName)" HelperText="Min.2 characters" />
+                <MudTextField Label="Email" Class="mt-3"
+                              @bind-Value="_registerAccount.Email" For="@(() => _registerAccount.Email)" InputType="InputType.Email"/>
+                <MudTextField Label="Password" Class="mt-3"
+                              @bind-Value="_registerAccount.Password" For="@(() => _registerAccount.Password)"HelperText="Choose a strong password" InputType="InputType.Password"/>
+                <MudTextField Label="Confirm Password" Class="mt-3"
+                              @bind-Value="_registerAccount.ConfirmPassword" For="@(() => _registerAccount.ConfirmPassword)" HelperText="Repeat the password" InputType="InputType.Password"/>
+                <MudSwitch @bind-Checked="_registerAccount.AcceptTerms" For="@(() => _registerAccount.AcceptTerms)" Label="Accept Terms & Conditions" Color="Color.Success" />
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" Size=Size.Large Class="ml-auto">Register</MudButton>
+                <MudSpacer/>
+                <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick=@(()=>Login()) Color="Color.Warning" Size=Size.Small Class="ml-auto">Cancel</MudButton>
+            </MudCardActions>
+        </MudCard>
+         @if (!string.IsNullOrEmpty(error))
+            {
+                <div class="alert alert-danger mt-3 mb-0">@error</div>
+            }
+    </EditForm>
 </div>
-
 @code
 {
     private readonly RegisterAccount _registerAccount = new();
-    private bool loading;
-
+    private string error;
+    protected void Login()
+    {
+        NavigationManager.NavigateTo("/account/login");
+    }
     private async void OnValidSubmit()
     {
-        loading = true;
         try
         {
-        await AccountService.Register(_registerAccount);
-        NavigationManager.NavigateTo("account/verify");
+            await AccountService.Register(_registerAccount);
+            NavigationManager.NavigateTo("account/verify");
         }
-        catch
+        catch(Exception ex)
         {
-            loading = false;
+            error = ex.Message;
             StateHasChanged();
         }
     }

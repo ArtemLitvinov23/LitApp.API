@@ -49,7 +49,7 @@ namespace LitBlog.DAL.Repositories
 
         public async Task DeleteAsync(int accountId)
         {
-            var user = _context.Accounts.FirstOrDefaultAsync(x => x.Id == accountId);
+            var user = await _context.Accounts.FirstOrDefaultAsync(x => x.Id == accountId);
             if (user is null)
                 throw new NullReferenceException("Account is not found");
 

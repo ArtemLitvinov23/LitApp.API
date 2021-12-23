@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using LitBlog.API.Helpers;
 using LitBlog.API.Models;
 using LitBlog.BLL.ModelsDto;
 using LitBlog.BLL.Services.Interfaces;
@@ -106,15 +105,15 @@ namespace LitBlog.API.Controllers
         }
 
         [Authorize]
-        [HttpGet("get-users")]
-        public async Task<ActionResult<List<UserResponseViewModel>>> GetAllUsers()
+        [HttpGet("get-users/{id}")]
+        public async Task<ActionResult<List<UserResponseViewModel>>> GetAllUsers(int id)
         {
-            var result = await _accountService.GetAllUsersAsync();
+            var result = await _accountService.GetAllUsersAsync(id);
             return Ok(_mapper.Map<List<UserResponseViewModel>>(result));
         }
 
         [Authorize]
-        [HttpGet("get-users/{id}")]
+        [HttpGet("get-user/{id}")]
         public async Task<ActionResult<UserResponseViewModel>> GetUserById(int id)
         {
             var result = await _accountService.GetUserByIdAsync(id);
@@ -149,7 +148,7 @@ namespace LitBlog.API.Controllers
         }
 
         [Authorize]
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAccount(int id)
         {
             await _accountService.DeleteAccountAsync(id);

@@ -70,10 +70,10 @@
         loading = true;
         try
         {
-            users = await _accountService.GetAllUsersAsync();
-            loading = false;
             var user = await _accountService.GetUserDataFromLocalStorage();
             CurrentUserId = user.Id.ToString();
+            users = await _accountService.GetAllUsersAsync(CurrentUserId);
+            loading = false;
         }
         catch(Exception ex)
         {

@@ -11,7 +11,7 @@ namespace LitBlazor.Services.Interfaces
         Task Login(AuthAccount model);
         Task Logout();
         Task<Users> GetUserDetailsAsync(string userId);
-        Task<List<Users>> GetAllUsersAsync();
+        Task<List<Users>> GetAllUsersAsync(string currentUserId);
         Task Register(RegisterAccount model);
         Task ResetPassword(ResetPassword model);
         Task ForgotPassword(ForgotPassword model);

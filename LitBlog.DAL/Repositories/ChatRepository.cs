@@ -16,22 +16,24 @@ namespace LitBlog.DAL.Repositories
 
         public async Task<List<ChatMessages>> GetConversationAsync(int userId,int contactId)
         {
-            var message = await _blogContext.Messages
-                .Where(h => (h.FromUserId == contactId && h.ToUserId == userId) || (h.FromUserId == userId && h.ToUserId == contactId))
-                .OrderBy(a => a.CreatedDate)
+            var message = await _blogContext.Messages.AsQueryable()
                 .Include(a => a.FromUser)
-                .Include(a=>a.ToUser)
+                .Include(a => a.ToUser)
+                .Where(h => (h.FromUserId == contactId && h.ToUserId == userId) || (h.FromUserId == userId && h.ToUserId == contactId))
+                .Where(x => x.CreatedDate > System.DateTime.Now.AddDays(-1))
+                .OrderBy(a => a.CreatedDate)
                 .Select(x => new ChatMessages
-                {
-                    FromUserId = x.FromUserId,
-                    Message = x.Message,
-                    Id = x.Id,
-                    ToUserId = x.ToUserId,
-                    ToUser = x.ToUser,
-                    FromEmail = x.FromEmail,
-                    ToEmail = x.ToEmail,
-                    FromUser = x.FromUser
-                }).ToListAsync();
+                  {
+                 FromUserId = x.FromUserId,
+                 Message = x.Message,
+                 Id = x.Id,
+                 ToUserId = x.ToUserId,
+                 ToUser = x.ToUser,
+                 FromEmail = x.FromEmail,
+                 ToEmail = x.ToEmail,
+                 FromUser = x.FromUser,
+                 CreatedDate = x.CreatedDate,
+                 }).ToListAsync();
             return message;
         }
 

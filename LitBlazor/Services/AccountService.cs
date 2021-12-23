@@ -22,8 +22,8 @@ namespace LitBlazor.Services
             _navigationManager = navigationManager;
             _localStorageService = localStorageService;
         }
-        public async Task<Users> GetUserDetailsAsync(string userId) => await _httpService.Get<Users>($"api/Account/get-users/{userId}");
-        public async Task<List<Users>> GetAllUsersAsync() => await _httpService.GetAll<Users>("api/Account/get-users");
+        public async Task<Users> GetUserDetailsAsync(string userId) => await _httpService.Get<Users>($"api/Account/get-user/{userId}");
+        public async Task<List<Users>> GetAllUsersAsync(string currentUserId) => await _httpService.GetAll<Users>($"api/Account/get-users/{currentUserId}");
         public async Task Initialize()
         {
             Account = await _localStorageService.GetItemAsync<Account>("account");

@@ -1,0 +1,25 @@
+﻿@inject IAccountService _accountService
+@inject IProfileService _profileService
+@layout MainLayout
+@inject NavigationManager _navigationManager
+<MudDialog>
+    <DialogContent>
+        Are you sure you want to remove description from your account?
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="()=>RemoveDescriptionFromAccount()">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    void Cancel() => MudDialog.Cancel();
+
+    async Task RemoveDescriptionFromAccount()
+    {
+        var user = await _accountService.GetUserDataFromLocalStorage();
+        await _profileService.RemoveDescriptionFromAccount(user.Id.ToString());
+        _navigationManager.NavigateTo("/profile");
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+}

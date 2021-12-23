@@ -6,7 +6,7 @@
 @inject IChatService _chatService
 @inject IAccountService _accountService
 @inject NavigationManager _navigationManager
-
+@using System.ComponentModel.DataAnnotations
 
 <MudThemeProvider />
 <MudDialogProvider />
@@ -42,7 +42,7 @@
         _drawerOpen = !_drawerOpen;
     }
 
-    async Task EditProfile(string id)=>await GetDatails(id);
+    void EditProfile(string id)=>_navigationManager.NavigateTo($"/profile");
 
     private void Logout()
     {
@@ -50,34 +50,34 @@
     }
     protected override async Task OnInitializedAsync()
     {
-        hubConnection = new HubConnectionBuilder().WithUrl("https://localhost:44311/signalRHub").Build();
-        await hubConnection.StartAsync();
-        hubConnection.On<string, string, string>("ReceiveChatNotification", (message, receiverUserId, senderUserId) =>
+        if (_accountService.Account == null)
         {
-            if (CurrentUserId == receiverUserId)
-            {
-                _snackBar.Add(message, Severity.Info, config =>
-                {
-                    config.VisibleStateDuration = 10000;
-                    config.HideTransitionDuration = 500;
-                    config.ShowTransitionDuration = 500;
-                    config.Action = "Chat?";
-                    config.ActionColor = Color.Info;
-                    config.Onclick = snackbar =>
-                    {
-                        NavigationManager.NavigateTo($"chat/{senderUserId}");
-                        return Task.CompletedTask;
-                    };
-                });
-            }
-        });
-        var user = await AccountService.GetUserDataFromLocalStorage();
-        CurrentUserId = user.Id.ToString();
-    }
-        private async Task GetDatails(string id)
-        {
-        var contact = await _accountService.GetUserDetailsAsync(id);
-        CurrentUserId = contact.Id.ToString();
-        _navigationManager.NavigateTo($"profile/{CurrentUserId}");
+            NavigationManager.NavigateTo("/account/login");
         }
+        else
+        {
+            hubConnection = new HubConnectionBuilder().WithUrl("https://localhost:44311/signalRHub").Build();
+            await hubConnection.StartAsync();
+            hubConnection.On<string, string, string>("ReceiveChatNotification", (message, receiverUserId, senderUserId) =>
+            {
+                if (CurrentUserId == receiverUserId)
+                {
+                    _snackBar.Add(message, Severity.Info, config =>
+                    {
+                        config.VisibleStateDuration = 10000;
+                        config.HideTransitionDuration = 500;
+                        config.ShowTransitionDuration = 500;
+                        config.Action = "Chat?";
+                        config.ActionColor = Color.Info;
+                        config.Onclick = snackbar =>
+                        {
+                            NavigationManager.NavigateTo($"chat/{senderUserId}");
+                            return Task.CompletedTask;};});
+                }
+            });
+            var user = await AccountService.GetUserDataFromLocalStorage();
+            CurrentUserId = user.Id.ToString();
+        } 
+
+    }
 }
