@@ -19,11 +19,8 @@
     <RowTemplate>
         <MudTd DataLabel="Name">@context.FirstName @context.LastName</MudTd>
         <MudTd>
-            @if(CurrentUserId != @context.Id.ToString())
-            {
-             <MudButton OnClick="@(() => ShowInformation(context))" StartIcon="@Icons.Material.Outlined.Info" Color="Color.Info" ButtonType="ButtonType.Button">Info</MudButton>
-             <MudButton OnClick="@(() => LoadUserChat(context.Id.ToString()))" StartIcon="@Icons.Material.Filled.Chat" Color="Color.Primary" ButtonType="ButtonType.Button">Chat</MudButton>
-            }
+           <MudButton OnClick="@(() => ShowInformation(context))" StartIcon="@Icons.Material.Outlined.Info" Color="Color.Info" ButtonType="ButtonType.Button">Info</MudButton>
+           <MudButton OnClick="@(() => LoadUserChat(context.Id.ToString()))" StartIcon="@Icons.Material.Filled.Chat" Color="Color.Primary" ButtonType="ButtonType.Button">Chat</MudButton>
         </MudTd>
     </RowTemplate>
 </MudTable>

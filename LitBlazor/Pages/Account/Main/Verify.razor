@@ -15,6 +15,7 @@
                 <MudSpacer/>
                 <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick=@(()=>Login()) Color="Color.Warning" Size=Size.Small Class="ml-auto">Cancel</MudButton>
             </MudCardActions>
+          <MudProgressLinear Color="Color.Primary" Indeterminate=loading/>
         </MudCard>
          @if (!string.IsNullOrEmpty(error))
             {
@@ -25,6 +26,7 @@
 @code{
     private VerifyAccount model = new();
     private string error;
+    private bool loading;
     [Parameter] public string Token { get; set; }
 
     protected void Login()
@@ -33,6 +35,7 @@
     }
     private async void OnValidSubmit()
     {
+        loading=true;
         try
         {
             var newToken = new VerifyAccount()
@@ -45,6 +48,7 @@
         }
         catch (Exception ex)
         {
+            loading = false;
             error = ex.Message;
             StateHasChanged();
         }

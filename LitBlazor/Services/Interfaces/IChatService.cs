@@ -8,5 +8,6 @@ namespace LitBlazor.Services.Interfaces
     {
         Task SaveMessageAsync(string userId,ChatMessages chatMessage);
         Task<List<ChatMessages>> GetConversationAsync(string userId,string contactId);
+        Task<List<ChatMessages>> GetFullChatHistory(string userId, string contactId);
     }
 }

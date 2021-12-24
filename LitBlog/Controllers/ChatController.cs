@@ -36,7 +36,14 @@ namespace LitBlog.API.Controllers
         [HttpGet("{userId}/{contactId}")]
         public async Task<List<ChatMessageModel>> GetConversationAsync(int userId,int contactId)
         {
-            var message = await _chatService.GetConversationAsync(userId, contactId);
+            var message = await _chatService.GetLastFourMessagesAsync(userId, contactId);
+            var result = _mapper.Map<List<ChatMessageModel>>(message);
+            return result;
+        }
+        [HttpGet("full/{userId}/{contactId}")]
+        public async Task<List<ChatMessageModel>> GetFullChatHistory(int userId, int contactId)
+        {
+            var message = await _chatService.GetFullHistoryMessagesAsync(userId, contactId);
             var result = _mapper.Map<List<ChatMessageModel>>(message);
             return result;
         }

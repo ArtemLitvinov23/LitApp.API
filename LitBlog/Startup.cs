@@ -95,7 +95,6 @@ namespace LitBlog.API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<SignalRHub>("/SignalRHub");
             });
 
         }

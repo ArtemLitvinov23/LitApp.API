@@ -24,6 +24,7 @@
                 <MudSpacer/>
                 <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick=@(()=>Login()) Color="Color.Warning" Size=Size.Small Class="ml-auto">Cancel</MudButton>
             </MudCardActions>
+             <MudProgressLinear Color="Color.Primary" Indeterminate=loading/>
         </MudCard>
          @if (!string.IsNullOrEmpty(error))
             {
@@ -35,12 +36,14 @@
 {
     private readonly RegisterAccount _registerAccount = new();
     private string error;
+    private bool loading;
     protected void Login()
     {
         NavigationManager.NavigateTo("/account/login");
     }
     private async void OnValidSubmit()
     {
+        loading = true;
         try
         {
             await AccountService.Register(_registerAccount);
@@ -48,6 +51,7 @@
         }
         catch(Exception ex)
         {
+            loading = false;
             error = ex.Message;
             StateHasChanged();
         }

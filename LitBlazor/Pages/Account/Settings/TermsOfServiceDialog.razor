@@ -19,6 +19,5 @@
         var user = await _accountService.GetUserDataFromLocalStorage();
         await _accountService.Delete(user.Id);
         MudDialog.Close(DialogResult.Ok(true));
-        _navigationManager.NavigateTo("/account/login");
     }
 }

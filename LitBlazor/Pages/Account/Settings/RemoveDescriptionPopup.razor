@@ -19,7 +19,6 @@
     {
         var user = await _accountService.GetUserDataFromLocalStorage();
         await _profileService.RemoveDescriptionFromAccount(user.Id.ToString());
-        _navigationManager.NavigateTo("/profile");
         MudDialog.Close(DialogResult.Ok(true));
     }
 }

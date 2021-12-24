@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using System.Threading.Tasks;
 
-namespace LitBlog.API
+namespace LitChat.SignalR
 {
     public class SignalRHub : Hub
     {
@@ -12,6 +11,11 @@ namespace LitBlog.API
         public async Task ChatNotificationAsync(string message, string receiverUserId, string senderUserId)
         {
             await Clients.All.SendAsync("ReceiveChatNotification", message, receiverUserId, senderUserId);
+        }
+        public override Task OnConnectedAsync()
+        {
+            Console.WriteLine($"{Context.ConnectionId} connected");
+            return base.OnConnectedAsync();
         }
     }
 }

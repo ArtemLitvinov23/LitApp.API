@@ -2,8 +2,10 @@
 using LitBlog.BLL.ModelsDto;
 using LitBlog.DAL.Models;
 using LitBlog.DAL.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LitBlog.BLL.Services
@@ -23,7 +25,18 @@ namespace LitBlog.BLL.Services
             _accountRepository = accountRepository;
             _mapper = mapper;
         }
-        public async Task<List<ChatMessagesDto>> GetConversationAsync(int userId, int contactId) => _mapper.Map<List<ChatMessagesDto>>(await _chatRepository.GetConversationAsync(userId, contactId));
+        public async Task<List<ChatMessagesDto>> GetLastFourMessagesAsync(int userId, int contactId)
+        {
+            var messages = await _chatRepository.GetFullChatHistory(userId, contactId).ToListAsync();
+            var result = _mapper.Map<List<ChatMessagesDto>>(messages);
+            return result.TakeLast(4).ToList();
+        }
+        public async Task<List<ChatMessagesDto>> GetFullHistoryMessagesAsync(int userId, int contactId)
+        {
+            var messages = await _chatRepository.GetFullChatHistory(userId, contactId).ToListAsync();
+            var result = _mapper.Map<List<ChatMessagesDto>>(messages);
+            return result;
+        }
         public async Task SaveMessageAsync(int userId,ChatMessagesDto chatMessage)
         {
             chatMessage.FromUserId = userId;

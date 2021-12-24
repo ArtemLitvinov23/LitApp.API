@@ -20,6 +20,7 @@
                 <MudIcon Icon="@Icons.Material.Outlined.ChatBubble" Style="margin-right:10px"></MudIcon>
                 <MudText Typo="Typo.h6">@ContactEmail</MudText>
             }
+           
         </MudToolBar>
         <div class="d-flex flex-column px-4" style="max-height:65vh;min-height:65vh; overflow:scroll;" id="chatContainer">
             @foreach (var message in messages)
@@ -31,6 +32,10 @@
                     <div>
                         <MudText Typo="Typo.body1">@message.FromEmail</MudText>
                         <MudText Typo="Typo.caption" Style="font-size: xx-small!important;">@message.CreatedDate.ToString("dd MMM, yyyy hh:mm tt")</MudText>
+                        @if(Online == true){
+                          <MudSpacer/>
+                          <MudText Typo="Typo.caption" Color="Color.Success" Style="font-size: xxx-small!important;">Online</MudText>
+                        }
                         <MudText Typo="Typo.body2" Style=" padding: 15px;background-color: var(--mud-palette-background-grey);border-radius: 5px;margin-top:5px">@message.Message</MudText>
                     </div>
                 </div>
@@ -75,9 +80,10 @@
                                     <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.Email</MudText>
                                     <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.FirstName @user.LastName </MudText>
                                 </div>
-                                <MudIconButton OnClick="@(() => RemoveUserFromFavorite(user))" Icon="@Icons.Sharp.Delete" Color="Color.Warning" ButtonType="ButtonType.Button">Delete</MudIconButton>
                             </div>
                         </MudListItem>
+                         <MudButton OnClick="@(() => LoadFullChatHistory(user.FavoriteUserAccountId.ToString()))" StartIcon="@Icons.Filled.History" Color="Color.Primary" Size="Size.Small" ButtonType="ButtonType.Button">Chat history</MudButton>
+                         <MudButton OnClick="@(() => ShowInformation(user.FavoriteUserAccountId.ToString()))" StartIcon="@Icons.Material.Outlined.Info" Color="Color.Info" Size="Size.Small" ButtonType="ButtonType.Button">Show profile info</MudButton>
                     }
                 </MudList>
             </div>
@@ -89,6 +95,7 @@
     [Parameter] public string CurrentMessage { get; set; }
     [Parameter] public string CurrentUserId { get; set; }
     [Parameter] public string CurrentUserEmail { get; set; }
+    private bool Online;
     private string error;
     private List<Models.ChatMessages> messages = new List<Models.ChatMessages>();
     private async Task SubmitAsync()
@@ -108,7 +115,6 @@
                 await _chatService.SaveMessageAsync(CurrentUserId,chatHistory);
                 chatHistory.FromUserId = CurrentUserId;
                 await hubConnection.SendAsync("SendMessageAsync", chatHistory, CurrentUserEmail);
-                messages.Add(chatHistory);
                 CurrentMessage = string.Empty;
             }
         }
@@ -122,14 +128,7 @@
     {
         try
         {
-            if (hubConnection == null)
-            {
-                hubConnection = new HubConnectionBuilder().WithUrl("https://localhost:44311/signalRHub").Build();
-            }
-            if (hubConnection.State == HubConnectionState.Disconnected)
-            {
-                await hubConnection.StartAsync();
-            }
+            await CheckConnection(); // checking connection to hub
             hubConnection.On<ChatMessages, string>("ReceiveMessage", async (message, userName) =>
             {
                 if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId) || (ContactId == message.FromUserId && CurrentUserId == message.ToUserId))
@@ -168,25 +167,45 @@
     [Parameter] public string ContactId { get; set; }
     async Task LoadUserChat(string userId)
     {
+        await CheckConnection();
         var contact = await _accountService.GetUserDetailsAsync(userId);
         ContactId = contact.Id.ToString();
         ContactEmail = contact.Email;
-        _navigationManager.NavigateTo($"chat/{ContactId}");
         messages = new List<Models.ChatMessages>();
         messages = await _chatService.GetConversationAsync(ContactId,CurrentUserId);
+    }
+    async Task LoadFullChatHistory(string userId)
+    {
+        var contact = await _accountService.GetUserDetailsAsync(userId);
+        ContactId = contact.Id.ToString();
+        ContactEmail = contact.Email;
+        messages = new List<Models.ChatMessages>();
+        messages = await _chatService.GetFullChatHistory(ContactId,CurrentUserId);
     }
     async Task GetAllFavorites(string id)
     {
         ChatUsers = await _favoriteService.GetAllFavoritesForAccountAsync(CurrentUserId);
     }
-    async Task RemoveUserFromFavorite(Models.FavoritesListResponse models)
+    private void ShowInformation(string userId)
     {
-        ContactId = models.FavoriteUserAccountId.ToString();
-        var contact = await _favoritesList.GetFavoritesUserAsync(ContactId);
-        await _favoritesList.RemoveUserFromFavoriteAsync(contact.FavoriteUserAccountId.ToString());
-        ChatUsers = await _favoriteService.GetAllFavoritesAsync();
-        ContactEmail = string.Empty;
-        messages = new List<Models.ChatMessages>(); 
+        ContactId = userId;
+        _navigationManager.NavigateTo($"card/{ContactId}");
+    }
+
+    private async Task CheckConnection()
+    {
+        if (hubConnection == null)
+        {
+            hubConnection = new HubConnectionBuilder().WithUrl(new Uri("https://localhost:7202/chat")).WithAutomaticReconnect().Build();
+        }
+        if (hubConnection.State == HubConnectionState.Disconnected)
+        {
+            await hubConnection.StartAsync();
+        }
+        if(hubConnection.State == HubConnectionState.Connected)
+        {
+            Online = true;
+        }
     }
 }
 }
