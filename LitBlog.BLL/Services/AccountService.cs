@@ -207,5 +207,11 @@ namespace LitBlog.BLL.Services
         }
 
         public async Task DeleteAccountAsync(int id)=> await _accountRepository.DeleteAsync(id);
+
+        public async Task<AccountResponseDto> GetAccountByEmailAsync(string accountEmail)
+        {
+            var account = await _accountRepository.GetAllAccounts().FirstOrDefaultAsync(x => x.Email == accountEmail);
+            return _mapper.Map<AccountResponseDto>(account);
+        }
     }
 }

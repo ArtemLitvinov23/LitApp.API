@@ -7,18 +7,22 @@ using LitBlog.BLL.Services.Interfaces;
 using LitBlog.BLL.Settings;
 using LitBlog.DAL;
 using LitBlog.DAL.Repositories;
+using LitChat.API.HubController;
 using LitChat.BLL.Services;
 using LitChat.BLL.Services.Interfaces;
 using LitChat.DAL.Repositories;
 using LitChat.DAL.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace LitBlog.API
 {
@@ -42,7 +46,10 @@ namespace LitBlog.API
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "LitBlog.WebApi", Version = "v1" });
             });
 
-            services.AddSignalR();
+            services.AddSignalR(hubOptions =>
+            {
+                hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(10);
+            });
             services.Configure<EmailSettings>(Configuration.GetSection("AppSettings"));
             services.AddAutoMapper(typeof(MapperProfile), typeof(AutoMapperProfile));
 
@@ -56,8 +63,9 @@ namespace LitBlog.API
             services.AddScoped<IFavoritesRepository, FavoritesRepository>();
             services.AddScoped<IFavoritesService, FavoritesService>();
             services.AddScoped<IUserProfileService, UserProfileService>();
-
-
+            services.AddScoped<IConnectionRepository, ConnectionRepository>();
+            services.AddScoped<IConnectionService, ConnectionService>();
+            services.AddHttpContextAccessor();
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -72,6 +80,19 @@ namespace LitBlog.API
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration.GetSection("JwtConfig").GetSection("Secret").Value)),
                     ValidateIssuer = false,
                     ValidateAudience = false,
+                };
+                x.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["JwtToken"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken)&&(path.StartsWithSegments("/chat")))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
                 };
             });
         }
@@ -95,6 +116,12 @@ namespace LitBlog.API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<SignalRHub>("/chat", options =>
+                {
+                    options.Transports =
+                        HttpTransportType.WebSockets |
+                        HttpTransportType.LongPolling;
+                });
             });
 
         }

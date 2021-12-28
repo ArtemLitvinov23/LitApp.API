@@ -20,7 +20,7 @@
         <MudTd DataLabel="Name">@context.FirstName @context.LastName</MudTd>
         <MudTd>
            <MudButton OnClick="@(() => ShowInformation(context))" StartIcon="@Icons.Material.Outlined.Info" Color="Color.Info" ButtonType="ButtonType.Button">Info</MudButton>
-           <MudButton OnClick="@(() => LoadUserChat(context.Id.ToString()))" StartIcon="@Icons.Material.Filled.Chat" Color="Color.Primary" ButtonType="ButtonType.Button">Chat</MudButton>
+           <MudButton OnClick="@(() => LoadUserChat(context))" StartIcon="@Icons.Material.Filled.Chat" Color="Color.Primary" ButtonType="ButtonType.Button">Chat</MudButton>
         </MudTd>
     </RowTemplate>
 </MudTable>
@@ -48,17 +48,15 @@
     [Parameter] public string CurrentUserId{ get; set; }
     [Parameter] public string ContactId{ get; set; }
 
-    async Task ShowInformation(Models.Users users)
+    void ShowInformation(Models.Users users)
     {
-        var contact = await _accountService.GetUserDetailsAsync(users.Id.ToString());
-        ContactId = contact.Id.ToString();
+        ContactId = users.Id.ToString();
         _navigationManager.NavigateTo($"card/{ContactId}");
     }
 
-    async Task LoadUserChat(string userId)
+   void LoadUserChat(Models.Users users)
     {
-        var contact = await _accountService.GetUserDetailsAsync(userId);
-        ContactId = contact.Id.ToString();
+        ContactId = users.Id.ToString();
         _navigationManager.NavigateTo($"chat/{ContactId}");
     }
 
@@ -67,8 +65,7 @@
         loading = true;
         try
         {
-            var user = await _accountService.GetUserDataFromLocalStorage();
-            CurrentUserId = user.Id.ToString();
+            CurrentUserId = _accountService.Account.Id.ToString();
             users = await _accountService.GetAllUsersAsync(CurrentUserId);
             loading = false;
         }

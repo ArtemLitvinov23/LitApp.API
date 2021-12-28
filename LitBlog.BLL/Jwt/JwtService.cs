@@ -29,8 +29,8 @@ namespace LitBlog.BLL.Jwt
             var key = Encoding.ASCII.GetBytes("MySuperSecretTokenArtemLitvinov");
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[] { new Claim("userId",account.Id.ToString()),
-                                                     new Claim("email",account.Email)}),
+                Subject = new ClaimsIdentity(new[] { new Claim("id",account.Id.ToString()),
+                                                     new Claim(ClaimTypes.Email,account.Email)}),
                 Expires = DateTime.Now.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
             };

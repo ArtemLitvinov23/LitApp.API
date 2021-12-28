@@ -56,7 +56,11 @@
         }
         else
         {
-            hubConnection = new HubConnectionBuilder().WithUrl(new Uri("https://localhost:7202/chat")).WithAutomaticReconnect().Build();
+            hubConnection = new HubConnectionBuilder().WithUrl("https://localhost:44311/chat", options =>
+            {
+                options.AccessTokenProvider = () => Task.FromResult(_accountService.Account.JwtToken);
+
+            }).WithAutomaticReconnect().Build();
             await hubConnection.StartAsync();
             hubConnection.On<string, string, string>("ReceiveChatNotification", (message, receiverUserId, senderUserId) =>
             {
@@ -75,9 +79,7 @@
                             return Task.CompletedTask;};});
                 }
             });
-            var user = await AccountService.GetUserDataFromLocalStorage();
-            CurrentUserId = user.Id.ToString();
+            CurrentUserId = _accountService.Account.Id.ToString();
         } 
-
     }
 }

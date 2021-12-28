@@ -41,6 +41,7 @@ namespace LitBlog.BLL.Mapper
             CreateMap<object, ChatMessages>();
             CreateMap<FavoritesListDto, FavoritesList>().ReverseMap();
             CreateMap<FavoritesList, FavoritesListResponseDto>();
+            CreateMap<Connections, ConnectionsDto>().ReverseMap();
         }
     }
 }

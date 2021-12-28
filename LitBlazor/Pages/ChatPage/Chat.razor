@@ -2,6 +2,7 @@
 @inject IFavoritesListService _favoriteService
 @inject NavigationManager _navigationManager
 @inject IAccountService _accountService
+@inject IConnectionService _connectionService
 @inject IFavoritesListService _favoritesList
 @attribute [Authorize]
 @page "/chat/{ContactId}"
@@ -32,10 +33,6 @@
                     <div>
                         <MudText Typo="Typo.body1">@message.FromEmail</MudText>
                         <MudText Typo="Typo.caption" Style="font-size: xx-small!important;">@message.CreatedDate.ToString("dd MMM, yyyy hh:mm tt")</MudText>
-                        @if(Online == true){
-                          <MudSpacer/>
-                          <MudText Typo="Typo.caption" Color="Color.Success" Style="font-size: xxx-small!important;">Online</MudText>
-                        }
                         <MudText Typo="Typo.body2" Style=" padding: 15px;background-color: var(--mud-palette-background-grey);border-radius: 5px;margin-top:5px">@message.Message</MudText>
                     </div>
                 </div>
@@ -82,8 +79,14 @@
                                 </div>
                             </div>
                         </MudListItem>
-                         <MudButton OnClick="@(() => LoadFullChatHistory(user.FavoriteUserAccountId.ToString()))" StartIcon="@Icons.Filled.History" Color="Color.Primary" Size="Size.Small" ButtonType="ButtonType.Button">Chat history</MudButton>
+                        <MudMenu Icon="@Icons.Material.Filled.MoreHoriz">
+                        <MudMenuItem>
+                             <MudButton OnClick="@(() => LoadFullChatHistory(user.FavoriteUserAccountId.ToString()))" StartIcon="@Icons.Filled.History" Color="Color.Primary" Size="Size.Small" ButtonType="ButtonType.Button">Chat history</MudButton>
+                        </MudMenuItem>
+                        <MudMenuItem>
                          <MudButton OnClick="@(() => ShowInformation(user.FavoriteUserAccountId.ToString()))" StartIcon="@Icons.Material.Outlined.Info" Color="Color.Info" Size="Size.Small" ButtonType="ButtonType.Button">Show profile info</MudButton>
+                        </MudMenuItem>
+                        </MudMenu>      
                     }
                 </MudList>
             </div>
@@ -95,7 +98,7 @@
     [Parameter] public string CurrentMessage { get; set; }
     [Parameter] public string CurrentUserId { get; set; }
     [Parameter] public string CurrentUserEmail { get; set; }
-    private bool Online;
+    [Parameter] public string Token { get; set; }
     private string error;
     private List<Models.ChatMessages> messages = new List<Models.ChatMessages>();
     private async Task SubmitAsync()
@@ -126,9 +129,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var user = _accountService.Account;
+        CurrentUserId = user.Id.ToString();
+        CurrentUserEmail = user.Email;
+        Token = user.JwtToken;
         try
         {
-            await CheckConnection(); // checking connection to hub
+            await CheckConnection(Token); // checking connection to hub
             hubConnection.On<ChatMessages, string>("ReceiveMessage", async (message, userName) =>
             {
                 if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId) || (ContactId == message.FromUserId && CurrentUserId == message.ToUserId))
@@ -146,9 +153,6 @@
                     StateHasChanged();
                 }
             });
-            var user = await _accountService.GetUserDataFromLocalStorage();
-            CurrentUserId = user.Id.ToString();
-            CurrentUserEmail = user.Email;
             await GetAllFavorites(CurrentUserId);
             if (!string.IsNullOrEmpty(ContactId))
             {
@@ -167,7 +171,7 @@
     [Parameter] public string ContactId { get; set; }
     async Task LoadUserChat(string userId)
     {
-        await CheckConnection();
+        await CheckConnection(Token);
         var contact = await _accountService.GetUserDetailsAsync(userId);
         ContactId = contact.Id.ToString();
         ContactEmail = contact.Email;
@@ -192,19 +196,18 @@
         _navigationManager.NavigateTo($"card/{ContactId}");
     }
 
-    private async Task CheckConnection()
+    private async Task CheckConnection(string token)
     {
         if (hubConnection == null)
         {
-            hubConnection = new HubConnectionBuilder().WithUrl(new Uri("https://localhost:7202/chat")).WithAutomaticReconnect().Build();
+            hubConnection = new HubConnectionBuilder().WithUrl("https://localhost:44311/chat", options =>
+            {
+                options.AccessTokenProvider = () => Task.FromResult(token);
+            }).Build();
         }
         if (hubConnection.State == HubConnectionState.Disconnected)
         {
             await hubConnection.StartAsync();
-        }
-        if(hubConnection.State == HubConnectionState.Connected)
-        {
-            Online = true;
         }
     }
 }

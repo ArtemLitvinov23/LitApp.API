@@ -33,6 +33,7 @@ namespace LitBlog.DAL.Models
         public DateTime? Updated { get; set; }
         public ICollection<ChatMessages> MessagesFromUser { get; set; }
         public ICollection<ChatMessages> MessagesToUser { get; set; }
+        public ICollection<Connections> Connections { get; set; }
         public ICollection<FavoritesList> Favorites { get; set; }
         public List<RefreshToken> RefreshTokens { get; set; }
         public bool OwnsToken(string token)

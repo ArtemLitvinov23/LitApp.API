@@ -10,12 +10,12 @@
 <MudCard>
     <MudCardHeader>
         <CardHeaderAvatar>
-            <MudAvatar Color="Color.Dark" Style="height:70px; width:70px;">@users.FirstName</MudAvatar>
+            <MudAvatar Color="Color.Dark" Style="height:70px; width:70px;">@userInfo.FirstName</MudAvatar>
         </CardHeaderAvatar>
         <CardHeaderContent>
-            <MudText Typo="Typo.body1">@users.FirstName @users.LastName </MudText>
-            <MudText Typo="Typo.body2">@users.Email</MudText>
-            <MudText Typo="Typo.caption">@users.Phone</MudText>
+            <MudText Typo="Typo.body1">@userInfo.FirstName @userInfo.LastName </MudText>
+            <MudText Typo="Typo.body2">@userInfo.Email</MudText>
+            <MudText Typo="Typo.caption">@userInfo.Phone</MudText>
         </CardHeaderContent>
         <CardHeaderActions>
                      <MudIconButton OnClick="@(() => Refresh())" Icon="@Icons.Filled.Refresh" Color="Color.Dark" ButtonType="ButtonType.Button"></MudIconButton>
@@ -23,11 +23,11 @@
         </CardHeaderActions>
     </MudCardHeader>
     <MudCardContent>
-        <MudText Typo="Typo.body2">@users.Description.</MudText>
+        <MudText Typo="Typo.body2">@userInfo.Description.</MudText>
     </MudCardContent>
     <MudCardActions>
-                <MudButton OnClick="@(() => EditAccount(users.Id.ToString()))" Variant="Variant.Filled" StartIcon="@Icons.Filled.Edit" Color="Color.Primary" ButtonType="ButtonType.Button">Edit information</MudButton>
-                <MudButton OnClick="@(() => RemovePhoneFromAccount(users.Id.ToString()))" Variant="Variant.Filled" StartIcon="@Icons.Filled.PhoneDisabled" Color="Color.Inherit" ButtonType="ButtonType.Button">Delete phone</MudButton>
+                <MudButton OnClick="@(() => EditAccount(userInfo.Id.ToString()))" Variant="Variant.Filled" StartIcon="@Icons.Filled.Edit" Color="Color.Primary" ButtonType="ButtonType.Button">Edit information</MudButton>
+                <MudButton OnClick="@(() => RemovePhoneFromAccount(userInfo.Id.ToString()))" Variant="Variant.Filled" StartIcon="@Icons.Filled.PhoneDisabled" Color="Color.Inherit" ButtonType="ButtonType.Button">Delete phone</MudButton>
                 <MudButton @onclick="OpenDialogDecription" Variant="Variant.Filled" StartIcon="@Icons.Filled.Delete" Color="Color.Tertiary" ButtonType="ButtonType.Button">Delete description</MudButton>
                 <MudButton @onclick="OpenDialog" Variant="Variant.Filled" StartIcon="@Icons.Filled.NoAccounts" Color="Color.Warning">Delete account</MudButton>
     </MudCardActions>
@@ -42,14 +42,14 @@
             <MudTextField @bind-Value="model.Description" Label="Description" Variant="Variant.Text" Margin="Margin.Normal"  HelperText="Max. 100 characters"></MudTextField>
         </MudCardContent>
     <MudCardActions>
-                <MudButton OnClick="@(() => AddUserInfoAsync(users.Id.ToString(), model))" StartIcon="@Icons.Filled.Save" Color="Color.Inherit" ButtonType="ButtonType.Button">Save changes</MudButton>
+                <MudButton OnClick="@(() => AddUserInfoAsync(userInfo.Id.ToString(), model))" StartIcon="@Icons.Filled.Save" Color="Color.Inherit" ButtonType="ButtonType.Button">Save changes</MudButton>
     </MudCardActions>
 </MudCard>
 </MudContainer>
 
 
 @code {
-    private Models.Users users = new Models.Users();
+    private Models.Users userInfo = new Models.Users();
     private Models.UpdateAccount model = new Models.UpdateAccount();
     [Parameter] public string CurrentUserId{ get; set;}
 
@@ -59,9 +59,8 @@
     }
     async Task Refresh()
     {
-        var user = await _accountService.GetUserDataFromLocalStorage();
-        CurrentUserId = user.Id.ToString();
-        users = await _accountService.GetUserDetailsAsync(CurrentUserId);
+        CurrentUserId = _accountService.Account.Id.ToString();
+        userInfo = await _accountService.GetUserDetailsAsync(CurrentUserId);
     }
 
     async Task AddUserInfoAsync(string userId,UpdateAccount updateAccount)
@@ -71,12 +70,12 @@
         updateAccount.LastName = string.Empty;
         updateAccount.Phone = string.Empty;
         updateAccount.Description = string.Empty;
-        users = await _accountService.GetUserDetailsAsync(CurrentUserId);
+        userInfo = await _accountService.GetUserDetailsAsync(CurrentUserId);
     }
     async Task RemovePhoneFromAccount(string id)
     {
         await _profileService.RemovePhoneFromAccount(id);
-        users = await _accountService.GetUserDetailsAsync(CurrentUserId);
+        userInfo = await _accountService.GetUserDetailsAsync(CurrentUserId);
     }
     async Task EditAccount(string userId)
     {

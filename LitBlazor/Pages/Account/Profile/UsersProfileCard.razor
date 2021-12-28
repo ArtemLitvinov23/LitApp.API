@@ -1,6 +1,7 @@
 ﻿@page "/card/{ContactId}"
 @inject IAccountService _accountService
 @inject IFavoritesListService _favoritesList
+@inject IConnectionService _connectionService
 @layout MainLayout
 @inject NavigationManager _navigationManager
 @attribute [Authorize]
@@ -14,8 +15,16 @@
         <CardHeaderContent>
             <MudText Typo="Typo.body1">@users.FirstName @users.LastName </MudText>
             <MudText Typo="Typo.body2">@users.Email</MudText>
-            <MudText Typo="Typo.caption">@users.Phone</MudText>
-        </CardHeaderContent>
+            <MudText Typo="Typo.caption">@users.Phone </MudText>
+            @if (@connection.IsOnline == true)
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Success">Online: @connection.ConnectedAt </MudText>
+                }
+                else
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Warning">Offline: @connection.DisconnectedAt </MudText>
+                }
+            </CardHeaderContent>
         <CardHeaderActions>
                      <MudIconButton OnClick="@(() => Return())" Icon="@Icons.TwoTone.ArrowBackIosNew" Color="Color.Inherit" ButtonType="ButtonType.Button">Return</MudIconButton>
         </CardHeaderActions>
@@ -39,6 +48,7 @@
 
 @code {
     private Models.Users users = new Models.Users();
+    private Connections connection = new Connections();
     [Parameter] public string CurrentUserId{ get; set;}
     [Parameter] public string ContactId{ get; set;}
     [Parameter] public bool IsDeleted{ get; set; }
@@ -49,8 +59,7 @@
     }
     async Task AddUserToFavorite(Models.Users users)
     {
-        var user = await _accountService.GetUserDataFromLocalStorage();
-        CurrentUserId = user.Id.ToString();
+        CurrentUserId = _accountService.Account.Id.ToString();
         ContactId = users.Id.ToString();
         var favoriteUser = new FavoritesList
             {
@@ -63,7 +72,6 @@
             };
         await _favoritesList.AddUserToFavoriteAsync(favoriteUser);
         IsDeleted = favoriteUser.IsDeleted;
-
     }
     async Task RemoveUserFromFavorite(Models.Users users)
     {
@@ -79,6 +87,7 @@
             users = await _accountService.GetUserDetailsAsync(ContactId);
             var userBoolInfo = await _favoritesList.GetFavoritesUserAsync(ContactId);
             IsDeleted = userBoolInfo.IsDeleted;
+            connection = await _connectionService.GetStatusFavoriteUserAsync(ContactId);
         }
         catch
         {

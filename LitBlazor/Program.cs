@@ -22,6 +22,7 @@ namespace LitBlazor
                .AddScoped<IProfileService, UserProfileService>()
                .AddScoped<IHttpServiceGeneric, HttpServiceGeneric>()
                .AddScoped<ILocalStorageService, LocalStorageService>()
+               .AddScoped<IConnectionService, ConnectionService>()
                .AddTransient<IChatService, ChatService>();
 
             // configure http client

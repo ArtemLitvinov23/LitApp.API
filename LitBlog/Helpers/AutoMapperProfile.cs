@@ -21,6 +21,17 @@ namespace LitBlog.API.Helpers
                 .ForMember(x => x.Phone, opt => opt.MapFrom(x => x.Phone))
                 .ForMember(x => x.Description, opt => opt.MapFrom(x => x.Description))
                 .ReverseMap();
+            CreateMap<ConnectionsDto, ConnectionViewModel>()
+                .ForMember(x => x.ConnectedAt, opt => opt.MapFrom(src => src.ConnectedAt))
+                .ForMember(x => x.DisconnectedAt, opt => opt.MapFrom(src => src.DisconnectedAt))
+                .ReverseMap();
+            CreateMap<ConnectionsDto, ConnectionsResponseViewModel>()
+                .ForMember(x => x.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(x => x.UserAccount, opt => opt.MapFrom(src => src.UserAccount))
+                .ForMember(x => x.IsOnline, opt => opt.MapFrom(src => src.IsOnline))
+                .ForMember(x => x.ConnectedAt, opt => opt.MapFrom(src => src.ConnectedAt))
+                .ForMember(x => x.DisconnectedAt, opt => opt.MapFrom(src => src.DisconnectedAt))
+                .ReverseMap();
             CreateMap<AccountDto, AccountRegisterViewModel>().ReverseMap();
             CreateMap<AuthenticateResponseDto, AccountRegisterViewModel>();
             CreateMap<UsersResponseDto, UserResponseViewModel>();
