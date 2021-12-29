@@ -1,6 +1,4 @@
 ﻿@page "/account/register"
-@inject IAccountService AccountService
-@inject NavigationManager NavigationManager
 
 <div style="max-width: 400px;">
     <EditForm Model="@_registerAccount" OnValidSubmit="OnValidSubmit">
@@ -39,15 +37,15 @@
     private bool loading;
     protected void Login()
     {
-        NavigationManager.NavigateTo("/account/login");
+        _navigationManager.NavigateTo("/account/login");
     }
     private async void OnValidSubmit()
     {
         loading = true;
         try
         {
-            await AccountService.Register(_registerAccount);
-            NavigationManager.NavigateTo("account/verify");
+            await _accountService.Register(_registerAccount);
+            _navigationManager.NavigateTo("account/verify");
         }
         catch(Exception ex)
         {

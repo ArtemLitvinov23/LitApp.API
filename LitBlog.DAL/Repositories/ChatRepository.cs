@@ -30,7 +30,7 @@ namespace LitBlog.DAL.Repositories
                     FromEmail = x.FromEmail,
                     ToEmail = x.ToEmail,
                     FromUser = x.FromUser,
-                    CreatedDate = x.CreatedDate,
+                    CreatedDate = x.CreatedDate.ToLocalTime(),
                 }).AsQueryable();
             return message;
         }

@@ -6,10 +6,12 @@ namespace LitChat.BLL.Services.Interfaces
 {
     public interface IConnectionService
     {
-        Task<IEnumerable<ConnectionsDto>> GetAllClientsAsync();
-        Task<ConnectionsDto> GetClientByUserIdAsync(int UserId);
+        Task<IEnumerable<ConnectionsResponseDto>> GetAllClientsAsync();
+        Task<ConnectionsDto> GetExistsConnectionAsync(int accountId);
+        Task<ConnectionsResponseDto> GetClientByUserIdAsync(int UserId);
         Task CreateConnectionAsync(ConnectionsDto connections);
-        Task DeleteConnectionAsync(string ConnectionId);
+        Task CloseConnection(int accountId);
+        Task DeleteConnectionAsync(int userId);
         Task UpdateConnection(ConnectionsDto connections);
     }
 }

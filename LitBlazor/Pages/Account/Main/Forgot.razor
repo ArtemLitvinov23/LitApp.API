@@ -1,6 +1,4 @@
 ﻿@page "/account/forgot-password"
-@inject IAccountService AccountService
-@inject NavigationManager NavigationManager
 
 <div style="max-width: 400px;">
     <EditForm Model="@forgotPassword" OnValidSubmit="HandleValidSubmit">
@@ -27,14 +25,14 @@
     private string error;
     protected void Login()
     {
-        NavigationManager.NavigateTo("/account/login");
+        _navigationManager.NavigateTo("/account/login");
     }
     protected override void OnInitialized()
     {
         // redirect to home if already logged in
-        if (AccountService.Account != null)
+        if (_accountService.Account != null)
         {
-            NavigationManager.NavigateTo("/chat");
+            _navigationManager.NavigateTo("/chat");
         }
     }
 
@@ -43,8 +41,8 @@
     {
         try
         {
-            await AccountService.ForgotPassword(forgotPassword);
-            NavigationManager.NavigateTo("account/reset-password");
+            await _accountService.ForgotPassword(forgotPassword);
+            _navigationManager.NavigateTo("account/reset-password");
         }
         catch (Exception ex)
         {

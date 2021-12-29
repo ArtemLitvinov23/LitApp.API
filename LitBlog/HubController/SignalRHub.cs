@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LitBlog.API.Models;
 using LitBlog.BLL.Services.Interfaces;
 using LitChat.API.Models;
 using LitChat.BLL.ModelsDto;
@@ -23,7 +24,7 @@ namespace LitChat.API.HubController
             _accountService = accountService;
             _mapper = mapper;
         }
-        public async Task SendMessageAsync(string message, string userName)
+        public async Task SendMessageAsync(ChatMessageModel message, string userName)
         {
             await Clients.All.SendAsync("ReceiveMessage", message, userName);
         }
@@ -36,19 +37,20 @@ namespace LitChat.API.HubController
             var contextUser = Context.User;
             var userEmail = contextUser.FindFirst(ClaimTypes.Email)?.Value;
             var user = await _accountService.GetAccountByEmailAsync(userEmail);
-            var existConnecting = await _connectionService.GetClientByUserIdAsync(user.Id);
-            if (existConnecting != null)
+            var currentConnecting = await _connectionService.GetClientByUserIdAsync(user.Id);
+            var existsConnecting = await _connectionService.GetExistsConnectionAsync(user.Id);
+            if (currentConnecting.UserAccount == existsConnecting.UserAccount)
             {
                 var connectionsModel = new ConnectionViewModel()
                 {
                     ConnectedAt = DateTime.Now,
-                    IsOnline = existConnecting.IsOnline,
+                    IsOnline = currentConnecting.IsOnline,
                     ConnectionId = Context.ConnectionId,
                     UserAccount = user.Id
                 };
                 var mappingModel = _mapper.Map<ConnectionsDto>(connectionsModel);
                 await _connectionService.UpdateConnection(mappingModel);
-                await _connectionService.DeleteConnectionAsync(existConnecting.ConnectionId);
+                await _connectionService.DeleteConnectionAsync(currentConnecting.UserAccount);
             }
             else
             {
@@ -65,15 +67,13 @@ namespace LitChat.API.HubController
             await base.OnConnectedAsync();
         }
 
+ 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             var contextUser = Context.User;
             var userEmail = contextUser.FindFirst(ClaimTypes.Email)?.Value;
             var user = await _accountService.GetAccountByEmailAsync(userEmail);
-            var existConnecting = await _connectionService.GetClientByUserIdAsync(user.Id);
-            existConnecting.DisconnectedAt = DateTime.Now;
-            existConnecting.IsOnline = false;
-            await _connectionService.UpdateConnection(existConnecting);
+            await _connectionService.CloseConnection(user.Id);
             await base.OnDisconnectedAsync(exception);
         }
     }

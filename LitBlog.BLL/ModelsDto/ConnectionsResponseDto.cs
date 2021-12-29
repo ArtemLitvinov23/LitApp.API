@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace LitBlazor.Models
+namespace LitChat.BLL.ModelsDto
 {
-    public class Connections
+    public class ConnectionsResponseDto
     {
-        public string UserAccount { get; set; }
+        public int UserAccount { get; set; }
         public DateTime ConnectedAt { get; set; }
         public DateTime DisconnectedAt { get; set; }
         public bool IsOnline { get; set; }

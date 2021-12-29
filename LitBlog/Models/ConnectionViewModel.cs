@@ -4,7 +4,6 @@ namespace LitChat.API.Models
 {
     public class ConnectionViewModel
     {
-        public int Id { get; set; }
         public string ConnectionId { get; set; }
         public int UserAccount { get; set; }
         public DateTime ConnectedAt { get; set; }

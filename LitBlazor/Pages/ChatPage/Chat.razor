@@ -1,9 +1,5 @@
-﻿@inject IChatService _chatService
-@inject IFavoritesListService _favoriteService
-@inject NavigationManager _navigationManager
-@inject IAccountService _accountService
-@inject IConnectionService _connectionService
-@inject IFavoritesListService _favoritesList
+﻿@using Microsoft.AspNetCore.Components;
+@using Microsoft.JSInterop;
 @attribute [Authorize]
 @page "/chat/{ContactId}"
 @page "/chat"
@@ -94,30 +90,32 @@
 </div>
 
 @code {
-    [CascadingParameter] public HubConnection hubConnection { get; set; }
+    [CascadingParameter] HubConnection hubConnection { get; set; }
     [Parameter] public string CurrentMessage { get; set; }
     [Parameter] public string CurrentUserId { get; set; }
     [Parameter] public string CurrentUserEmail { get; set; }
     [Parameter] public string Token { get; set; }
+    [Inject] IJSRuntime _jsRunTime{ get; set; }
+    public bool IsConnected =>hubConnection.State == HubConnectionState.Connected;
     private string error;
     private List<Models.ChatMessages> messages = new List<Models.ChatMessages>();
     private async Task SubmitAsync()
     {
         try
         {
-            if (!string.IsNullOrEmpty(CurrentMessage) && !string.IsNullOrEmpty(ContactId))
+            if (!string.IsNullOrEmpty(CurrentMessage) && !string.IsNullOrEmpty(ContactId) && IsConnected)
             {
                 var chatHistory = new ChatMessages()
             {
                 Message = CurrentMessage,
                 ToUserId = ContactId,
+                FromUserId = CurrentUserId,
                 CreatedDate = DateTime.Now,
                 FromEmail = CurrentUserEmail,
-                ToEmail = ContactEmail
+                ToEmail = ContactEmail,
             };
-                await _chatService.SaveMessageAsync(CurrentUserId,chatHistory);
-                chatHistory.FromUserId = CurrentUserId;
                 await hubConnection.SendAsync("SendMessageAsync", chatHistory, CurrentUserEmail);
+                await _chatService.SaveMessageAsync(CurrentUserId,chatHistory);
                 CurrentMessage = string.Empty;
             }
         }
@@ -126,7 +124,10 @@
             error = ex.Message;
         }
     }
-
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await _jsRuntime.InvokeAsync<string>("OnScrollEvent", "chatContainer");
+        }
     protected override async Task OnInitializedAsync()
     {
         var user = _accountService.Account;
@@ -137,36 +138,32 @@
         {
             await CheckConnection(Token); // checking connection to hub
             hubConnection.On<ChatMessages, string>("ReceiveMessage", async (message, userName) =>
-            {
-                if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId) || (ContactId == message.FromUserId && CurrentUserId == message.ToUserId))
-                {
-
-                    if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId))
                     {
-                        messages.Add(new ChatMessages { Message = message.Message, CreatedDate = message.CreatedDate, FromEmail = CurrentUserEmail });
-                        await hubConnection.SendAsync("ChatNotificationAsync", $"New Message From {userName}", ContactId, CurrentUserId);
-                    }
-                    else if ((ContactId == message.FromUserId && CurrentUserId == message.ToUserId))
-                    {
-                        messages.Add(new ChatMessages { Message = message.Message, CreatedDate = message.CreatedDate, FromEmail = ContactEmail });
-                    }
-                    StateHasChanged();
-                }
-            });
-            await GetAllFavorites(CurrentUserId);
+                        if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId))
+                        {
+                            await hubConnection.SendAsync("ChatNotificationAsync", $"New Message From {userName}", ContactId, CurrentUserId);
+                            messages.Add(message);
+                        }
+                        else if ((ContactId == message.FromUserId && CurrentUserId == message.ToUserId))
+                        {
+                            messages.Add(message);
+                        }
+                        await _jsRuntime.InvokeAsync<string>("OnScrollEvent", "chatContainer");
+                        StateHasChanged();
+                    });
+            await GetAllFavorites(CurrentUserId,ContactId);
             if (!string.IsNullOrEmpty(ContactId))
             {
                 await LoadUserChat(ContactId);
             }
         }
-
         catch (Exception ex)
         {
             error = ex.Message;
         }
-
     }
     public List<Models.FavoritesListResponse> ChatUsers = new List<Models.FavoritesListResponse>();
+    public Models.Connections connection = new Models.Connections();
     [Parameter] public string ContactEmail { get; set; }
     [Parameter] public string ContactId { get; set; }
     async Task LoadUserChat(string userId)
@@ -186,9 +183,9 @@
         messages = new List<Models.ChatMessages>();
         messages = await _chatService.GetFullChatHistory(ContactId,CurrentUserId);
     }
-    async Task GetAllFavorites(string id)
+    async Task GetAllFavorites(string currentUserId,string favoriteUserId)
     {
-        ChatUsers = await _favoriteService.GetAllFavoritesForAccountAsync(CurrentUserId);
+        ChatUsers = await _favoriteService.GetAllFavoritesForAccountAsync(currentUserId);
     }
     private void ShowInformation(string userId)
     {
@@ -210,5 +207,4 @@
             await hubConnection.StartAsync();
         }
     }
-}
 }

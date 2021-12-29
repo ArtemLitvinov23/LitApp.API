@@ -1,9 +1,6 @@
 ﻿@page "/users"
 @attribute [Authorize]
 @layout MainLayout
-@inject IAccountService _accountService
-@inject IFavoritesListService _favoritesList
-@inject NavigationManager _navigationManager
 
 <MudContainer Style="display: inline-block; position: relative; top: 0; bottom: 0; left: 0; right: 0; width: 500px; height: 500px; margin: auto; ">
 <MudTable Items="@users" Filter="new Func<Models.Users,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1" Breakpoint="Breakpoint.Sm" Loading="@loading" LoadingProgressColor="Color.Info" Dense="@dense" >

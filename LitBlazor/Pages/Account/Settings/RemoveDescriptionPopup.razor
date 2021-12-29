@@ -1,7 +1,4 @@
-﻿@inject IAccountService _accountService
-@inject IProfileService _profileService
-@layout MainLayout
-@inject NavigationManager _navigationManager
+﻿@layout MainLayout
 <MudDialog>
     <DialogContent>
         Are you sure you want to remove description from your account?
@@ -14,7 +11,6 @@
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     void Cancel() => MudDialog.Cancel();
-
     async Task RemoveDescriptionFromAccount()
     {
         var user = await _accountService.GetUserDataFromLocalStorage();

@@ -1,9 +1,4 @@
 ﻿@page "/card/{ContactId}"
-@inject IAccountService _accountService
-@inject IFavoritesListService _favoritesList
-@inject IConnectionService _connectionService
-@layout MainLayout
-@inject NavigationManager _navigationManager
 @attribute [Authorize]
 
 <MudContainer Style="display: inline-block; position: relative; top: 0; bottom: 0; left: 0; right: 0; width: 600px; height: 200px; margin: auto; ">
@@ -16,7 +11,8 @@
             <MudText Typo="Typo.body1">@users.FirstName @users.LastName </MudText>
             <MudText Typo="Typo.body2">@users.Email</MudText>
             <MudText Typo="Typo.caption">@users.Phone </MudText>
-            @if (@connection.IsOnline == true)
+            <br/>
+            @if (!string.IsNullOrEmpty(@connection.UserAccount) && @connection.IsOnline == true)
                 {
                     <MudText Typo="Typo.caption" Color="Color.Success">Online: @connection.ConnectedAt </MudText>
                 }
@@ -43,15 +39,20 @@
             }
  </MudCardActions>
 </MudCard>
+         @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger mt-3 mb-0">@errorMessage</div>
+            }
 </MudContainer>
 
 
 @code {
-    private Models.Users users = new Models.Users();
-    private Connections connection = new Connections();
+    private Models.Users users = new();
+    private Connections connection = new();
     [Parameter] public string CurrentUserId{ get; set;}
     [Parameter] public string ContactId{ get; set;}
     [Parameter] public bool IsDeleted{ get; set; }
+    private string errorMessage;
 
     void Return()
     {
@@ -87,10 +88,11 @@
             users = await _accountService.GetUserDetailsAsync(ContactId);
             var userBoolInfo = await _favoritesList.GetFavoritesUserAsync(ContactId);
             IsDeleted = userBoolInfo.IsDeleted;
-            connection = await _connectionService.GetStatusFavoriteUserAsync(ContactId);
+            connection = await _connectionService.GetStatusUserAsync(users.Id.ToString());
         }
-        catch
+        catch(Exception ex)
         {
+            errorMessage = ex.Message;
             IsDeleted = true;
             StateHasChanged();
         }

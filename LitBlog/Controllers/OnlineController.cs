@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace LitChat.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class OnlineController : ControllerBase
     {
         private readonly IConnectionService _connectionService;
@@ -22,18 +22,27 @@ namespace LitChat.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ConnectionsResponseViewModel>>> GetConnectedClient()
+        [AllowAnonymous]
+        public async Task<ActionResult<List<ConnectionsResponseViewModel>>> GetConnectedClient()
         {
            var allClients = await _connectionService.GetAllClientsAsync();
-           var mappingModel = _mapper.Map<IEnumerable<ConnectionsResponseViewModel>>(allClients);
+           var mappingModel = _mapper.Map<List<ConnectionsResponseViewModel>>(allClients);
            return Ok(mappingModel);
         }
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ConnectionsResponseViewModel>> GetConnectedClient(int id)
         {
             var allClients = await _connectionService.GetClientByUserIdAsync(id);
             var mappingModel = _mapper.Map<ConnectionsResponseViewModel>(allClients);
             return Ok(mappingModel);
+        }
+        [HttpPatch("{id}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<ConnectionsResponseViewModel>> DisconnectClient(int id)
+        {
+            await _connectionService.CloseConnection(id);
+            return Ok();
         }
     }
 }

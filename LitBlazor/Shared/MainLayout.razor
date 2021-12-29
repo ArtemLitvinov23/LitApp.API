@@ -1,12 +1,4 @@
 ﻿@inherits LayoutComponentBase
-@using Microsoft.AspNetCore.SignalR.Client
-@inject IAccountService AccountService
-@inject NavigationManager NavigationManager
-@inject ISnackbar _snackBar
-@inject IChatService _chatService
-@inject IAccountService _accountService
-@inject NavigationManager _navigationManager
-@using System.ComponentModel.DataAnnotations
 
 <MudThemeProvider />
 <MudDialogProvider />
@@ -16,6 +8,10 @@
          <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit"  OnClick="@((e) => DrawerToggle())" Edge="Edge.Start"/>
          <MudText Typo="Typo.h6" Class="ml-4">Litchat</MudText>
          <MudSpacer />
+         @if(_accountService.Account !=null)
+        {
+          <MudText>@_accountService.Account.Email.ToLower()</MudText>
+        }
          <MudIconButton Icon="@Icons.Custom.Brands.LinkedIn" Color="Color.Inherit"/>
          <MudIconButton OnClick="@(() => EditProfile(CurrentUserId))" Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit"></MudIconButton>
          <MudIconButton OnClick="@(() => Logout())" Icon="@Icons.Outlined.Logout" Color="Color.Inherit"></MudIconButton>
@@ -44,15 +40,16 @@
 
     void EditProfile(string id)=>_navigationManager.NavigateTo($"/profile");
 
-    private void Logout()
+    private async Task Logout()
     {
-        NavigationManager.NavigateTo("/account/logout");
+        await hubConnection.StopAsync();
+        _navigationManager.NavigateTo("/account/logout");
     }
     protected override async Task OnInitializedAsync()
     {
-        if (_accountService.Account == null)
+        if (_accountService.Account.JwtToken == null)
         {
-            NavigationManager.NavigateTo("/account/login");
+            _navigationManager.NavigateTo("/account/login");
         }
         else
         {
@@ -62,6 +59,7 @@
 
             }).WithAutomaticReconnect().Build();
             await hubConnection.StartAsync();
+            CurrentUserId = _accountService.Account.Id.ToString();
             hubConnection.On<string, string, string>("ReceiveChatNotification", (message, receiverUserId, senderUserId) =>
             {
                 if (CurrentUserId == receiverUserId)
@@ -75,11 +73,10 @@
                         config.ActionColor = Color.Info;
                         config.Onclick = snackbar =>
                         {
-                            NavigationManager.NavigateTo($"chat/{senderUserId}");
+                            _navigationManager.NavigateTo($"chat/{senderUserId}");
                             return Task.CompletedTask;};});
                 }
             });
-            CurrentUserId = _accountService.Account.Id.ToString();
         } 
     }
 }

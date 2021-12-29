@@ -1,6 +1,4 @@
 ﻿@page "/account/verify/{Token}"
-@inject IAccountService AccountService
-@inject NavigationManager NavigationManager
 
 <div style="max-width: 400px;">
     <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
@@ -31,7 +29,7 @@
 
     protected void Login()
     {
-        NavigationManager.NavigateTo("/account/login");
+        _navigationManager.NavigateTo("/account/login");
     }
     private async void OnValidSubmit()
     {
@@ -43,8 +41,8 @@
                     Token = Token
                 };
             model = newToken;
-            await AccountService.Verify(model);
-            NavigationManager.NavigateTo("/account/login");
+            await _accountService.Verify(model);
+            _navigationManager.NavigateTo("/account/login");
         }
         catch (Exception ex)
         {

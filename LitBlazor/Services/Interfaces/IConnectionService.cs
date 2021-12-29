@@ -6,7 +6,8 @@ namespace LitBlazor.Services.Interfaces
 {
     public interface IConnectionService
     {
-        Task<Connections> GetStatusFavoriteUserAsync(string favoriteUserId);
-        Task<IEnumerable<Connections>> GetAllStatusAsync();
+        Task<Connections> GetStatusUserAsync(string UserId);
+        Task<List<Connections>> GetAllStatusAsync();
+        Task CloseConnection(string userId);
     }
 }

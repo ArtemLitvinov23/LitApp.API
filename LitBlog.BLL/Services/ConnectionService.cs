@@ -18,6 +18,16 @@ namespace LitChat.BLL.Services
             _connectionRepository = connectionRepository;
             _mapper = mapper;
         }
+
+        public async Task CloseConnection(int accountId)
+        {
+            var user = await _connectionRepository.GetClientById(accountId);
+            user.DisconnectedAt = DateTime.Now;
+            user.IsOnline = false;
+            var mappingModel = _mapper.Map<Connections>(user);
+            await _connectionRepository.UpdateConnection(mappingModel);
+        }
+
         public async Task CreateConnectionAsync(ConnectionsDto connections)
         {
             if (connections is null)
@@ -28,20 +38,26 @@ namespace LitChat.BLL.Services
             await _connectionRepository.CreateConnection(mappingModel);
         }
 
-        public async Task DeleteConnectionAsync(string ConnectionId)
+        public async Task DeleteConnectionAsync(int UserId)
         {
-            await _connectionRepository.DeleteConnection(ConnectionId);
+            var connections = await _connectionRepository.GetClientById(UserId);
+            await _connectionRepository.DeleteConnection(connections.ConnectionId);
         }
 
-        public async Task<IEnumerable<ConnectionsDto>> GetAllClientsAsync()
+        public async Task<IEnumerable<ConnectionsResponseDto>> GetAllClientsAsync()
         {
-            return _mapper.Map<IEnumerable<ConnectionsDto>>(await _connectionRepository.GetAllClients());
+            return _mapper.Map<IEnumerable<ConnectionsResponseDto>>(await _connectionRepository.GetAllClients());
         }
 
-        public async Task<ConnectionsDto> GetClientByUserIdAsync(int UserId)
+        public async Task<ConnectionsResponseDto> GetClientByUserIdAsync(int UserId)
         {
-            var connections = await _connectionRepository.GetClientByConnectionId(UserId);
-            return _mapper.Map<ConnectionsDto>(connections);
+            var connections = await _connectionRepository.GetClientById(UserId);
+            return _mapper.Map<ConnectionsResponseDto>(connections);
+        }
+
+        public async Task<ConnectionsDto> GetExistsConnectionAsync(int accountId)
+        {
+            return _mapper.Map<ConnectionsDto>(await _connectionRepository.GetExistsConnectionAsync(accountId));
         }
 
         public async Task UpdateConnection(ConnectionsDto connections)

@@ -4,8 +4,7 @@ namespace LitChat.BLL.ModelsDto
 {
     public class ConnectionsDto
     {
-        public int Id { get; set; }
-        public string ConnectionId { get; set; } = null!;
+        public string ConnectionId { get; set; }
         public int UserAccount { get; set; }
         public DateTime ConnectedAt { get; set; }
         public DateTime DisconnectedAt { get; set; }
