@@ -1,5 +1,6 @@
 ﻿using LitBlog.DAL.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,9 +14,9 @@ namespace LitBlog.DAL.Repositories
             _blogContext = blogContext;
         }
 
-        public IQueryable<ChatMessages> GetFullChatHistory(int userId,int contactId)
+        public async Task<IEnumerable<ChatMessages>> GetFullChatHistory(int userId,int contactId)
         {
-            var message = _blogContext.Messages
+            var message = await _blogContext.Messages
                 .Include(a => a.FromUser)
                 .Include(a => a.ToUser)
                 .Where(h => (h.FromUserId == contactId && h.ToUserId == userId) || (h.FromUserId == userId && h.ToUserId == contactId))
@@ -31,10 +32,28 @@ namespace LitBlog.DAL.Repositories
                     ToEmail = x.ToEmail,
                     FromUser = x.FromUser,
                     CreatedDate = x.CreatedDate.ToLocalTime(),
-                }).AsQueryable();
+                }).ToListAsync();
             return message;
         }
 
+        public async Task RemoveChatHistory(int userId, int contactId)
+        {
+            var findChat = await _blogContext.Messages.Where(x => x.FromUserId == userId && x.ToUserId == contactId || x.FromUserId==contactId && x.ToUserId ==userId).ToListAsync();
+            _blogContext.Messages.RemoveRange(findChat);
+            await _blogContext.SaveChangesAsync();
+        }
+        public async Task RemoveMessage(int messageId)
+        {
+            var message = await _blogContext.Messages.FindAsync(messageId);
+            _blogContext.Messages.Remove(message);
+            await _blogContext.SaveChangesAsync();
+        }
+        public async Task RemoveAllMyMessages(int userId)
+        {
+            var findChat = await _blogContext.Messages.Where(x => x.FromUserId == userId || x.ToUserId == userId).ToListAsync();
+            _blogContext.Messages.RemoveRange(findChat);
+            await _blogContext.SaveChangesAsync();
+        }
         public async Task SaveMessageAsync(ChatMessages message)
         {
             await _blogContext.Messages.AddAsync(message);

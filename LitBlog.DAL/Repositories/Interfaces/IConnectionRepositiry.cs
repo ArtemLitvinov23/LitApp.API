@@ -7,7 +7,7 @@ namespace LitChat.DAL.Repositories.Interfaces
     public interface IConnectionRepository
     {
         Task<IEnumerable<Connections>> GetAllClients();
-        Task<Connections> GetExistsConnectionAsync(int userAccount);
+        Task<Connections> GetConnectionForUserAsync(int userAccount);
         Task<Connections> GetClientById(int UserId);
         Task CreateConnection(Connections connections);
         Task UpdateConnection(Connections connections);

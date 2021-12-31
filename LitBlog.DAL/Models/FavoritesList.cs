@@ -16,8 +16,8 @@ namespace LitChat.DAL.Models
         public string FirstName { get; set; }
         [Required]
         public string LastName { get; set; }
-        [ForeignKey("OwnerAccountId")]
-        public Account OwnerAccount { get; set; }
+        [ForeignKey("FavoriteUserAccountId")]
+        public Account FavoriteAccount { get; set; }
         public bool IsDeleted { get; set; }
 
     }

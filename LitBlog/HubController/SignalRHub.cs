@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using LitBlog.API.Models;
+using LitBlog.BLL.ModelsDto;
 using LitBlog.BLL.Services.Interfaces;
 using LitChat.API.Models;
 using LitChat.BLL.ModelsDto;
@@ -30,29 +31,13 @@ namespace LitChat.API.HubController
         }
         public async Task ChatNotificationAsync(string message, string receiverUserId, string senderUserId)
         {
-            await Clients.All.SendAsync("ReceiveChatNotification", message, receiverUserId, senderUserId);
+            await Clients.All.SendAsync("ChatNotification", message, receiverUserId, senderUserId);
         }
         public override async Task OnConnectedAsync()
         {
-            var contextUser = Context.User;
-            var userEmail = contextUser.FindFirst(ClaimTypes.Email)?.Value;
-            var user = await _accountService.GetAccountByEmailAsync(userEmail);
-            var currentConnecting = await _connectionService.GetClientByUserIdAsync(user.Id);
-            var existsConnecting = await _connectionService.GetExistsConnectionAsync(user.Id);
-            if (currentConnecting.UserAccount == existsConnecting.UserAccount)
-            {
-                var connectionsModel = new ConnectionViewModel()
-                {
-                    ConnectedAt = DateTime.Now,
-                    IsOnline = currentConnecting.IsOnline,
-                    ConnectionId = Context.ConnectionId,
-                    UserAccount = user.Id
-                };
-                var mappingModel = _mapper.Map<ConnectionsDto>(connectionsModel);
-                await _connectionService.UpdateConnection(mappingModel);
-                await _connectionService.DeleteConnectionAsync(currentConnecting.UserAccount);
-            }
-            else
+            var user = await GetUserAsync();
+            var connection = await _connectionService.GetConnectionForUserAsync(user.Id);
+            if (connection == null)
             {
                 var connectionsModel = new ConnectionViewModel()
                 {
@@ -64,17 +49,33 @@ namespace LitChat.API.HubController
                 var mappingModel = _mapper.Map<ConnectionsDto>(connectionsModel);
                 await _connectionService.CreateConnectionAsync(mappingModel);
             }
+            else
+            {
+                var connectionsModel = new ConnectionViewModel()
+                {
+                    ConnectedAt = DateTime.Now,
+                    IsOnline = true,
+                    ConnectionId = Context.ConnectionId,
+                    UserAccount = user.Id
+                };
+                var mappingModel = _mapper.Map<ConnectionsDto>(connectionsModel);
+                await _connectionService.UpdateConnection(mappingModel);
+                await _connectionService.DeleteConnectionAsync(connection.UserAccount);
+            }
             await base.OnConnectedAsync();
         }
-
- 
         public override async Task OnDisconnectedAsync(Exception exception)
+        {
+            var user = await GetUserAsync();
+            await _connectionService.CloseConnection(user.Id);
+            await base.OnDisconnectedAsync(exception);
+        }
+        private async Task<AccountResponseDto> GetUserAsync()
         {
             var contextUser = Context.User;
             var userEmail = contextUser.FindFirst(ClaimTypes.Email)?.Value;
             var user = await _accountService.GetAccountByEmailAsync(userEmail);
-            await _connectionService.CloseConnection(user.Id);
-            await base.OnDisconnectedAsync(exception);
+            return user;
         }
     }
 }

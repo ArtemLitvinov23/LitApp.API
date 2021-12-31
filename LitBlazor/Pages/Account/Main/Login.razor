@@ -1,7 +1,7 @@
 ﻿@page "/account/login"
 
-<div style="max-width: 400px;">
-    <h4 class="card-header">Welcome to the LitChat!</h4>
+<MudContainer Style="display: block; position: center; top: 200; bottom: 0; left: 0; right: 0; width: 400px; height: 200px; margin: auto;">
+    <h1 class="card-header">Welcome to LitChat!</h1>
     <EditForm Model="@loginRequest" OnValidSubmit="HandleValidSubmit">
         <DataAnnotationsValidator />
         <MudCard>
@@ -12,12 +12,13 @@
                               @bind-Value="loginRequest.Password" For="@(() => loginRequest.Password)" InputType="InputType.Password" />
             </MudCardContent>
             <MudCardActions>
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" Size=Size.Large Class="ml-auto">Login</MudButton>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" Size=Size.Medium Class="ml-auto">Login</MudButton>
                 <MudSpacer/>
                 <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick=@(()=>Forgott()) Color="Color.Warning" Size=Size.Small Class="ml-auto">Forgot password</MudButton>
                 <MudSpacer/>
-                <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick=@(()=>Register()) Color="Color.Primary" Size=Size.Small Class="ml-auto">Register</MudButton>
+                <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick=@(()=>Register()) Color="Color.Primary" Size=Size.Medium Class="ml-auto">Register</MudButton>
             </MudCardActions>
+            <MudSpacer/>
            <MudProgressLinear Color="Color.Primary" Indeterminate=loading/>
         </MudCard>
          @if (!string.IsNullOrEmpty(error))
@@ -25,20 +26,12 @@
                 <div class="alert alert-danger mt-3 mb-0">@error</div>
             }
     </EditForm>
-</div>
+</MudContainer>
 @code {
     private AuthAccount loginRequest { get; set; } = new AuthAccount();
     private bool loading;
     private string error;
 
-    protected override void OnInitialized()
-    {
-        // redirect to home if already logged in
-        if (_accountService.Account != null)
-        {
-            _navigationManager.NavigateTo("/chat");
-        }
-    }
     protected void Register()
     {
        _navigationManager.NavigateTo("/account/register");

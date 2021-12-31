@@ -55,9 +55,9 @@ namespace LitChat.BLL.Services
             return _mapper.Map<ConnectionsResponseDto>(connections);
         }
 
-        public async Task<ConnectionsDto> GetExistsConnectionAsync(int accountId)
+        public async Task<ConnectionsDto> GetConnectionForUserAsync(int accountId)
         {
-            return _mapper.Map<ConnectionsDto>(await _connectionRepository.GetExistsConnectionAsync(accountId));
+            return _mapper.Map<ConnectionsDto>(await _connectionRepository.GetConnectionForUserAsync(accountId));
         }
 
         public async Task UpdateConnection(ConnectionsDto connections)

@@ -13,5 +13,6 @@ namespace LitChat.DAL.Repositories.Interfaces
         Task<FavoritesList> GetFavoriteUserById(int id);
         Task AddUserToFavorite(FavoritesList user);
         Task RemoveUserFromFavorite(int id);
+        Task RemoveMeFromFavorite(int id);
     }
 }

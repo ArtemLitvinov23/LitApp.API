@@ -46,13 +46,17 @@ namespace LitBlog.BLL.Services
             string message;
             if (!string.IsNullOrEmpty(origin))
             {
-                var verifyUrl = $"{origin}/Account/verify?token={account.VerificationToken}";
+                var verifyUrl = $"{origin}/account/verify/{account.VerificationToken}";
                 message = $@"<p>Please click the below link to verify your email address:</p>
                              <p><a href=""{verifyUrl}"">{verifyUrl}</a></p>";
             }
             else
-                message = $@"<p>Please use the below token to verify your email address with the <code>{origin}/account/verify</code> api route:</p>
-                             <p><code>{account.VerificationToken}</code></p>";
+            {
+                var url = "https://localhost:44311/";
+                var verifyUrlWithoutOrigin = $"{url}/account/verify/{account.VerificationToken}";
+                message = $@"<p>Please use the below token to verify your email address with the  api route:</p>
+                              <p><a href=""{verifyUrlWithoutOrigin}"">{verifyUrlWithoutOrigin}</a></p>";
+            }
 
             await SendAsync(account.Email, "Sign-up Verification API - Verify Email",
                 $@"<h4>Verify Email</h4>

@@ -33,10 +33,10 @@ namespace LitBlazor.Services
             Account = await _httpService.PostWithOutToken<Account>("api/Account/sign-in",model);
             await _localStorageService.SetItem("account", Account);
         }
-        public async Task Register(RegisterAccount model) => await _httpService.Post("api/Account/sign-up", model);
-        public async Task Verify(VerifyAccount model)=> await _httpService.Post("api/Account/verify", model);
-        public async Task ForgotPassword(ForgotPassword model) => await _httpService.Post("api/Account/forgot-password", model);
-        public async Task ResetPassword(ResetPassword model)=> await _httpService.Post("api/Account/forgot-password", model);
+        public async Task Register(RegisterAccount model) => await _httpService.PostWithOutToken("api/Account/sign-up", model);
+        public async Task Verify(VerifyAccount model)=> await _httpService.PostWithOutToken("api/Account/verify", model);
+        public async Task ForgotPassword(ForgotPassword model) => await _httpService.PostWithOutToken("api/Account/forgot-password", model);
+        public async Task ResetPassword(ResetPassword model)=> await _httpService.PostWithOutToken("api/Account/forgot-password", model);
         public async Task Logout()
         {
             Account = null;

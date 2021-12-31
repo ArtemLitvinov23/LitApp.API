@@ -1,6 +1,7 @@
 ﻿@page "/account/register"
 
-<div style="max-width: 400px;">
+<MudContainer Style="display: block; position: center; top: 200; bottom: 0; left: 0; right: 0; width: 400px; height: 200px; margin: auto; ">
+     <h1 class="card-header">Sign up</h1>
     <EditForm Model="@_registerAccount" OnValidSubmit="OnValidSubmit">
         <DataAnnotationsValidator />
         <MudCard>
@@ -18,22 +19,28 @@
                 <MudSwitch @bind-Checked="_registerAccount.AcceptTerms" For="@(() => _registerAccount.AcceptTerms)" Label="Accept Terms & Conditions" Color="Color.Success" />
             </MudCardContent>
             <MudCardActions>
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" Size=Size.Large Class="ml-auto">Register</MudButton>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" Size=Size.Medium Class="ml-auto">Register</MudButton>
                 <MudSpacer/>
-                <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick=@(()=>Login()) Color="Color.Warning" Size=Size.Small Class="ml-auto">Cancel</MudButton>
+                <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick=@(()=>Login()) Color="Color.Warning" Size=Size.Medium Class="ml-auto">Cancel</MudButton>
             </MudCardActions>
+                        <MudSpacer/>
              <MudProgressLinear Color="Color.Primary" Indeterminate=loading/>
         </MudCard>
+        @if (!string.IsNullOrEmpty(message))
+            {
+                <div class="alert alert-danger mt-3 mb-0">@message</div>
+            }
          @if (!string.IsNullOrEmpty(error))
             {
                 <div class="alert alert-danger mt-3 mb-0">@error</div>
             }
     </EditForm>
-</div>
+</MudContainer>
 @code
 {
     private readonly RegisterAccount _registerAccount = new();
     private string error;
+    private string message;
     private bool loading;
     protected void Login()
     {
@@ -45,7 +52,7 @@
         try
         {
             await _accountService.Register(_registerAccount);
-            _navigationManager.NavigateTo("account/verify");
+            message = $"Email '{_registerAccount.Email}' is already registered, please checked your email";
         }
         catch(Exception ex)
         {

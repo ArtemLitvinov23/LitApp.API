@@ -1,44 +1,40 @@
 ﻿@page "/account/forgot-password"
 
-<div style="max-width: 400px;">
+<MudContainer Style="display: block; position: center; top: 200; bottom: 0; left: 0; right: 0; width: 400px; height: 200px; margin: auto; ">
     <EditForm Model="@forgotPassword" OnValidSubmit="HandleValidSubmit">
+        <h1 class="card-header">Forgot password</h1>
         <DataAnnotationsValidator />
         <MudCard>
             <MudCardContent>
                 <MudTextField Label="Email" Class="mt-3"
-                              @bind-Value="forgotPassword.Email" For="@(() => forgotPassword.Email)" HelperText="enter valid email adress"  InputType="InputType.Email"/>
+                 @bind-Value="forgotPassword.Email" For="@(() => forgotPassword.Email)" HelperText="enter valid email adress"  InputType="InputType.Email"/>
             </MudCardContent>
             <MudCardActions>
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" Size=Size.Large Class="ml-auto">Send</MudButton>
                 <MudSpacer/>
                 <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick=@(()=>Login()) Color="Color.Warning" Size=Size.Small Class="ml-auto">Cancel</MudButton>
             </MudCardActions>
+            <MudSpacer/>
+            <MudProgressLinear Color="Color.Primary" Indeterminate=loading/>
         </MudCard>
          @if (!string.IsNullOrEmpty(error))
             {
                 <div class="alert alert-danger mt-3 mb-0">@error</div>
             }
     </EditForm>
-</div>
+</MudContainer>>
 @code {
     private Models.ForgotPassword forgotPassword = new();
     private string error;
+    private bool loading;
     protected void Login()
     {
         _navigationManager.NavigateTo("/account/login");
     }
-    protected override void OnInitialized()
-    {
-        // redirect to home if already logged in
-        if (_accountService.Account != null)
-        {
-            _navigationManager.NavigateTo("/chat");
-        }
-    }
-
 
     private async void HandleValidSubmit()
     {
+        loading = true;
         try
         {
             await _accountService.ForgotPassword(forgotPassword);
@@ -46,6 +42,7 @@
         }
         catch (Exception ex)
         {
+            loading = false;
             error = ex.Message;
             StateHasChanged();
         }

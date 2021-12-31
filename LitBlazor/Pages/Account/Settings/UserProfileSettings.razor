@@ -2,7 +2,7 @@
 @layout MainLayout
 @attribute [Authorize]
 
-<MudContainer Style="display: inline-block; position: relative; top: 0; bottom: 0; left: 0; right: 0; width: 800px; height: 200px; margin: auto; ">
+<MudContainer Style="display: inline-block; position: relative; top: 0; bottom: 0; left: 0; right: 0; width: 450px; height: 200px; margin: auto; ">
 <MudCard>
     <MudCardHeader>
         <CardHeaderAvatar>
@@ -23,8 +23,7 @@
     </MudCardContent>
     <MudCardActions>
                 <MudButton OnClick="@(() => EditAccount(userInfo.Id.ToString()))" Variant="Variant.Filled" StartIcon="@Icons.Filled.Edit" Color="Color.Primary" ButtonType="ButtonType.Button">Edit information</MudButton>
-                <MudButton OnClick="@(() => RemovePhoneFromAccount(userInfo.Id.ToString()))" Variant="Variant.Filled" StartIcon="@Icons.Filled.PhoneDisabled" Color="Color.Inherit" ButtonType="ButtonType.Button">Delete phone</MudButton>
-                <MudButton @onclick="OpenDialogDecription" Variant="Variant.Filled" StartIcon="@Icons.Filled.Delete" Color="Color.Tertiary" ButtonType="ButtonType.Button">Delete description</MudButton>
+                <MudSpacer/>
                 <MudButton @onclick="OpenDialog" Variant="Variant.Filled" StartIcon="@Icons.Filled.NoAccounts" Color="Color.Warning">Delete account</MudButton>
     </MudCardActions>
 </MudCard>
@@ -34,7 +33,7 @@
         <MudCardContent>
             <MudTextField @bind-Value="model.FirstName" Label="First name" Variant="Variant.Text" Margin="Margin.Normal"  HelperText="Min. 2 characters"></MudTextField>
             <MudTextField @bind-Value="model.LastName" Label="Last name" Variant="Variant.Text" Margin="Margin.Normal"  HelperText="Min. 2 characters"></MudTextField>
-            <MudTextField @bind-Value="model.Phone" Label="Phone" Variant="Variant.Text" Margin="Margin.Normal" ></MudTextField>
+            <MudTextField @bind-Value="model.Phone" Label="Phone" Variant="Variant.Text" Margin="Margin.Normal"  HelperText="Personal phone number"></MudTextField>
             <MudTextField @bind-Value="model.Description" Label="Description" Variant="Variant.Text" Margin="Margin.Normal"  HelperText="Max. 100 characters"></MudTextField>
         </MudCardContent>
     <MudCardActions>
@@ -68,11 +67,6 @@
         updateAccount.Description = string.Empty;
         userInfo = await _accountService.GetUserDetailsAsync(CurrentUserId);
     }
-    async Task RemovePhoneFromAccount(string id)
-    {
-        await _profileService.RemovePhoneFromAccount(id);
-        userInfo = await _accountService.GetUserDetailsAsync(CurrentUserId);
-    }
     async Task EditAccount(string userId)
     {
         var userInfo =  await _accountService.GetUserDetailsAsync(CurrentUserId);
@@ -99,9 +93,5 @@
     private void OpenDialog()
     {
         DialogService.Show<TermsOfServiceDialog>("Remove account");
-    }
-        private void OpenDialogDecription()
-    {
-        DialogService.Show<RemoveDescriptionPopup>("Remove description");
     }
     }

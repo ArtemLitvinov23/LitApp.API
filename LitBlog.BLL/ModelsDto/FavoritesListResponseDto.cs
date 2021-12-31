@@ -2,7 +2,6 @@
 {
     public class FavoritesListResponseDto
     {
-        public int Id { get; set; }
         public int OwnerAccountId { get; set; }
         public int FavoriteUserAccountId { get; set; }
         public string Email { get; set; }

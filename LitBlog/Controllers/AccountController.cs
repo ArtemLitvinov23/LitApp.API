@@ -49,7 +49,7 @@ namespace LitBlog.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("verify")]
-        public async Task<ActionResult> Verify([FromQuery]VerifyRequestViewModel verifyRequest)
+        public async Task<ActionResult> Verify(VerifyRequestViewModel verifyRequest)
         {
             await _accountService.VerifyEmailAsync(verifyRequest.Token);
             return Ok(new { message = "Verification successful, you can now login" });

@@ -8,13 +8,14 @@
          <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit"  OnClick="@((e) => DrawerToggle())" Edge="Edge.Start"/>
          <MudText Typo="Typo.h6" Class="ml-4">Litchat</MudText>
          <MudSpacer />
-         @if(_accountService.Account !=null)
-        {
-          <MudText>@_accountService.Account.Email.ToLower()</MudText>
-        }
-         <MudIconButton Icon="@Icons.Custom.Brands.LinkedIn" Color="Color.Inherit"/>
-         <MudIconButton OnClick="@(() => EditProfile(CurrentUserId))" Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit"></MudIconButton>
-         <MudIconButton OnClick="@(() => Logout())" Icon="@Icons.Outlined.Logout" Color="Color.Inherit"></MudIconButton>
+         @if (_accountService.Account != null)
+            {
+            <MudText>@_accountService.Account.Email.ToLower()</MudText>
+
+            <MudIconButton Icon="@Icons.Custom.Brands.LinkedIn" Color="Color.Inherit"/>
+            <MudIconButton OnClick="@(() => EditProfile(CurrentUserId))" Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit"></MudIconButton>
+            <MudIconButton OnClick="@(() => Logout())" Icon="@Icons.Outlined.Logout" Color="Color.Inherit"></MudIconButton>
+            }
     </MudAppBar>
     <MudDrawer @bind-Open=" _drawerOpen" Elevation="2">
         <NavMenu />
@@ -31,7 +32,7 @@
 @code {
     private HubConnection hubConnection;
     [Parameter] public string CurrentUserId{ get; set; }
-    public bool IsConnected => hubConnection.State == HubConnectionState.Connected;
+    [Parameter] public string Token{ get; set; }
     bool _drawerOpen = false;
     void DrawerToggle()
     {
@@ -42,25 +43,21 @@
 
     private async Task Logout()
     {
-        await hubConnection.StopAsync();
-        _navigationManager.NavigateTo("/account/logout");
+         await hubConnection.StopAsync();
+         _navigationManager.NavigateTo("/account/logout");
     }
     protected override async Task OnInitializedAsync()
     {
-        if (_accountService.Account.JwtToken == null)
+        if (_accountService.Account == null || _accountService.Account.JwtToken == null)
         {
             _navigationManager.NavigateTo("/account/login");
         }
         else
         {
-            hubConnection = new HubConnectionBuilder().WithUrl("https://localhost:44311/chat", options =>
-            {
-                options.AccessTokenProvider = () => Task.FromResult(_accountService.Account.JwtToken);
-
-            }).WithAutomaticReconnect().Build();
-            await hubConnection.StartAsync();
             CurrentUserId = _accountService.Account.Id.ToString();
-            hubConnection.On<string, string, string>("ReceiveChatNotification", (message, receiverUserId, senderUserId) =>
+            Token = _accountService.Account.JwtToken;
+            await CheckConnection(Token);
+            hubConnection.On<string, string, string>("ChatNotification", (message, receiverUserId, senderUserId) =>
             {
                 if (CurrentUserId == receiverUserId)
                 {
@@ -78,5 +75,19 @@
                 }
             });
         } 
+    }
+    private async Task CheckConnection(string token)
+    {
+        if (hubConnection == null)
+        {
+            hubConnection = new HubConnectionBuilder().WithUrl("https://localhost:44311/chat", options =>
+            {
+                options.AccessTokenProvider = () => Task.FromResult(token);
+            }).Build();
+        }
+        if (hubConnection.State == HubConnectionState.Disconnected)
+        {
+            await hubConnection.StartAsync();
+        }
     }
 }

@@ -14,8 +14,8 @@
 
     async Task RemoveAccount()
     {
-        var user = await _accountService.GetUserDataFromLocalStorage();
-        await _accountService.Delete(user.Id);
+        var userId = _accountService.Account.Id;
+        await _accountService.Delete(userId);
         MudDialog.Close(DialogResult.Ok(true));
     }
 }

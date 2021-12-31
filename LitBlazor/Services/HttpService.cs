@@ -79,7 +79,12 @@ namespace LitBlazor.Services
             var httpResponse = await _httpClient.SendAsync(request);
             return await httpResponse.Content.ReadFromJsonAsync<T>();
         }
-
+        public async Task PostWithOutToken(string uri, object value)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, uri);
+            request.Content = new StringContent(JsonSerializer.Serialize(value), Encoding.UTF8, "application/json");
+            await _httpClient.SendAsync(request);
+        }
         public async Task<T> Post<T>(string uri, object value)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, uri);

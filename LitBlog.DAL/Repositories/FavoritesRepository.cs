@@ -21,6 +21,12 @@ namespace LitChat.DAL.Repositories
             await _blogContext.SaveChangesAsync();
         }
         public async Task<List<FavoritesList>> GetAllFavoriteForAccountUser(int id) => await _blogContext.FavoritesUsers.Where(x=>x.OwnerAccountId==id).ToListAsync();
+        public async Task RemoveMeFromFavorite(int id)
+        {
+            var account = await _blogContext.FavoritesUsers.Where(x => x.FavoriteUserAccountId == id).ToListAsync();
+            _blogContext.RemoveRange(account);
+            await _blogContext.SaveChangesAsync();
+        }
 
         public IQueryable<FavoritesList> GetAllFavoriteUser() =>  _blogContext.FavoritesUsers.AsQueryable();
 

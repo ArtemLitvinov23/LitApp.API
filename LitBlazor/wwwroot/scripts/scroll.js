@@ -1,3 +1,5 @@
-﻿function OnScrollEvent() {
-    document.documentElement.scrollTop = 0;
+﻿
+function OnScrollEvent(id) {
+    var objDiv = document.getElementById(id);
+    objDiv.scrollTop = objDiv.scrollHeight;
 }

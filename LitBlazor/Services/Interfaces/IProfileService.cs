@@ -7,7 +7,5 @@ namespace LitBlazor.Services.Interfaces
     {
         Task<UserInfo> GetUserInfoAsync(string id);
         Task AddUserInfoAsync(string userId, UserInfo chatMessage);
-        Task RemovePhoneFromAccount(string userId);
-        Task RemoveDescriptionFromAccount(string userId);
     }
 }

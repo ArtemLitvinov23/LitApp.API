@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace LitBlazor.Models
+namespace LitChat.API.Models
 {
-    public class ChatMessages
+    public class ChatMessagesResponseViewModel
     {
         public string MessageId { get; set; }
         public string FromUserId { get; set; }

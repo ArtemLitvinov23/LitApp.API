@@ -16,10 +16,11 @@ namespace LitBlog.DAL
         {
             modelBuilder.Entity<FavoritesList>(x =>
             {
-                x.HasOne(d => d.OwnerAccount)
+                x.HasOne(d => d.FavoriteAccount)
                 .WithMany(d => d.Favorites)
-                .HasForeignKey(d => d.OwnerAccountId)
+                .HasForeignKey(d => d.FavoriteUserAccountId)
                 .OnDelete(DeleteBehavior.Cascade);
+                x.HasIndex(d => d.OwnerAccountId);
             });
 
             modelBuilder.Entity<ChatMessages>(entity =>

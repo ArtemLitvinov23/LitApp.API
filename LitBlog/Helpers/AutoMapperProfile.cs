@@ -42,6 +42,18 @@ namespace LitBlog.API.Helpers
             CreateMap<ChatMessagesDto, ChatMessageModel>()
                 .ForMember(x => x.FromUserId, opt => opt.MapFrom(src => src.FromUserId))
                 .ForMember(x => x.ToUserId, opt => opt.MapFrom(dst => dst.ToUserId))
+                .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate))
+                .ForMember(x => x.FromEmail, opt => opt.MapFrom(src => src.FromEmail))
+                .ForMember(x => x.ToEmail, opt => opt.MapFrom(src => src.ToEmail))
+                .ForMember(x => x.Message, opt => opt.MapFrom(src => src.Message))
+                .ReverseMap();
+            CreateMap<ChatMessagesDto, ChatMessagesResponseViewModel>()
+                .ForMember(x=>x.MessageId,opt=>opt.MapFrom(src=>src.Id))
+                .ForMember(x => x.FromUserId, opt => opt.MapFrom(src => src.FromUserId))
+                .ForMember(x => x.ToUserId, opt => opt.MapFrom(dst => dst.ToUserId))
+                .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate))
+                .ForMember(x => x.FromEmail, opt => opt.MapFrom(src => src.FromEmail))
+                .ForMember(x => x.ToEmail, opt => opt.MapFrom(src => src.ToEmail))
                 .ForMember(x => x.Message, opt => opt.MapFrom(src => src.Message))
                 .ReverseMap();
             CreateMap<AccountDto, UserResponseViewModel>().ReverseMap();

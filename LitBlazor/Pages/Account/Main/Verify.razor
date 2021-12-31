@@ -1,53 +1,27 @@
-﻿@page "/account/verify/{Token}"
+﻿@page "/account/verify/{JwtToken}"
+@page "/account/verify"
 
-<div style="max-width: 400px;">
-    <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
-        <DataAnnotationsValidator />
-        <MudCard>
-            <MudCardContent>
-                <MudTextField Label="Email" Class="mt-3"
-                              @bind-Value="model.Token" For="@(() => model.Token)"/>
-            </MudCardContent>
-            <MudCardActions>
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" Size=Size.Large Class="ml-auto">Verify</MudButton>
-                <MudSpacer/>
-                <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick=@(()=>Login()) Color="Color.Warning" Size=Size.Small Class="ml-auto">Cancel</MudButton>
-            </MudCardActions>
-          <MudProgressLinear Color="Color.Primary" Indeterminate=loading/>
-        </MudCard>
-         @if (!string.IsNullOrEmpty(error))
-            {
-                <div class="alert alert-danger mt-3 mb-0">@error</div>
-            }
-    </EditForm>
-</div>
 @code{
     private VerifyAccount model = new();
-    private string error;
-    private bool loading;
-    [Parameter] public string Token { get; set; }
+    [Parameter] public string JwtToken { get; set; } 
 
-    protected void Login()
+    protected override async Task OnInitializedAsync()
     {
-        _navigationManager.NavigateTo("/account/login");
-    }
-    private async void OnValidSubmit()
-    {
-        loading=true;
+         if (_accountService.Account != null)
+         {
+            await _accountService.Logout();
+         }
         try
         {
-            var newToken = new VerifyAccount()
+            model = new VerifyAccount()
                 {
-                    Token = Token
+                    Token = JwtToken
                 };
-            model = newToken;
             await _accountService.Verify(model);
-            _navigationManager.NavigateTo("/account/login");
+        _navigationManager.NavigateTo("/account/login");
         }
-        catch (Exception ex)
+        catch
         {
-            loading = false;
-            error = ex.Message;
             StateHasChanged();
         }
     }

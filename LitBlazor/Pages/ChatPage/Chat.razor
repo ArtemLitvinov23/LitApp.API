@@ -24,13 +24,25 @@
             {
                 <div class="d-flex flex-row my-4">
                     <div class="mr-4">
-                        <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">@message.FromEmail.ToUpper().FirstOrDefault()</MudAvatar>
+                        @if(CurrentUserId == message.FromUserId)
+                        {
+                            <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">@message.ToEmail.ToUpper().FirstOrDefault()</MudAvatar>
+                        }
+                        else
+                        {
+                            <MudAvatar Color="Color.Success" Style="height:50px; width:50px;">@message.FromEmail.ToUpper().FirstOrDefault()</MudAvatar>
+                        }
                     </div>
                     <div>
                         <MudText Typo="Typo.body1">@message.FromEmail</MudText>
                         <MudText Typo="Typo.caption" Style="font-size: xx-small!important;">@message.CreatedDate.ToString("dd MMM, yyyy hh:mm tt")</MudText>
-                        <MudText Typo="Typo.body2" Style=" padding: 15px;background-color: var(--mud-palette-background-grey);border-radius: 5px;margin-top:5px">@message.Message</MudText>
+                        <MudText Typo="Typo.body2" Style=" padding: 15px;background-color: var(--mud-palette-background-grey);border-radius: 5px;margin-top:5px">@message.Message</MudText>    
                     </div>
+                        <MudMenu Icon="@Icons.Filled.MoreVert" Size="Size.Small">
+                        <MudMenuItem>
+                         <MudIconButton OnClick="@(() => DeleteChatMessage(message.MessageId))" Icon="@Icons.Filled.Delete" Color="Color.Warning" Size="Size.Small"></MudIconButton>
+                        </MudMenuItem>
+                        </MudMenu>  
                 </div>
             }
         </div>
@@ -82,6 +94,9 @@
                         <MudMenuItem>
                          <MudButton OnClick="@(() => ShowInformation(user.FavoriteUserAccountId.ToString()))" StartIcon="@Icons.Material.Outlined.Info" Color="Color.Info" Size="Size.Small" ButtonType="ButtonType.Button">Show profile info</MudButton>
                         </MudMenuItem>
+                        <MudMenuItem>
+                         <MudButton OnClick="@(() => DeleteChatHistory(user.FavoriteUserAccountId.ToString()))" StartIcon="@Icons.Filled.Delete" Color="Color.Warning" Size="Size.Small" ButtonType="ButtonType.Button">Remove chat history</MudButton>
+                        </MudMenuItem>
                         </MudMenu>      
                     }
                 </MudList>
@@ -125,9 +140,9 @@
         }
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await _jsRuntime.InvokeAsync<string>("OnScrollEvent", "chatContainer");
-        }
+    {
+        await _jsRuntime.InvokeAsync<string>("OnScrollEvent","chatContainer");
+    }
     protected override async Task OnInitializedAsync()
     {
         var user = _accountService.Account;
@@ -148,7 +163,7 @@
                         {
                             messages.Add(message);
                         }
-                        await _jsRuntime.InvokeAsync<string>("OnScrollEvent", "chatContainer");
+                        await _jsRuntime.InvokeAsync<string>("OnScrollEvent","chatContainer");
                         StateHasChanged();
                     });
             await GetAllFavorites(CurrentUserId,ContactId);
@@ -181,6 +196,19 @@
         ContactId = contact.Id.ToString();
         ContactEmail = contact.Email;
         messages = new List<Models.ChatMessages>();
+        messages = await _chatService.GetFullChatHistory(ContactId,CurrentUserId);
+    }
+    async Task DeleteChatHistory(string userId)
+    {
+        var contact = await _accountService.GetUserDetailsAsync(userId);
+        ContactId = contact.Id.ToString();
+        ContactEmail = contact.Email;
+        await _chatService.DeleteChatHistoryAsync(CurrentUserId,ContactId);
+        messages = await _chatService.GetFullChatHistory(ContactId,CurrentUserId);
+    }
+    async Task DeleteChatMessage(string messageId)
+    {
+        await _chatService.DeleteChatMessageAsync(messageId);
         messages = await _chatService.GetFullChatHistory(ContactId,CurrentUserId);
     }
     async Task GetAllFavorites(string currentUserId,string favoriteUserId)

@@ -2,6 +2,7 @@
 using LitBlog.API.Models;
 using LitBlog.BLL.ModelsDto;
 using LitBlog.BLL.Services;
+using LitChat.API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -34,18 +35,30 @@ namespace LitBlog.API.Controllers
         }
 
         [HttpGet("{userId}/{contactId}")]
-        public async Task<List<ChatMessageModel>> GetConversationAsync(int userId,int contactId)
+        public async Task<List<ChatMessagesResponseViewModel>> GetConversationAsync(int userId,int contactId)
         {
             var message = await _chatService.GetLastFourMessagesAsync(userId, contactId);
-            var result = _mapper.Map<List<ChatMessageModel>>(message);
+            var result = _mapper.Map<List<ChatMessagesResponseViewModel>>(message);
             return result;
         }
         [HttpGet("full/{userId}/{contactId}")]
-        public async Task<List<ChatMessageModel>> GetFullChatHistory(int userId, int contactId)
+        public async Task<List<ChatMessagesResponseViewModel>> GetFullChatHistory(int userId, int contactId)
         {
             var message = await _chatService.GetFullHistoryMessagesAsync(userId, contactId);
-            var result = _mapper.Map<List<ChatMessageModel>>(message);
+            var result = _mapper.Map<List<ChatMessagesResponseViewModel>>(message);
             return result;
+        }
+        [HttpDelete("{userId}/{contactId}")]
+        public async Task<IActionResult> DeleteChatHistory(int userId, int contactId)
+        {
+            await _chatService.RemoveChatHistory(userId, contactId);
+            return Ok();
+        }
+        [HttpDelete("{messageId}")]
+        public async Task<IActionResult> DeleteChatHistory(int messageId)
+        {
+            await _chatService.RemoveMessage(messageId);
+            return Ok();
         }
     }
 }

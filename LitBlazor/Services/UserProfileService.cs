@@ -13,7 +13,5 @@ namespace LitBlazor.Services
         }
         public async Task<UserInfo> GetUserInfoAsync(string userId) => await _httpService.Get<UserInfo>($"api/Profile/{userId}");
         public async Task AddUserInfoAsync(string userId, UserInfo userInfo) => await _httpService.Patch($"api/Profile/{userId}", userInfo);
-        public async Task RemovePhoneFromAccount(string userId)=> await _httpService.Patch($"api/Profile/phone/{userId}");
-        public async Task RemoveDescriptionFromAccount(string userId) => await _httpService.Patch($"api/Profile/description/{userId}");
     }
 }

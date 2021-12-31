@@ -7,6 +7,7 @@ using LitBlog.BLL.Services.Interfaces;
 using LitBlog.DAL.Models;
 using LitBlog.DAL.Repositories;
 using LitChat.BLL.ModelsDto;
+using LitChat.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,22 +19,28 @@ namespace LitBlog.BLL.Services
     public class AccountService : IAccountService
     {
         private readonly IAccountRepository _accountRepository;
+        private readonly IFavoritesRepository _favoriteRepository;
         private readonly IEmailService _emailService;
+        private readonly IChatRepository _chatRepository;
         private readonly IJwtOptions _jwtOptions;
         private readonly IMapper _mapper;
         private readonly IPasswordHasher _password;
 
         public AccountService(
-            IAccountRepository accountRepository, 
+            IAccountRepository accountRepository,
             IEmailService emailService,
             IJwtOptions jwtOptions,
-            IMapper mapper, IPasswordHasher password)
+            IMapper mapper, IPasswordHasher password,
+            IFavoritesRepository favoriteRepository,
+            IChatRepository chatRepository)
         {
             _accountRepository = accountRepository;
             _emailService = emailService;
             _jwtOptions = jwtOptions;
             _mapper = mapper;
             _password = password;
+            _favoriteRepository = favoriteRepository;
+            _chatRepository = chatRepository;
         }
 
         public async Task<AuthenticateResponseDto> AuthenticateAsync(AuthenticateRequestDto authRequest, string ipAddress)
@@ -206,9 +213,14 @@ namespace LitBlog.BLL.Services
             return _mapper.Map<AccountResponseDto>(getAccount);
         }
 
-        public async Task DeleteAccountAsync(int id)=> await _accountRepository.DeleteAsync(id);
+        public async Task DeleteAccountAsync(int id)
+        {
+            await _chatRepository.RemoveAllMyMessages(id);
+            await _favoriteRepository.RemoveMeFromFavorite(id);
+            await _accountRepository.DeleteAsync(id);
+        }
 
-        public async Task<AccountResponseDto> GetAccountByEmailAsync(string accountEmail)
+            public async Task<AccountResponseDto> GetAccountByEmailAsync(string accountEmail)
         {
             var account = await _accountRepository.GetAllAccounts().FirstOrDefaultAsync(x => x.Email == accountEmail);
             return _mapper.Map<AccountResponseDto>(account);

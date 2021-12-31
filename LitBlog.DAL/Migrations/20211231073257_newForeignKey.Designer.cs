@@ -4,6 +4,7 @@ using LitBlog.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LitChat.DAL.Migrations
 {
     [DbContext(typeof(BlogContext))]
-    partial class BlogContextModelSnapshot : ModelSnapshot
+    [Migration("20211231073257_newForeignKey")]
+    partial class newForeignKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -82,7 +84,7 @@ namespace LitChat.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Accounts", (string)null);
+                    b.ToTable("Accounts");
                 });
 
             modelBuilder.Entity("LitBlog.DAL.Models.ChatMessages", b =>
@@ -117,7 +119,7 @@ namespace LitChat.DAL.Migrations
 
                     b.HasIndex("ToUserId");
 
-                    b.ToTable("Messages", (string)null);
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("LitChat.DAL.Models.Connections", b =>
@@ -147,7 +149,7 @@ namespace LitChat.DAL.Migrations
 
                     b.HasIndex("UserAccount");
 
-                    b.ToTable("Connections", (string)null);
+                    b.ToTable("Connections");
                 });
 
             modelBuilder.Entity("LitChat.DAL.Models.FavoritesList", b =>
@@ -186,14 +188,12 @@ namespace LitChat.DAL.Migrations
 
                     b.HasIndex("FavoriteUserAccountId");
 
-                    b.HasIndex("OwnerAccountId");
-
-                    b.ToTable("FavoritesUsers", (string)null);
+                    b.ToTable("FavoritesUsers");
                 });
 
             modelBuilder.Entity("LitBlog.DAL.Models.Account", b =>
                 {
-                    b.OwnsMany("LitBlog.DAL.Models.Account.RefreshTokens#LitBlog.DAL.Models.RefreshToken", "RefreshTokens", b1 =>
+                    b.OwnsMany("LitBlog.DAL.Models.RefreshToken", "RefreshTokens", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -229,7 +229,7 @@ namespace LitChat.DAL.Migrations
 
                             b1.HasIndex("AccountId");
 
-                            b1.ToTable("RefreshToken", (string)null);
+                            b1.ToTable("RefreshToken");
 
                             b1.WithOwner("Account")
                                 .HasForeignKey("AccountId");
