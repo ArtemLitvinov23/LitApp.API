@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
 using LitBlog.BLL.Helpers;
-using LitBlog.DAL.Models;
 using LitBlog.DAL.Repositories;
 using LitChat.BLL.ModelsDto;
-using LitChat.BLL.Services.Interfaces;
 using System;
 using System.Threading.Tasks;
 

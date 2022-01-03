@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace LitChat.DAL.Repositories.Interfaces
+namespace LitChat.DAL.Repositories
 {
     public interface IFavoritesRepository
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace LitChat.BLL.Services.Interfaces
+namespace LitChat.BLL.Services
 {
     public interface IConnectionService
     {

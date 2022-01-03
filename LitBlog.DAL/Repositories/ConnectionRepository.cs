@@ -1,6 +1,5 @@
 ﻿using LitBlog.DAL;
 using LitChat.DAL.Models;
-using LitChat.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;

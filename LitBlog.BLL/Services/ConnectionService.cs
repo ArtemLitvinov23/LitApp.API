@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
 using LitChat.BLL.ModelsDto;
-using LitChat.BLL.Services.Interfaces;
 using LitChat.DAL.Models;
-using LitChat.DAL.Repositories.Interfaces;
+using LitChat.DAL.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

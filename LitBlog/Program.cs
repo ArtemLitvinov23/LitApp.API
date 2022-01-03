@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using NLog.Web;
+using System;
 
 namespace LitBlog.API
 {
@@ -7,14 +10,31 @@ namespace LitBlog.API
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var logger = NLogBuilder.ConfigureNLog("NLog.config").GetCurrentClassLogger();
+            try
+            {
+                CreateHostBuilder(args).Build().Run();
+            }
+            catch (Exception exception)
+            {
+                logger.Error(exception, "Stopped program because of exception");
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+            webBuilder.UseStartup<Startup>();
+            })
+            .ConfigureLogging(logging =>
+            {
+            logging.AddConsole();
+            logging.AddNLog($"NLog.config");
+            logging.ClearProviders();
+            logging.SetMinimumLevel(LogLevel.Trace);
+            })
+            .UseNLog();
+
     }
 }

@@ -1,9 +1,8 @@
 ﻿using LitBlog.BLL.ModelsDto;
-using LitChat.BLL.ModelsDto;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace LitBlog.BLL.Services.Interfaces
+namespace LitBlog.BLL.Services
 {
     public interface IAccountService
     {

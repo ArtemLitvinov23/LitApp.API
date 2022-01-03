@@ -2,25 +2,16 @@
 using LitBlog.API.Models;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace LitChat.API.Models
 {
     public class AccountViewModel
     {
-        [Required]
-        [EmailAddress]
         public string Email { get; set; }
-        [Required]
         public string Password { get; set; }
-        [Required]
         public string FirstName { get; set; }
-        [Required]
         public string LastName { get; set; }
-
-        [Phone]
         public string Phone { get; set; }
-        [MaxLength(100)]
         public string Description { get; set; }
         public RoleViewModel Role { get; set; }
         public string VerificationToken { get; set; }

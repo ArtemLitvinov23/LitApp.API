@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using LitChat.API.Models;
 using LitChat.BLL.ModelsDto;
-using LitChat.BLL.Services.Interfaces;
+using LitChat.BLL.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;

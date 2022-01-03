@@ -1,7 +1,7 @@
 ﻿using LitChat.BLL.ModelsDto;
 using System.Threading.Tasks;
 
-namespace LitChat.BLL.Services.Interfaces
+namespace LitChat.BLL.Services
 {
     public interface IUserProfileService
     {

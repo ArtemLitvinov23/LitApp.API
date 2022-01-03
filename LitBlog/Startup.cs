@@ -1,23 +1,16 @@
-using LitBlog.API.Helpers;
-using LitBlog.BLL.Jwt;
-using LitBlog.BLL.Mapper;
-using LitBlog.BLL.PasswordHasher;
-using LitBlog.BLL.Services;
-using LitBlog.BLL.Services.Interfaces;
+using FluentValidation.AspNetCore;
 using LitBlog.BLL.Settings;
 using LitBlog.DAL;
-using LitBlog.DAL.Repositories;
+using LitChat.API.Extensions;
 using LitChat.API.HubController;
-using LitChat.BLL.Services;
-using LitChat.BLL.Services.Interfaces;
-using LitChat.DAL.Repositories;
-using LitChat.DAL.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
@@ -40,10 +33,10 @@ namespace LitBlog.API
             services.AddCors();
             services.AddControllers().AddNewtonsoftJson(options =>
             options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-            );
+            ).AddFluentValidation(fvc => fvc.RegisterValidatorsFromAssemblyContaining<Startup>());
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "LitBlog.WebApi", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "LitChat.WebApi", Version = "v2.2" });
             });
 
             services.AddSignalR(hubOptions =>
@@ -51,21 +44,8 @@ namespace LitBlog.API
                 hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(10);
             });
             services.Configure<EmailSettings>(Configuration.GetSection("AppSettings"));
-            services.AddAutoMapper(typeof(MapperProfile), typeof(AutoMapperProfile));
-
-            services.AddScoped<IAccountService, AccountService>();
-            services.AddScoped<IAccountRepository, AccountRepository>();
-            services.AddTransient<IJwtOptions, JwtService>();
-            services.AddTransient<IPasswordHasher, PasswordHasher>();
-            services.AddScoped<IEmailService, EmailService>();
-            services.AddScoped<IChatRepository, ChatRepository>();
-            services.AddScoped<IChatService, ChatService>();
-            services.AddScoped<IFavoritesRepository, FavoritesRepository>();
-            services.AddScoped<IFavoritesService, FavoritesService>();
-            services.AddScoped<IUserProfileService, UserProfileService>();
-            services.AddScoped<IConnectionRepository, ConnectionRepository>();
-            services.AddScoped<IConnectionService, ConnectionService>();
             services.AddHttpContextAccessor();
+            services.AllServices();
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -97,10 +77,14 @@ namespace LitBlog.API
             });
         }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app,IWebHostEnvironment env)
         {
-            app.UseSwagger();
-            app.UseSwaggerUI(x => x.SwaggerEndpoint("/swagger/v1/swagger.json", ".NET LitBlog API"));
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(x => x.SwaggerEndpoint("/swagger/v1/swagger.json", ".NET LitChat API"));
+            }
 
             app.UseRouting();
 
@@ -110,6 +94,7 @@ namespace LitBlog.API
                    .SetIsOriginAllowed(origin => true)
                    .AllowCredentials()
                     );
+
             app.UseAuthentication();
             app.UseAuthorization();
 

@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+<audio id="notification" src="media/notification.mp3" />
 
 <MudThemeProvider />
 <MudDialogProvider />
@@ -57,10 +58,11 @@
             CurrentUserId = _accountService.Account.Id.ToString();
             Token = _accountService.Account.JwtToken;
             await CheckConnection(Token);
-            hubConnection.On<string, string, string>("ChatNotification", (message, receiverUserId, senderUserId) =>
+            hubConnection.On<string, string, string>("ChatNotification", async (message, receiverUserId, senderUserId) =>
             {
                 if (CurrentUserId == receiverUserId)
                 {
+                    
                     _snackBar.Add(message, Severity.Info, config =>
                     {
                         config.VisibleStateDuration = 10000;
@@ -73,6 +75,7 @@
                             _navigationManager.NavigateTo($"chat/{senderUserId}");
                             return Task.CompletedTask;};});
                 }
+                await _jsRuntime.InvokeAsync<string>("PlayAudio", "notification");
             });
         } 
     }
