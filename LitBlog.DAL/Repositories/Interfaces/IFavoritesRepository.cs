@@ -8,7 +8,6 @@ namespace LitChat.DAL.Repositories
     public interface IFavoritesRepository
     {
         Task<List<FavoritesList>> GetAllFavoriteForAccountUser(int id);
-
         IQueryable<FavoritesList> GetAllFavoriteUser();
         Task<FavoritesList> GetFavoriteUserById(int id);
         Task AddUserToFavorite(FavoritesList user);

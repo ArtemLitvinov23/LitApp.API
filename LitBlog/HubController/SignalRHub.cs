@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using LitBlog.API.Models;
 using LitBlog.BLL.ModelsDto;
-using LitBlog.BLL.Services.Interfaces;
+using LitBlog.BLL.Services;
 using LitChat.API.Models;
 using LitChat.BLL.ModelsDto;
-using LitChat.BLL.Services.Interfaces;
+using LitChat.BLL.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System;

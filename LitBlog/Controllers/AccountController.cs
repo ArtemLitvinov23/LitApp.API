@@ -3,6 +3,7 @@ using LitBlog.API.Models;
 using LitBlog.BLL.ModelsDto;
 using LitBlog.BLL.Services;
 using LitChat.API.Models;
+using LitChat.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,14 +18,17 @@ namespace LitBlog.API.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
+        private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
         public AccountController(
             IAccountService accountService,
-            IMapper mapper)
+            IMapper mapper,
+            IUserService userService)
         {
             _accountService = accountService;
             _mapper = mapper;
+            _userService = userService;
         }
 
         [AllowAnonymous]
@@ -108,7 +112,7 @@ namespace LitBlog.API.Controllers
         [HttpGet("get-users/{id}")]
         public async Task<ActionResult<List<UserResponseViewModel>>> GetAllUsers(int id)
         {
-            var result = await _accountService.GetAllUsersAsync(id);
+            var result = await _userService.GetAllUsersAsync(id);
             return Ok(_mapper.Map<List<UserResponseViewModel>>(result));
         }
 
@@ -116,7 +120,7 @@ namespace LitBlog.API.Controllers
         [HttpGet("get-user/{id}")]
         public async Task<ActionResult<UserResponseViewModel>> GetUserById(int id)
         {
-            var result = await _accountService.GetUserByIdAsync(id);
+            var result = await _userService.GetUserByIdAsync(id);
             return Ok(_mapper.Map<UserResponseViewModel>(result));
         }
 
@@ -126,16 +130,6 @@ namespace LitBlog.API.Controllers
         {
             var result = await _accountService.GetAccountByIdAsync(id);
             return Ok(result);
-        }
-
-        [Authorize]
-        [HttpPost("create")]
-        public async Task<ActionResult<AccountResponseViewModel>> CreateAccount(AccountViewModel create)
-        {
-            var mapModel = _mapper.Map<AccountDto>(create);
-            var createdAccount = await _accountService.CreateAccountAsync(mapModel);
-            var response = _mapper.Map<AccountResponseViewModel>(createdAccount);
-            return Ok(response);
         }
 
         [Authorize]
