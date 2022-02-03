@@ -1,0 +1,31 @@
+﻿@using MudBlazor
+@using LitChat.Blazor
+@using LitChat.Blazor.Services
+@using LitChat.Blazor.Services.Interfaces
+@using LitChat.Blazor.Models
+@using LitChat.Blazor.Shared
+@using LitChat.Blazor.Helpers
+@using LitChat.Blazor.Pages
+@using LitChat.Blazor.Pages.Account
+@using System.Net.Http
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.JSInterop
+@using Microsoft.AspNetCore.SignalR.Client
+@using System.ComponentModel.DataAnnotations
+
+@inject IChatService _chatService
+@inject IFavoritesListService _favoriteService
+@inject NavigationManager _navigationManager
+@inject IAccountService _accountService
+@inject IConnectionService _connectionService
+@inject IFavoritesListService _favoritesList
+@inject IProfileService _profileService
+@inject IDialogService DialogService
+@inject IJSRuntime _jsRuntime
+@inject ISnackbar _snackBar
