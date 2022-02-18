@@ -34,18 +34,18 @@ namespace LitChat.API.Controllers
         }
 
         [HttpGet("{userId}/{contactId}")]
-        public async Task<List<ChatMessagesResponseViewModel>> GetConversationAsync(int userId, int contactId)
+        public async Task<ActionResult<List<ChatMessagesResponseViewModel>>> GetConversationAsync(int userId, int contactId)
         {
             var message = await _chatService.GetLastFourMessagesAsync(userId, contactId);
             var result = _mapper.Map<List<ChatMessagesResponseViewModel>>(message);
-            return result;
+            return Ok(result);
         }
         [HttpGet("full/{userId}/{contactId}")]
-        public async Task<List<ChatMessagesResponseViewModel>> GetFullChatHistory(int userId, int contactId)
+        public async Task<ActionResult<List<ChatMessagesResponseViewModel>>> GetFullChatHistory(int userId, int contactId)
         {
             var message = await _chatService.GetFullHistoryMessagesAsync(userId, contactId);
             var result = _mapper.Map<List<ChatMessagesResponseViewModel>>(message);
-            return result;
+            return Ok(result);
         }
         [HttpDelete("{userId}/{contactId}")]
         public async Task<IActionResult> DeleteChatHistory(int userId, int contactId)

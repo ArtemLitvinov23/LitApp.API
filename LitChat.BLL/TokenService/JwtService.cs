@@ -1,4 +1,4 @@
-﻿using LitChat.BLL.Exception;
+﻿using LitChat.BLL.Exceptions;
 using LitChat.BLL.Jwt.Interfaces;
 using LitChat.BLL.Jwt.Options;
 using LitChat.BLL.ModelsDto;
@@ -15,12 +15,12 @@ using System.Text;
 
 namespace LitChat.BLL.Jwt
 {
-    public class JwtService : IJwtOptions
+    public class JwtService : IJwtService
     {
-        private readonly JWtOptions _appSettings;
+        private readonly TokenOptions _appSettings;
         private readonly IAccountRepository _accountRepository;
 
-        public JwtService(IOptions<JWtOptions> appSettings, IAccountRepository accountRepository)
+        public JwtService(IOptions<TokenOptions> appSettings, IAccountRepository accountRepository)
         {
             _accountRepository = accountRepository;
             _appSettings = appSettings.Value;
@@ -28,7 +28,7 @@ namespace LitChat.BLL.Jwt
         public string GenerateJwtToken(AccountDto account)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("MySuperSecretTokenArtemLitvinov");
+            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] { new Claim("id",account.Id.ToString()),
@@ -74,9 +74,9 @@ namespace LitChat.BLL.Jwt
 
         public string RandomTokenString()
         {
-            using var rngCryptoServiceProvider = new RNGCryptoServiceProvider();
             var randomBytes = new byte[40];
-            rngCryptoServiceProvider.GetBytes(randomBytes);
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomBytes);
             return BitConverter.ToString(randomBytes).Replace(" - ", " ");
         }
     }

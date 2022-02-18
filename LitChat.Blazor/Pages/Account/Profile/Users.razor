@@ -3,33 +3,33 @@
 @layout MainLayout
 
 <MudContainer Style="display: inline-block; position: relative; top: 0; bottom: 0; left: 0; right: 0; width: 500px; height: 500px; margin: auto; ">
-<MudTable Items="@users" Filter="new Func<Models.Users,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1" Breakpoint="Breakpoint.Sm" Loading="@loading" LoadingProgressColor="Color.Info" Dense="@dense" >
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">Users</MudText>
+    <MudTable Items="@users" Filter="new Func<Models.Users,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1" Breakpoint="Breakpoint.Sm" Loading="@loading" LoadingProgressColor="Color.Info" Dense="@dense">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Users</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Users</MudTh>
+            <MudTh> </MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">@context.FirstName @context.LastName</MudTd>
+            <MudTd>
+                <MudButton OnClick="@(() => ShowInformation(context))" StartIcon="@Icons.Material.Outlined.Info" Color="Color.Info" ButtonType="ButtonType.Button">Info</MudButton>
+                <MudButton OnClick="@(() => LoadUserChat(context))" StartIcon="@Icons.Material.Filled.Chat" Color="Color.Primary" ButtonType="ButtonType.Button">Chat</MudButton>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+    <div class="d-flex flex-wrap mt-4">
+        <MudSwitch @bind-Checked="@loading" Color="Color.Info">Loading</MudSwitch>
+        <MudSwitch @bind-Checked="@dense" Color="Color.Secondary">Dense</MudSwitch>
         <MudSpacer />
-        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh>Users</MudTh>
-        <MudTh> </MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Name">@context.FirstName @context.LastName</MudTd>
-        <MudTd>
-           <MudButton OnClick="@(() => ShowInformation(context))" StartIcon="@Icons.Material.Outlined.Info" Color="Color.Info" ButtonType="ButtonType.Button">Info</MudButton>
-           <MudButton OnClick="@(() => LoadUserChat(context))" StartIcon="@Icons.Material.Filled.Chat" Color="Color.Primary" ButtonType="ButtonType.Button">Chat</MudButton>
-        </MudTd>
-    </RowTemplate>
-</MudTable>
-<div class="d-flex flex-wrap mt-4">
-    <MudSwitch @bind-Checked="@loading" Color="Color.Info">Loading</MudSwitch>
-    <MudSwitch @bind-Checked="@dense" Color="Color.Secondary">Dense</MudSwitch>
-    <MudSpacer />
-</div>
-            @if (!string.IsNullOrEmpty(error))
-            {
-                <div class="alert alert-danger mt-3 mb-0">@error</div>
-            }
+    </div>
+    @if (!string.IsNullOrEmpty(error))
+    {
+        <div class="alert alert-danger mt-3 mb-0">@error</div>
+    }
 </MudContainer>
 @code {
     private bool loading = false;
@@ -42,8 +42,8 @@
     private Models.Users selectedItem1 = null;
     private Models.Users selectedItem2 = null;
     private HashSet<Users> selectedItems = new HashSet<Users>();
-    [Parameter] public string CurrentUserId{ get; set; }
-    [Parameter] public string ContactId{ get; set; }
+    [Parameter] public string CurrentUserId { get; set; }
+    [Parameter] public string ContactId { get; set; }
 
     void ShowInformation(Models.Users users)
     {
@@ -51,7 +51,7 @@
         _navigationManager.NavigateTo($"card/{ContactId}");
     }
 
-   void LoadUserChat(Models.Users users)
+    void LoadUserChat(Models.Users users)
     {
         ContactId = users.Id.ToString();
         _navigationManager.NavigateTo($"chat/{ContactId}");
@@ -66,7 +66,7 @@
             users = await _accountService.GetAllUsersAsync(CurrentUserId);
             loading = false;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             error = ex.Message;
             loading = false;

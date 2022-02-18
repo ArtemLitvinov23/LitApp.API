@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using LitChat.BLL.Exception;
+using LitChat.BLL.Exceptions;
 using LitChat.BLL.ModelsDto;
 using LitChat.BLL.Services.Interfaces;
 using LitChat.DAL.Repositories.Interfaces;

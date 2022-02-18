@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using LitChat.API.Models;
+using LitChat.BLL.Exceptions;
 using LitChat.BLL.ModelsDto;
 using LitChat.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -24,42 +25,66 @@ namespace LitChat.API.HubController
         }
         public async Task SendMessageAsync(ChatMessageModel message, string userName)
         {
-            await Clients.All.SendAsync("ReceiveMessage", message, userName);
+            try
+            {
+                await Clients.All.SendAsync("ReceiveMessage", message, userName);
+            }
+            catch (Exception e)
+            {
+                new InternalServerException(e.Message);
+                throw;
+            }
         }
         public async Task ChatNotificationAsync(string message, string receiverUserId, string senderUserId)
         {
-            await Clients.All.SendAsync("ChatNotification", message, receiverUserId, senderUserId);
+            try
+            {
+                await Clients.All.SendAsync("ChatNotification", message, receiverUserId, senderUserId);
+            }
+            catch (Exception e)
+            {
+                new InternalServerException(e.Message);
+                throw;
+            }
         }
         public override async Task OnConnectedAsync()
         {
-            var user = await GetUserAsync();
-            var connection = await _connectionService.GetConnectionForUserAsync(user.Id);
-            if (connection == null)
+            try
             {
-                var connectionsModel = new ConnectionViewModel()
+                var user = await GetUserAsync();
+                var connection = await _connectionService.GetConnectionForUserAsync(user.Id);
+                if (connection == null)
                 {
-                    ConnectedAt = DateTime.Now,
-                    IsOnline = true,
-                    ConnectionId = Context.ConnectionId,
-                    UserAccount = user.Id
-                };
-                var mappingModel = _mapper.Map<ConnectionsDto>(connectionsModel);
-                await _connectionService.CreateConnectionAsync(mappingModel);
+                    var connectionsModel = new ConnectionViewModel()
+                    {
+                        ConnectedAt = DateTime.Now,
+                        IsOnline = true,
+                        ConnectionId = Context.ConnectionId,
+                        UserAccount = user.Id
+                    };
+                    var mappingModel = _mapper.Map<ConnectionsDto>(connectionsModel);
+                    await _connectionService.CreateConnectionAsync(mappingModel);
+                }
+                else
+                {
+                    var connectionsModel = new ConnectionViewModel()
+                    {
+                        ConnectedAt = DateTime.Now,
+                        IsOnline = true,
+                        ConnectionId = Context.ConnectionId,
+                        UserAccount = user.Id
+                    };
+                    var mappingModel = _mapper.Map<ConnectionsDto>(connectionsModel);
+                    await _connectionService.UpdateConnection(mappingModel);
+                    await _connectionService.DeleteConnectionAsync(connection.UserAccount);
+                }
+                await base.OnConnectedAsync();
             }
-            else
+            catch (Exception e)
             {
-                var connectionsModel = new ConnectionViewModel()
-                {
-                    ConnectedAt = DateTime.Now,
-                    IsOnline = true,
-                    ConnectionId = Context.ConnectionId,
-                    UserAccount = user.Id
-                };
-                var mappingModel = _mapper.Map<ConnectionsDto>(connectionsModel);
-                await _connectionService.UpdateConnection(mappingModel);
-                await _connectionService.DeleteConnectionAsync(connection.UserAccount);
+                new InternalServerException(e.Message);
+                throw;
             }
-            await base.OnConnectedAsync();
         }
         public override async Task OnDisconnectedAsync(Exception exception)
         {

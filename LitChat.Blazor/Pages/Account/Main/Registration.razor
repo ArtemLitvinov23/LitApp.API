@@ -1,7 +1,7 @@
 ﻿@page "/account/register"
 
 <MudContainer Style="display: block; position: center; top: 200; bottom: 0; left: 0; right: 0; width: 400px; height: 200px; margin: auto; ">
-     <h1 class="card-header">Sign up</h1>
+    <h1 class="card-header">Sign up</h1>
     <EditForm Model="@_registerAccount" OnValidSubmit="OnValidSubmit">
         <DataAnnotationsValidator />
         <MudCard>
@@ -11,29 +11,29 @@
                 <MudTextField Label="Last name" Class="mt-3"
                               @bind-Value="_registerAccount.LastName" For="@(() => _registerAccount.LastName)" HelperText="Min.2 characters" />
                 <MudTextField Label="Email" Class="mt-3"
-                              @bind-Value="_registerAccount.Email" For="@(() => _registerAccount.Email)" InputType="InputType.Email"/>
+                              @bind-Value="_registerAccount.Email" For="@(() => _registerAccount.Email)" InputType="InputType.Email" />
                 <MudTextField Label="Password" Class="mt-3"
-                              @bind-Value="_registerAccount.Password" For="@(() => _registerAccount.Password)"HelperText="Choose a strong password" InputType="InputType.Password"/>
+                              @bind-Value="_registerAccount.Password" For="@(() => _registerAccount.Password)" HelperText="Choose a strong password" InputType="InputType.Password" />
                 <MudTextField Label="Confirm Password" Class="mt-3"
-                              @bind-Value="_registerAccount.ConfirmPassword" For="@(() => _registerAccount.ConfirmPassword)" HelperText="Repeat the password" InputType="InputType.Password"/>
+                              @bind-Value="_registerAccount.ConfirmPassword" For="@(() => _registerAccount.ConfirmPassword)" HelperText="Repeat the password" InputType="InputType.Password" />
                 <MudSwitch @bind-Checked="_registerAccount.AcceptTerms" For="@(() => _registerAccount.AcceptTerms)" Label="Accept Terms & Conditions" Color="Color.Success" />
             </MudCardContent>
             <MudCardActions>
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" Size=Size.Medium Class="ml-auto">Register</MudButton>
-                <MudSpacer/>
+                <MudSpacer />
                 <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick=@(()=>Login()) Color="Color.Warning" Size=Size.Medium Class="ml-auto">Cancel</MudButton>
             </MudCardActions>
-                        <MudSpacer/>
-             <MudProgressLinear Color="Color.Primary" Indeterminate=loading/>
+            <MudSpacer />
+            <MudProgressLinear Color="Color.Primary" Indeterminate=loading />
         </MudCard>
         @if (!string.IsNullOrEmpty(message))
-            {
-                <div class="alert alert-danger mt-3 mb-0">@message</div>
-            }
-         @if (!string.IsNullOrEmpty(error))
-            {
-                <div class="alert alert-danger mt-3 mb-0">@error</div>
-            }
+        {
+            <div class="alert alert-danger mt-3 mb-0">@message</div>
+        }
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div class="alert alert-danger mt-3 mb-0">@error</div>
+        }
     </EditForm>
 </MudContainer>
 @code
@@ -54,7 +54,7 @@
             await _accountService.Register(_registerAccount);
             message = $"Email '{_registerAccount.Email}' is already registered, please checked your email";
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             loading = false;
             error = ex.Message;

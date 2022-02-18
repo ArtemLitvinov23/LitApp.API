@@ -7,6 +7,6 @@ namespace LitChat.BLL.Services.Interfaces
     public interface IUserService
     {
         Task<UsersResponseDto> GetUserByIdAsync(int id);
-        Task<List<UsersResponseDto>> GetAllUsersAsync(int currentUserId);
+        Task<List<UsersResponseDto>> GetAllUsersWithoutCurrentUserAsync(int currentUserId);
     }
 }

@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
-using LitChat.BLL.Exception;
+using LitChat.BLL.Exceptions;
 using LitChat.BLL.Jwt.Interfaces;
 using LitChat.BLL.ModelsDto;
-using LitChat.BLL.PasswordHasher.Interfaces;
 using LitChat.BLL.Services.Interfaces;
 using LitChat.DAL.Models;
 using LitChat.DAL.Repositories.Interfaces;
@@ -20,14 +19,14 @@ namespace LitChat.BLL.Services
         private readonly IFavoritesRepository _favoriteRepository;
         private readonly IEmailService _emailService;
         private readonly IChatRepository _chatRepository;
-        private readonly IJwtOptions _jwtOptions;
+        private readonly IJwtService _jwtOptions;
         private readonly IMapper _mapper;
         private readonly IPasswordHasher _password;
 
         public AccountService(
             IAccountRepository accountRepository,
             IEmailService emailService,
-            IJwtOptions jwtOptions,
+            IJwtService jwtOptions,
             IMapper mapper, IPasswordHasher password,
             IFavoritesRepository favoriteRepository,
             IChatRepository chatRepository)
@@ -97,18 +96,26 @@ namespace LitChat.BLL.Services
 
         public async Task RegisterAsync(AccountDto model, string origin)
         {
-            var existAccount = _accountRepository.GetAllAccounts().Any(x => x.Email == model.Email);
-            if (existAccount)
-                throw new AppException($"Email '{model.Email}' is already registered, please checked your email");
-            var account = _mapper.Map<Account>(model);
-            account.IsVerified = false;
-            account.Role = Role.Admin;
-            account.Created = DateTime.Now;
-            account.VerificationToken = _jwtOptions.RandomTokenString();
-            account.PasswordHash = _password.HashPassword(model.Password);
-            await _accountRepository.CreateAccountAsync(account);
-            var result = _mapper.Map<AccountDto>(account);
-            await _emailService.SendVerificationEmailAsync(result, origin);
+            try
+            {
+                var existAccount = _accountRepository.GetAllAccounts().Any(x => x.Email == model.Email);
+                if (existAccount)
+                    throw new AppException($"Email '{model.Email}' is already registered, please checked your email");
+                var account = _mapper.Map<Account>(model);
+                account.IsVerified = false;
+                account.Role = Role.Admin;
+                account.Created = DateTime.Now;
+                account.VerificationToken = _jwtOptions.RandomTokenString();
+                account.PasswordHash = _password.HashPassword(model.Password);
+                await _accountRepository.CreateAccountAsync(account);
+                var result = _mapper.Map<AccountDto>(account);
+                await _emailService.SendVerificationEmailAsync(result, origin);
+            }
+            catch (Exception e)
+            {
+                new InternalServerException(e.Message);
+                throw;
+            }
         }
 
         public async Task VerifyEmailAsync(string token)
@@ -123,13 +130,22 @@ namespace LitChat.BLL.Services
 
         public async Task ForgotPasswordAsync(ForgotPasswordRequestDto model, string origin)
         {
-            var account = _accountRepository.GetAllAccounts().SingleOrDefault(x => x.Email == model.Email);
-            if (account == null) return;
-            account.ResetToken = _jwtOptions.RandomTokenString();
-            account.ResetTokenExpires = DateTime.UtcNow.AddDays(1);
-            await _accountRepository.UpdateAccountAsync(account);
-            var accountDto = _mapper.Map<AccountDto>(account);
-            await _emailService.SendPasswordResetEmailAsync(accountDto, origin);
+            try
+            {
+                var account = _accountRepository.GetAllAccounts().SingleOrDefault(x => x.Email == model.Email);
+                if (account == null) return;
+                account.ResetToken = _jwtOptions.RandomTokenString();
+                account.ResetTokenExpires = DateTime.UtcNow.AddDays(1);
+                await _accountRepository.UpdateAccountAsync(account);
+                var accountDto = _mapper.Map<AccountDto>(account);
+                await _emailService.SendPasswordResetEmailAsync(accountDto, origin);
+            }
+            catch (Exception e)
+            {
+                new InternalServerException(e.Message);
+                throw;
+            }
+
         }
 
         public async Task ValidateResetTokenAsync(RevokeTokenRequestDto model)
@@ -168,9 +184,8 @@ namespace LitChat.BLL.Services
         public async Task<AccountResponseDto> UpdateAccountAsync(int id, UpdateAccountDto model)
         {
             var getAccount = await _accountRepository.GetAccountAsync(id);
-
             if (getAccount == null)
-                throw new AppException();
+                throw new AppException($"Account with {id} id does not found");
 
             // copy model to account and save
             _mapper.Map(model, getAccount);
@@ -182,6 +197,10 @@ namespace LitChat.BLL.Services
 
         public async Task DeleteAccountAsync(int id)
         {
+            var getAccount = await _accountRepository.GetAccountAsync(id);
+            if (getAccount == null)
+                throw new AppException($"Account with {id} id does not found");
+
             await _chatRepository.RemoveAllMyMessages(id);
             await _favoriteRepository.RemoveMeFromFavorite(id);
             await _accountRepository.DeleteAsync(id);
@@ -190,6 +209,10 @@ namespace LitChat.BLL.Services
         public async Task<AccountResponseDto> GetAccountByEmailAsync(string accountEmail)
         {
             var account = await _accountRepository.GetAllAccounts().FirstOrDefaultAsync(x => x.Email == accountEmail);
+            if (account == null)
+            {
+                throw new AppException($"User with {accountEmail} does not found");
+            }
             return _mapper.Map<AccountResponseDto>(account);
         }
     }

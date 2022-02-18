@@ -2,17 +2,17 @@
 @attribute [Authorize]
 
 <MudContainer Style="display: inline-block; position: relative; top: 0; bottom: 0; left: 0; right: 0; width: 600px; height: 200px; margin: auto; ">
-<MudCard>
-    <MudCardHeader>
-        <CardHeaderAvatar>
-            <MudAvatar Color="Color.Dark" Style="height:70px; width:70px;">@users.FirstName</MudAvatar>
-        </CardHeaderAvatar>
-        <CardHeaderContent>
-            <MudText Typo="Typo.body1">@users.FirstName @users.LastName </MudText>
-            <MudText Typo="Typo.body2">@users.Email</MudText>
-            <MudText Typo="Typo.caption">@users.Phone </MudText>
-            <br/>
-            @if (!string.IsNullOrEmpty(@connection.UserAccount) && @connection.IsOnline == true)
+    <MudCard>
+        <MudCardHeader>
+            <CardHeaderAvatar>
+                <MudAvatar Color="Color.Dark" Style="height:70px; width:70px;">@users.FirstName</MudAvatar>
+            </CardHeaderAvatar>
+            <CardHeaderContent>
+                <MudText Typo="Typo.body1">@users.FirstName @users.LastName </MudText>
+                <MudText Typo="Typo.body2">@users.Email</MudText>
+                <MudText Typo="Typo.caption">@users.Phone </MudText>
+                <br />
+                @if (!string.IsNullOrEmpty(@connection.UserAccount) && @connection.IsOnline == true)
                 {
                     <MudText Typo="Typo.caption" Color="Color.Success">Online: @connection.ConnectedAt </MudText>
                 }
@@ -21,15 +21,15 @@
                     <MudText Typo="Typo.caption" Color="Color.Warning">Offline: @connection.DisconnectedAt </MudText>
                 }
             </CardHeaderContent>
-        <CardHeaderActions>
-                     <MudIconButton OnClick="@(() => Return())" Icon="@Icons.TwoTone.ArrowBackIosNew" Color="Color.Inherit" ButtonType="ButtonType.Button">Return</MudIconButton>
-        </CardHeaderActions>
-    </MudCardHeader>
-    <MudCardContent>
-        <MudText Typo="Typo.body2">@users.Description.</MudText>
-    </MudCardContent>
- <MudCardActions>
-          @if (IsDeleted)
+            <CardHeaderActions>
+                <MudIconButton OnClick="@(() => Return())" Icon="@Icons.TwoTone.ArrowBackIosNew" Color="Color.Inherit" ButtonType="ButtonType.Button">Return</MudIconButton>
+            </CardHeaderActions>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudText Typo="Typo.body2">@users.Description.</MudText>
+        </MudCardContent>
+        <MudCardActions>
+            @if (IsDeleted)
             {
                 <MudButton OnClick="@(() => AddUserToFavorite(users))" StartIcon="@Icons.Filled.Favorite" Color="Color.Inherit" ButtonType="ButtonType.Button">Add to favorite</MudButton>
             }
@@ -37,21 +37,21 @@
             {
                 <MudButton OnClick="@(() => RemoveUserFromFavorite(users))" StartIcon="@Icons.Filled.FavoriteBorder" Color="Color.Inherit" ButtonType="ButtonType.Button">Remove from favorite</MudButton>
             }
- </MudCardActions>
-</MudCard>
-         @if (!string.IsNullOrEmpty(errorMessage))
-            {
-                <div class="alert alert-danger mt-3 mb-0">@errorMessage</div>
-            }
+        </MudCardActions>
+    </MudCard>
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger mt-3 mb-0">@errorMessage</div>
+    }
 </MudContainer>
 
 
 @code {
     private Models.Users users = new();
     private Connections connection = new();
-    [Parameter] public string CurrentUserId{ get; set;}
-    [Parameter] public string ContactId{ get; set;}
-    [Parameter] public bool IsDeleted{ get; set; }
+    [Parameter] public string CurrentUserId { get; set; }
+    [Parameter] public string ContactId { get; set; }
+    [Parameter] public bool IsDeleted { get; set; }
     private string errorMessage;
 
     void Return()
@@ -64,12 +64,12 @@
         ContactId = users.Id.ToString();
         var favoriteUser = new FavoritesList
             {
-             OwnerAccountId = CurrentUserId,
-             FavoriteUserAccountId = ContactId,
-             Email = users.Email,
-             FirstName = users.FirstName,
-             LastName = users.LastName,
-             IsDeleted = false
+                OwnerAccountId = CurrentUserId,
+                FavoriteUserAccountId = ContactId,
+                Email = users.Email,
+                FirstName = users.FirstName,
+                LastName = users.LastName,
+                IsDeleted = false
             };
         await _favoritesList.AddUserToFavoriteAsync(favoriteUser);
         IsDeleted = favoriteUser.IsDeleted;
@@ -90,7 +90,7 @@
             IsDeleted = userBoolInfo.IsDeleted;
             connection = await _connectionService.GetStatusUserAsync(users.Id.ToString());
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             errorMessage = ex.Message;
             IsDeleted = true;

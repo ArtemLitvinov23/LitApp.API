@@ -1,9 +1,9 @@
-﻿using LitChat.BLL.PasswordHasher.Interfaces;
+﻿using LitChat.BLL.Services.Interfaces;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
 
-namespace LitChat.BLL.PasswordHasher
+namespace LitChat.BLL.Services
 {
     public class PasswordHasher : IPasswordHasher
     {

@@ -8,23 +8,23 @@
             <MudCardContent>
                 <MudTextField Label="Email" Class="mt-3"
                               @bind-Value="loginRequest.Email" For="@(() => loginRequest.Email)" />
-                <MudTextField Label="Password"  Class="mt-3"
+                <MudTextField Label="Password" Class="mt-3"
                               @bind-Value="loginRequest.Password" For="@(() => loginRequest.Password)" InputType="InputType.Password" />
             </MudCardContent>
             <MudCardActions>
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" Size=Size.Medium Class="ml-auto">Login</MudButton>
-                <MudSpacer/>
+                <MudSpacer />
                 <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick=@(()=>Forgott()) Color="Color.Warning" Size=Size.Small Class="ml-auto">Forgot password</MudButton>
-                <MudSpacer/>
+                <MudSpacer />
                 <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick=@(()=>Register()) Color="Color.Primary" Size=Size.Medium Class="ml-auto">Register</MudButton>
             </MudCardActions>
-            <MudSpacer/>
-           <MudProgressLinear Color="Color.Primary" Indeterminate=loading/>
+            <MudSpacer />
+            <MudProgressLinear Color="Color.Primary" Indeterminate=loading />
         </MudCard>
-         @if (!string.IsNullOrEmpty(error))
-            {
+        @if (!string.IsNullOrEmpty(error))
+        {
                 <div class="alert alert-danger mt-3 mb-0">@error</div>
-            }
+        }
     </EditForm>
 </MudContainer>
 @code {
@@ -34,18 +34,18 @@
 
     protected void Register()
     {
-       _navigationManager.NavigateTo("/account/register");
+        _navigationManager.NavigateTo("/account/register");
     }
     protected void Forgott()
     {
-       _navigationManager.NavigateTo("/account/forgot-password");
+        _navigationManager.NavigateTo("/account/forgot-password");
     }
     private async void HandleValidSubmit()
     {
         loading = true;
         try
         {
-        await _accountService.Login(loginRequest);
+            await _accountService.Login(loginRequest);
             var returnUrl = _navigationManager.QueryString("returnUrl") ?? "/chat";
             _navigationManager.NavigateTo(returnUrl);
         }

@@ -27,11 +27,13 @@ namespace LitChat.DAL.Repositories
         }
 
         public async Task<IEnumerable<Connections>> GetAllClients()=> await _blogContext.Connections.ToListAsync();
+
         public async Task<Connections> GetConnectionForUserAsync(int userAccount)
         {
             var result = await _blogContext.Connections.FirstOrDefaultAsync(x=>x.UserAccount == userAccount);
             return result;
         }
+
         public async Task<Connections> GetClientById(int UserId) => await _blogContext.Connections.FirstOrDefaultAsync(x => x.UserAccount == UserId);
 
         public async Task UpdateConnection(Connections connections)

@@ -2,11 +2,11 @@
 using LitChat.API.Models;
 using LitChat.BLL.ModelsDto;
 
-namespace LitChat.API.Helpers
+namespace LitChat.API.Mapper
 {
-    public class AutoMapperProfile : Profile
+    public class PLMapperProfile : Profile
     {
-        public AutoMapperProfile()
+        public PLMapperProfile()
         {
             CreateMap<AccountDto, AccountViewModel>()
                 .ForMember(x => x.MessagesFromUser, opt => opt.MapFrom(src => src.MessagesFromUser))

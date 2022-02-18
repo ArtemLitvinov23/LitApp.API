@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LitChat.BLL.Exceptions;
 using LitChat.BLL.ModelsDto;
 using LitChat.BLL.Services.Interfaces;
 using LitChat.DAL.Models;
@@ -32,7 +33,7 @@ namespace LitChat.BLL.Services
         {
             if (connections is null)
             {
-                throw new ApplicationException("null connection");
+                throw new AppException("null connection");
             }
             var mappingModel = _mapper.Map<Connections>(connections);
             await _connectionRepository.CreateConnection(mappingModel);
@@ -64,7 +65,7 @@ namespace LitChat.BLL.Services
         {
             if (connections is null)
             {
-                throw new ApplicationException("null connection");
+                throw new AppException("null connection");
             }
             var mappingModel = _mapper.Map<Connections>(connections);
             await _connectionRepository.UpdateConnection(mappingModel);

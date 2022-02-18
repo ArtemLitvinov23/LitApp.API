@@ -4,9 +4,9 @@ using LitChat.DAL.Models;
 
 namespace LitChat.BLL.Mapper
 {
-    public class MapperProfile : Profile
+    public class BLMapperProfile : Profile
     {
-        public MapperProfile()
+        public BLMapperProfile()
         {
             CreateMap<object, AccountDto>();
             CreateMap<AccountDto, Account>()

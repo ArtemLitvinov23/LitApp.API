@@ -3,7 +3,7 @@ using LitChat.DAL.Models;
 
 namespace LitChat.BLL.Jwt.Interfaces
 {
-    public interface IJwtOptions
+    public interface IJwtService
     {
         public string GenerateJwtToken(AccountDto account);
         public (RefreshToken, Account) GetRefreshToken(string token);

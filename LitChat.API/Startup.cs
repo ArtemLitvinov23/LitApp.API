@@ -1,6 +1,7 @@
 using FluentValidation.AspNetCore;
 using LitChat.API.Extensions;
 using LitChat.API.HubController;
+using LitChat.API.Middleware;
 using LitChat.BLL.Settings;
 using LitChat.DAL;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -96,7 +97,10 @@ namespace LitChat.API
                     );
 
             app.UseAuthentication();
+
             app.UseAuthorization();
+
+            app.UseMiddleware<ErrorHandlerMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

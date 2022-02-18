@@ -22,7 +22,7 @@ namespace LitChat.BLL.Services
             _mapper = mapper;
         }
 
-        public async Task<List<UsersResponseDto>> GetAllUsersAsync(int currentUserId)
+        public async Task<List<UsersResponseDto>> GetAllUsersWithoutCurrentUserAsync(int currentUserId)
         {
             var users = await _accountRepository.GetAllAccounts().Where(x => x.Id != currentUserId).ToListAsync();
             var userDto = _mapper.Map<List<UsersResponseDto>>(users);

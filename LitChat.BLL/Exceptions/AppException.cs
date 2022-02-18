@@ -1,8 +1,9 @@
 ﻿using System.Globalization;
+using System;
 
-namespace LitChat.BLL.Exception
+namespace LitChat.BLL.Exceptions
 {
-    public class AppException : System.Exception
+    public class AppException : Exception
     {
         public AppException() : base() { }
 

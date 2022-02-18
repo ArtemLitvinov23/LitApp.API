@@ -1,4 +1,4 @@
-﻿namespace LitChat.BLL.PasswordHasher.Interfaces
+﻿namespace LitChat.BLL.Services.Interfaces
 {
     public interface IPasswordHasher
     {

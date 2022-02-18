@@ -1,4 +1,5 @@
-﻿using LitChat.BLL.ModelsDto;
+﻿using LitChat.BLL.Exceptions;
+using LitChat.BLL.ModelsDto;
 using LitChat.BLL.Services.Interfaces;
 using LitChat.BLL.Settings;
 using MailKit.Net.Smtp;
@@ -35,9 +36,9 @@ namespace LitChat.BLL.Services
 
                 await smtp.DisconnectAsync(true);
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                throw new ArgumentException(e.Message);
+                throw new InternalServerException(e.Message);
             }
 
         }

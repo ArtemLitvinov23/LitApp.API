@@ -7,20 +7,20 @@
         <MudCard>
             <MudCardContent>
                 <MudTextField Label="Email" Class="mt-3"
-                 @bind-Value="forgotPassword.Email" For="@(() => forgotPassword.Email)" HelperText="enter valid email adress"  InputType="InputType.Email"/>
+                              @bind-Value="forgotPassword.Email" For="@(() => forgotPassword.Email)" HelperText="enter valid email adress" InputType="InputType.Email" />
             </MudCardContent>
             <MudCardActions>
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" Size=Size.Large Class="ml-auto">Send</MudButton>
-                <MudSpacer/>
+                <MudSpacer />
                 <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" OnClick=@(()=>Login()) Color="Color.Warning" Size=Size.Small Class="ml-auto">Cancel</MudButton>
             </MudCardActions>
-            <MudSpacer/>
-            <MudProgressLinear Color="Color.Primary" Indeterminate=loading/>
+            <MudSpacer />
+            <MudProgressLinear Color="Color.Primary" Indeterminate=loading />
         </MudCard>
-         @if (!string.IsNullOrEmpty(error))
-            {
-                <div class="alert alert-danger mt-3 mb-0">@error</div>
-            }
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div class="alert alert-danger mt-3 mb-0">@error</div>
+        }
     </EditForm>
 </MudContainer>>
 @code {

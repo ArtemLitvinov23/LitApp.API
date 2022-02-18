@@ -41,7 +41,7 @@ namespace LitChat.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("sign-up")]
+        [HttpPost("[action]")]
         public async Task<ActionResult> SignUp(AccountRegisterViewModel request)
         {
             var account = _mapper.Map<AccountDto>(request);
@@ -50,7 +50,7 @@ namespace LitChat.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("verify")]
+        [HttpPost("[action]")]
         public async Task<ActionResult> Verify(VerifyRequestViewModel verifyRequest)
         {
             await _accountService.VerifyEmailAsync(verifyRequest.Token);
@@ -58,7 +58,7 @@ namespace LitChat.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("forgot-password")]
+        [HttpPost("[action]")]
         public async Task<ActionResult> ForgotPassword(ForgotPasswordRequestViewModel model)
         {
             var mapModel = _mapper.Map<ForgotPasswordRequestDto>(model);
@@ -67,7 +67,7 @@ namespace LitChat.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("reset-password")]
+        [HttpPost("[action]")]
         public async Task<ActionResult> ResetPassword(ResetPasswordRequestViewModel model)
         {
             var mapModel = _mapper.Map<ResetPasswordRequestDto>(model);
@@ -76,7 +76,7 @@ namespace LitChat.API.Controllers
         }
 
         [Authorize]
-        [HttpPost("refresh-token")]
+        [HttpPost("[action]")]
         public async Task<ActionResult<AuthenticateResponseViewModel>> RefreshToken()
         {
             var refreshToken = Request.Cookies["refreshToken"];
@@ -86,7 +86,7 @@ namespace LitChat.API.Controllers
         }
 
         [Authorize]
-        [HttpPost("revoke-token")]
+        [HttpPost("[action]")]
         public IActionResult RevokeToken(RevokeTokenRequestViewModel model)
         {
             var token = model.Token ?? Request.Cookies["refreshToken"];
@@ -98,7 +98,7 @@ namespace LitChat.API.Controllers
         }
 
         [Authorize]
-        [HttpGet]
+        [HttpGet("[action]")]
         public async Task<ActionResult<List<AccountResponseViewModel>>> GetAllAccount()
         {
             var result = await _accountService.GetAllAccountsAsync();
@@ -107,15 +107,15 @@ namespace LitChat.API.Controllers
         }
 
         [Authorize]
-        [HttpGet("get-users/{id}")]
-        public async Task<ActionResult<List<UserResponseViewModel>>> GetAllUsers(int id)
+        [HttpGet("[action]/{currentUserId}")]
+        public async Task<ActionResult<List<UserResponseViewModel>>> GetAllUsersWithoutCurrent(int currentUserId)
         {
-            var result = await _userService.GetAllUsersAsync(id);
+            var result = await _userService.GetAllUsersWithoutCurrentUserAsync(currentUserId);
             return Ok(_mapper.Map<List<UserResponseViewModel>>(result));
         }
 
         [Authorize]
-        [HttpGet("get-user/{id}")]
+        [HttpGet("[action]/{id}")]
         public async Task<ActionResult<UserResponseViewModel>> GetUserById(int id)
         {
             var result = await _userService.GetUserByIdAsync(id);

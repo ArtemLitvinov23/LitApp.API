@@ -22,8 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LitBlog.BLL\LitChat.BLL.csproj" />
-    <ProjectReference Include="..\LitBlog.DAL\LitChat.DAL.csproj" />
     <ProjectReference Include="..\LitChat.BLL\LitChat.BLL.csproj" />
     <ProjectReference Include="..\LitChat.DAL\LitChat.DAL.csproj" />
   </ItemGroup>
