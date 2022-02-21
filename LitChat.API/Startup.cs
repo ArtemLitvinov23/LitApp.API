@@ -46,7 +46,7 @@ namespace LitChat.API
             });
             services.Configure<EmailSettings>(Configuration.GetSection("AppSettings"));
             services.AddHttpContextAccessor();
-            services.AllServices();
+            services.AllServices(Configuration);
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

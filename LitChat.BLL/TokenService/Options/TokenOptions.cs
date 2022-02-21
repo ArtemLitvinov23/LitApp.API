@@ -3,7 +3,7 @@
     public class TokenOptions
     {
         public string Secret { get; set; }
-        public int TokenLifeTime { get; set; }
-        public int RefreshTokenTTL { get; set; }
+        public string TokenLifeTime { get; set; }
+        public string RefreshTokenTTL { get; set; }
     }
 }

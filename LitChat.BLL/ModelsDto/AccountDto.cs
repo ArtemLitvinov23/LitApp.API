@@ -24,6 +24,10 @@ namespace LitChat.BLL.ModelsDto
         public DateTime? Updated { get; set; }
         public ICollection<ChatMessagesDto> MessagesFromUser { get; set; }
         public ICollection<ChatMessagesDto> MessagesToUser { get; set; }
+
+        public ICollection<FriendDto> SentFriendsRequest { get; set; }
+        public ICollection<FriendDto> RecievedFriendRequest { get; set; }
+
         public List<RefreshToken> RefreshTokens { get; set; }
         public bool OwnsToken(string token)
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LitChat.BLL.ModelsDto;
+using System;
 using System.Collections.Generic;
 
 namespace LitChat.API.Models
@@ -22,5 +23,7 @@ namespace LitChat.API.Models
         public DateTime? Updated { get; set; }
         public ICollection<ChatMessageModel> MessagesFromUser { get; set; }
         public ICollection<ChatMessageModel> MessagesToUser { get; set; }
+        public ICollection<FriendViewModel> SentFriendsRequest { get; set; }
+        public ICollection<FriendViewModel> RecievedFriendRequest { get; set; }
     }
 }

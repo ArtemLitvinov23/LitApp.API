@@ -9,10 +9,27 @@ namespace LitChat.DAL
         public DbSet<FavoritesList> FavoritesUsers { get; set; }
         public DbSet<ChatMessages> Messages { get; set; }
         public DbSet<Connections> Connections { get; set; }
+        public DbSet<Friend> Friends { get; set; }
         public BlogContext(DbContextOptions<BlogContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Friend>(x =>
+            {
+                x.HasOne(a => a.RequestBy)
+                .WithMany(a => a.SentFriendsRequest)
+                .HasForeignKey(a => a.RequestById)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+            });
+
+            modelBuilder.Entity<Friend>(x =>
+            {
+                x.HasOne(a => a.RequestTo)
+                .WithMany(a => a.RecievedFriendRequest)
+                .HasForeignKey(a => a.RequestToId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+            });
+
             modelBuilder.Entity<FavoritesList>(x =>
             {
                 x.HasOne(d => d.FavoriteAccount)

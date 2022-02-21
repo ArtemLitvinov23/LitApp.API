@@ -36,9 +36,9 @@ namespace LitChat.BLL.Services
 
                 await smtp.DisconnectAsync(true);
             }
-            catch (Exception e)
+            catch
             {
-                throw new InternalServerException(e.Message);
+                throw new InternalServerException("Some trouble with email server, please try later");
             }
 
         }

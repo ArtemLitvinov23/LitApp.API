@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace LitChat.BLL.ModelsDto
+﻿namespace LitChat.BLL.ModelsDto
 {
     public class FavoritesListDto
     {

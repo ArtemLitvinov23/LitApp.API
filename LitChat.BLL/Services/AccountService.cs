@@ -44,10 +44,11 @@ namespace LitChat.BLL.Services
         {
             var account = _accountRepository.GetAllAccounts().FirstOrDefault(x => x.Email == authRequest.Email);
             if (account is null)
-                throw new AppException($"An account with this {authRequest.Email } does not exist, please register your account");
+                throw new AppException($"Account with this {authRequest.Email } does not exist, please register your account");
 
-            if (account != null && account.IsVerified)
-                _password.Verify(authRequest.Password, account.PasswordHash);
+            if (account != null && account.IsVerified && !_password.Verify(authRequest.Password, account.PasswordHash))
+                throw new AppException($"Account with this {authRequest.Email } does not verified or entered wrong password");
+
             var accountDto = _mapper.Map<AccountDto>(account);
             var jwtToken = _jwtOptions.GenerateJwtToken(accountDto);
             var refreshToken = _jwtOptions.GenerateRefreshToken(ipAddress);
@@ -108,8 +109,8 @@ namespace LitChat.BLL.Services
                 account.VerificationToken = _jwtOptions.RandomTokenString();
                 account.PasswordHash = _password.HashPassword(model.Password);
                 await _accountRepository.CreateAccountAsync(account);
-                var result = _mapper.Map<AccountDto>(account);
-                await _emailService.SendVerificationEmailAsync(result, origin);
+                var accountDto = _mapper.Map<AccountDto>(account);
+                await _emailService.SendVerificationEmailAsync(accountDto, origin);
             }
             catch (Exception e)
             {
@@ -145,7 +146,6 @@ namespace LitChat.BLL.Services
                 new InternalServerException(e.Message);
                 throw;
             }
-
         }
 
         public async Task ValidateResetTokenAsync(RevokeTokenRequestDto model)
@@ -178,8 +178,10 @@ namespace LitChat.BLL.Services
 
         public async Task<AccountResponseDto> GetAccountByIdAsync(int accountId)
         {
-            var account = await _accountRepository.GetAccountByIdAsync(accountId);
-            return _mapper.Map<AccountResponseDto>(account);
+            var getAccount = await _accountRepository.GetAccountByIdAsync(accountId);
+            if (getAccount == null) return null;
+
+            return _mapper.Map<AccountResponseDto>(getAccount);
         }
         public async Task<AccountResponseDto> UpdateAccountAsync(int id, UpdateAccountDto model)
         {
@@ -187,8 +189,6 @@ namespace LitChat.BLL.Services
             if (getAccount == null)
                 throw new AppException($"Account with {id} id does not found");
 
-            // copy model to account and save
-            _mapper.Map(model, getAccount);
             getAccount.Updated = DateTime.UtcNow;
             await _accountRepository.UpdateAccountAsync(getAccount);
 
@@ -210,9 +210,8 @@ namespace LitChat.BLL.Services
         {
             var account = await _accountRepository.GetAllAccounts().FirstOrDefaultAsync(x => x.Email == accountEmail);
             if (account == null)
-            {
                 throw new AppException($"User with {accountEmail} does not found");
-            }
+
             return _mapper.Map<AccountResponseDto>(account);
         }
     }

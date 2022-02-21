@@ -33,7 +33,7 @@ namespace LitChat.BLL.Jwt
             {
                 Subject = new ClaimsIdentity(new[] { new Claim("id",account.Id.ToString()),
                                                      new Claim(ClaimTypes.Email,account.Email)}),
-                Expires = DateTime.Now.AddDays(1),
+                Expires = DateTime.Now.AddDays(double.Parse(_appSettings.TokenLifeTime)),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -69,7 +69,7 @@ namespace LitChat.BLL.Jwt
         public void RemoveOldRefreshTokens(AccountDto account)
         {
             account.RefreshTokens.RemoveAll(x =>
-                !x.IsActive && x.Created.AddDays(_appSettings.RefreshTokenTTL) <= DateTime.UtcNow);
+                !x.IsActive && x.Created.AddDays(double.Parse(_appSettings.RefreshTokenTTL)) <= DateTime.UtcNow);
         }
 
         public string RandomTokenString()
