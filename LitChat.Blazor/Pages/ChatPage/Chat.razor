@@ -67,11 +67,11 @@
             <MudList Clickable="true">
                 @foreach (var user in ChatUsers)
                 {
-                    <MudListItem Class="pa-0 px-2" OnClick="@(() => LoadUserChat(user.FavoriteUserAccountId.ToString()))">
+                    <MudListItem Class="pa-0 px-2" OnClick="@(() => LoadUserChat(user.FriendId.ToString()))">
                         <div class="d-flex flex-row mt-n1 mb-n1">
                             <div class="mr-4">
                                 <MudBadge Class="my-2">
-                                    @if (user.OwnerAccountId.ToString() == ContactId)
+                                    @if (user.RequestById.ToString() == ContactId)
                                     {
                                         <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">
                                             @user.Email.ToUpper().FirstOrDefault()
@@ -91,13 +91,13 @@
                     </MudListItem>
                     <MudMenu Icon="@Icons.Material.Filled.MoreHoriz">
                         <MudMenuItem>
-                            <MudButton OnClick="@(() => LoadFullChatHistory(user.FavoriteUserAccountId.ToString()))" StartIcon="@Icons.Filled.History" Color="Color.Primary" Size="Size.Small" ButtonType="ButtonType.Button">Chat history</MudButton>
+                            <MudButton OnClick="@(() => LoadFullChatHistory(user.FriendId.ToString()))" StartIcon="@Icons.Filled.History" Color="Color.Primary" Size="Size.Small" ButtonType="ButtonType.Button">Chat history</MudButton>
                         </MudMenuItem>
                         <MudMenuItem>
-                            <MudButton OnClick="@(() => ShowInformation(user.FavoriteUserAccountId.ToString()))" StartIcon="@Icons.Material.Outlined.Info" Color="Color.Info" Size="Size.Small" ButtonType="ButtonType.Button">Show profile info</MudButton>
+                            <MudButton OnClick="@(() => ShowInformation(user.FriendId.ToString()))" StartIcon="@Icons.Material.Outlined.Info" Color="Color.Info" Size="Size.Small" ButtonType="ButtonType.Button">Show profile info</MudButton>
                         </MudMenuItem>
                         <MudMenuItem>
-                            <MudButton OnClick="@(() => DeleteChatHistory(user.FavoriteUserAccountId.ToString()))" StartIcon="@Icons.Filled.Delete" Color="Color.Warning" Size="Size.Small" ButtonType="ButtonType.Button">Remove chat history</MudButton>
+                            <MudButton OnClick="@(() => DeleteChatHistory(user.FriendId.ToString()))" StartIcon="@Icons.Filled.Delete" Color="Color.Warning" Size="Size.Small" ButtonType="ButtonType.Button">Remove chat history</MudButton>
                         </MudMenuItem>
                     </MudMenu>
                 }
@@ -115,7 +115,7 @@
     [Inject] IJSRuntime _jsRunTime { get; set; }
     public bool IsConnected => hubConnection.State == HubConnectionState.Connected;
     private string error;
-    private List<Models.ChatMessages> messages = new List<Models.ChatMessages>();
+    private List<ChatMessages> messages = new List<ChatMessages>();
     private async Task SubmitAsync()
     {
         try
@@ -179,7 +179,7 @@
             error = ex.Message;
         }
     }
-    public List<Models.FavoritesListResponse> ChatUsers = new List<Models.FavoritesListResponse>();
+    public List<Friend> ChatUsers = new List<Friend>();
     public Models.Connections connection = new Models.Connections();
     [Parameter] public string ContactEmail { get; set; }
     [Parameter] public string ContactId { get; set; }
@@ -215,7 +215,7 @@
     }
     async Task GetAllFavorites(string currentUserId, string favoriteUserId)
     {
-        ChatUsers = await _favoriteService.GetAllFavoritesForAccountAsync(currentUserId);
+        ChatUsers = await _friendService.FriendsList();
     }
     private void ShowInformation(string userId)
     {

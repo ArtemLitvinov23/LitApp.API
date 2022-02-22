@@ -1,9 +1,8 @@
-﻿using LitChat.DAL.Models;
-using System;
+﻿using System;
 
-namespace LitChat.BLL.ModelsDto
+namespace LitChat.Blazor.Models
 {
-    public class FriendViewModel
+    public class Friend
     {
         public int RequestById { get; set; }
 
@@ -16,8 +15,6 @@ namespace LitChat.BLL.ModelsDto
         public string LastName { get; set; }
 
         public DateTime? RequestTime { get; set; }
-
-        public RequestFlags RequestFlags { get; set; }
 
         public bool Approved { get; set; }
 

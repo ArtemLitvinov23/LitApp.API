@@ -59,12 +59,12 @@ namespace LitChat.BLL.Services
 
         public async Task<List<FriendDto>> GetAllRejectedRequestsAsync() => _mapper.Map<List<FriendDto>>(await _friendRepository.GetAllFriends().Where(x => x.RequestFlags == RequestFlags.Rejected).ToListAsync());
 
-        public async Task<UsersResponseDto> GetFriendById(int friendAccountId)
+        public async Task<FriendDto> GetFriendById(int friendAccountId)
         {
             var friend = await _friendRepository.GetFriendById(friendAccountId);
             if (friend == null) return null;
 
-            var response = _mapper.Map<UsersResponseDto>(friend);
+            var response = _mapper.Map<FriendDto>(friend);
             return response;
         }
 

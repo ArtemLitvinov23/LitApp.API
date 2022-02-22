@@ -5,9 +5,9 @@ namespace LitChat.BLL.Services.Interfaces
 {
     public interface IEmailService
     {
-        Task SendAsync(string to, string subject, string html, string from = null);
+        Task<bool> SendAsync(string to, string subject, string html, string from = null);
 
-        Task SendVerificationEmailAsync(AccountDto account, string origin);
+        Task<bool> SendVerificationEmailAsync(AccountDto account, string origin);
 
         Task SendAlreadyRegisteredEmailAsync(string email, string origin);
 

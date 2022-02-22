@@ -88,10 +88,12 @@ namespace LitChat.API.Mapper
                 .ForMember(x => x.Email, opt => opt.MapFrom(src => src.RequestTo.Email));
 
             CreateMap<FriendDto, FriendViewModel>()
-                .ForPath(x => x.FriendInfo.Id, opt => opt.MapFrom(src => src.RequestTo.Id))
-                .ForPath(x => x.FriendInfo.Email, opt => opt.MapFrom(src => src.RequestTo.Email))
-                .ForPath(x => x.FriendInfo.FirstName, opt => opt.MapFrom(src => src.RequestTo.FirstName))
-                .ForPath(x => x.FriendInfo.LastName, opt => opt.MapFrom(src => src.RequestTo.LastName));
+                .ForPath(x => x.FriendId, opt => opt.MapFrom(src => src.RequestToId))
+                .ForPath(x => x.Email, opt => opt.MapFrom(src => src.RequestTo.Email))
+                .ForPath(x => x.FirstName, opt => opt.MapFrom(src => src.RequestTo.FirstName))
+                .ForPath(x => x.LastName, opt => opt.MapFrom(src => src.RequestTo.LastName))
+                .ForPath(x => x.Approved, opt => opt.MapFrom(src => src.Approved))
+                .ForPath(x => x.RequestFlags, opt => opt.MapFrom(src => src.RequestFlags));
 
         }
     }

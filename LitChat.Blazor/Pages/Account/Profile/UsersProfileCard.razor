@@ -29,13 +29,13 @@
             <MudText Typo="Typo.body2">@users.Description.</MudText>
         </MudCardContent>
         <MudCardActions>
-            @if (IsDeleted)
+            @if (IsApproved)
             {
-                <MudButton OnClick="@(() => AddUserToFavorite(users))" StartIcon="@Icons.Filled.Favorite" Color="Color.Inherit" ButtonType="ButtonType.Button">Add to favorite</MudButton>
+                <MudButton OnClick="@(() => AddUserToFavorite(users))" StartIcon="@Icons.Sharp.PersonAdd" Color="Color.Inherit" ButtonType="ButtonType.Button">Add to friends</MudButton>
             }
             else
             {
-                <MudButton OnClick="@(() => RemoveUserFromFavorite(users))" StartIcon="@Icons.Filled.FavoriteBorder" Color="Color.Inherit" ButtonType="ButtonType.Button">Remove from favorite</MudButton>
+                <MudButton OnClick="@(() => RemoveUserFromFavorite(users))" StartIcon="@Icons.Sharp.PersonAddDisabled" Color="Color.Inherit" ButtonType="ButtonType.Button">Remove from friends</MudButton>
             }
         </MudCardActions>
     </MudCard>
@@ -51,7 +51,7 @@
     private Connections connection = new();
     [Parameter] public string CurrentUserId { get; set; }
     [Parameter] public string ContactId { get; set; }
-    [Parameter] public bool IsDeleted { get; set; }
+    [Parameter] public bool IsApproved { get; set; }
     private string errorMessage;
 
     void Return()
@@ -72,28 +72,28 @@
                 IsDeleted = false
             };
         await _favoritesList.AddUserToFavoriteAsync(favoriteUser);
-        IsDeleted = favoriteUser.IsDeleted;
+        IsApproved = favoriteUser.IsDeleted;
     }
     async Task RemoveUserFromFavorite(Models.Users users)
     {
         ContactId = users.Id.ToString();
         var contact = await _favoritesList.GetFavoritesUserAsync(ContactId);
         await _favoritesList.RemoveUserFromFavoriteAsync(contact.FavoriteUserAccountId.ToString());
-        IsDeleted = true;
+        IsApproved = true;
     }
     protected override async Task OnInitializedAsync()
     {
         try
         {
             users = await _accountService.GetUserDetailsAsync(ContactId);
-            var userBoolInfo = await _favoritesList.GetFavoritesUserAsync(ContactId);
-            IsDeleted = userBoolInfo.IsDeleted;
+            var friendInfo = await _friendService.GetFriend(users.Id);
+            IsApproved = friendInfo.Approved;
             connection = await _connectionService.GetStatusUserAsync(users.Id.ToString());
         }
         catch (Exception ex)
         {
             errorMessage = ex.Message;
-            IsDeleted = true;
+            IsApproved = true;
             StateHasChanged();
         }
     }

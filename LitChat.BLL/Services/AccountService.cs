@@ -108,9 +108,11 @@ namespace LitChat.BLL.Services
                 account.Created = DateTime.Now;
                 account.VerificationToken = _jwtOptions.RandomTokenString();
                 account.PasswordHash = _password.HashPassword(model.Password);
-                await _accountRepository.CreateAccountAsync(account);
                 var accountDto = _mapper.Map<AccountDto>(account);
-                await _emailService.SendVerificationEmailAsync(accountDto, origin);
+                var result = await _emailService.SendVerificationEmailAsync(accountDto, origin);
+
+                if (result) await _accountRepository.CreateAccountAsync(account);
+
             }
             catch (Exception e)
             {

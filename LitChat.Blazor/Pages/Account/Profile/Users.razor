@@ -16,8 +16,8 @@
         <RowTemplate>
             <MudTd DataLabel="Name">@context.FirstName @context.LastName</MudTd>
             <MudTd>
-                <MudButton OnClick="@(() => ShowInformation(context))" StartIcon="@Icons.Material.Outlined.Info" Color="Color.Info" ButtonType="ButtonType.Button">Info</MudButton>
-                <MudButton OnClick="@(() => LoadUserChat(context))" StartIcon="@Icons.Material.Filled.Chat" Color="Color.Primary" ButtonType="ButtonType.Button">Chat</MudButton>
+                <MudButton OnClick="@(() => ShowInformation(context.Id))" StartIcon="@Icons.Material.Outlined.Info" Color="Color.Info" ButtonType="ButtonType.Button">Info</MudButton>
+                <MudButton OnClick="@(() => LoadUserChat(context.Id))" StartIcon="@Icons.Material.Filled.Chat" Color="Color.Primary" ButtonType="ButtonType.Button">Chat</MudButton>
             </MudTd>
         </RowTemplate>
     </MudTable>
@@ -45,15 +45,15 @@
     [Parameter] public string CurrentUserId { get; set; }
     [Parameter] public string ContactId { get; set; }
 
-    void ShowInformation(Models.Users users)
+    void ShowInformation(int userId)
     {
-        ContactId = users.Id.ToString();
+        ContactId = userId.ToString();
         _navigationManager.NavigateTo($"card/{ContactId}");
     }
 
-    void LoadUserChat(Models.Users users)
+    void LoadUserChat(int userId)
     {
-        ContactId = users.Id.ToString();
+        ContactId = userId.ToString();
         _navigationManager.NavigateTo($"chat/{ContactId}");
     }
 

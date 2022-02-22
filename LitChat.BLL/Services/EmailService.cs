@@ -18,7 +18,7 @@ namespace LitChat.BLL.Services
         {
             _appSettings = settings.Value;
         }
-        public async Task SendAsync(string to, string subject, string html, string from = null)
+        public async Task<bool> SendAsync(string to, string subject, string html, string from = null)
         {
             try
             {
@@ -35,15 +35,16 @@ namespace LitChat.BLL.Services
                 await smtp.SendAsync(email);
 
                 await smtp.DisconnectAsync(true);
+                return true;
             }
             catch
             {
-                throw new InternalServerException("Some trouble with email server, please try later");
+                return false; 
             }
 
         }
 
-        public async Task SendVerificationEmailAsync(AccountDto account, string origin)
+        public async Task<bool> SendVerificationEmailAsync(AccountDto account, string origin)
         {
             string message;
             if (!string.IsNullOrEmpty(origin))
@@ -60,11 +61,12 @@ namespace LitChat.BLL.Services
                               <p><a href=""{verifyUrlWithoutOrigin}"">{verifyUrlWithoutOrigin}</a></p>";
             }
 
-            await SendAsync(account.Email, "Sign-up Verification API - Verify Email",
+           var result =  await SendAsync(account.Email, "Sign-up Verification API - Verify Email",
                 $@"<h4>Verify Email</h4>
                      <p>Thanks for registering!</p>
                       {message}"
                      );
+            return result;
         }
 
         public async Task SendAlreadyRegisteredEmailAsync(string email, string origin)

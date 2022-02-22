@@ -10,7 +10,7 @@ namespace LitChat.BLL.Services.Interfaces
         Task<List<FriendDto>> GetAllApprovedFriendsAsync();
         Task<List<FriendDto>> GetAllPendingRequestsAsync();
         Task<List<FriendDto>> GetAllRejectedRequestsAsync();
-        Task<UsersResponseDto> GetFriendById(int id);
+        Task<FriendDto> GetFriendById(int id);
         Task ApprovedUserAsync(AccountDto sender, AccountDto friend);
         Task RejectUserAsync(AccountDto account, AccountDto friend);
         Task DeleteUserFromFriends(AccountDto account);

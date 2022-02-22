@@ -23,6 +23,7 @@ namespace LitChat.Blazor
                .AddScoped<IHttpServiceGeneric, HttpServiceGeneric>()
                .AddScoped<ILocalStorageService, LocalStorageService>()
                .AddScoped<IConnectionService, ConnectionService>()
+               .AddScoped<IFriendService, FriendService>()
                .AddTransient<IChatService, ChatService>();
 
             // configure http client
