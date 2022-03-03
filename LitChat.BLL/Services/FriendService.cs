@@ -16,19 +16,23 @@ namespace LitChat.BLL.Services
     {
 
         private readonly IFriendRepository _friendRepository;
+        private readonly IAccountRepository _accountRepository;
         private readonly IMapper _mapper;
         public FriendService(
             IFriendRepository friendRepository,
-            IMapper mapper)
+            IMapper mapper, IAccountRepository accountRepository)
         {
             _friendRepository = friendRepository;
             _mapper = mapper;
+            _accountRepository = accountRepository;
         }
 
-        public async Task ApprovedUserAsync(AccountDto sender, AccountDto friend)
+        public async Task ApprovedUserAsync(int senderId, int friendId)
         {
-            var senderAccount = _mapper.Map<Account>(sender);
-            var friendAccount = _mapper.Map<Account>(friend);
+            var senderAccount = await _accountRepository.GetAccountByIdAsync(senderId);
+            var friendAccount = await _accountRepository.GetAccountByIdAsync(friendId);
+            if (senderAccount is null || friendAccount is null) throw new AppException("Users is not found");
+
             var response = await _friendRepository.GetRequests(senderAccount, friendAccount);
             if (response != null)
             {
@@ -41,8 +45,10 @@ namespace LitChat.BLL.Services
             }
         }
 
-        public async Task DeleteUserFromFriends(AccountDto friendAccount)
+        public async Task DeleteUserFromFriends(int friendId)
         {
+            var friendAccount = await _accountRepository.GetAccountByIdAsync(friendId);
+
             if (friendAccount == null) throw new AppException("Account is not found");
 
             await _friendRepository.RemoveUserFromFriends(friendAccount.Id);
@@ -55,7 +61,7 @@ namespace LitChat.BLL.Services
         }
            
 
-        public async Task<List<FriendDto>> GetAllPendingRequestsAsync() => _mapper.Map<List<FriendDto>>(await _friendRepository.GetAllFriends().Where(x => x.RequestFlags == RequestFlags.Pending).ToListAsync());
+        public async Task<List<FriendDto>> GetAllPendingRequestsAsync(int accountId) => _mapper.Map<List<FriendDto>>(await _friendRepository.GetAllFriends().Where(x => x.RequestFlags == RequestFlags.Pending && x.RequestToId == accountId).ToListAsync());
 
         public async Task<List<FriendDto>> GetAllRejectedRequestsAsync() => _mapper.Map<List<FriendDto>>(await _friendRepository.GetAllFriends().Where(x => x.RequestFlags == RequestFlags.Rejected).ToListAsync());
 
@@ -68,12 +74,13 @@ namespace LitChat.BLL.Services
             return response;
         }
 
-        public async Task RejectUserAsync(AccountDto account, AccountDto friend)
+        public async Task RejectUserAsync(int senderId, int friendId)
         {
-            var myAccount = _mapper.Map<Account>(account);
-            var friendAccount = _mapper.Map<Account>(friend);
+            var senderAccount = await _accountRepository.GetAccountByIdAsync(senderId);
+            var friendAccount = await _accountRepository.GetAccountByIdAsync(friendId);
+            if (senderAccount is null || friendAccount is null) throw new AppException("Users is not found");
 
-            var response = await _friendRepository.GetRequests(myAccount, friendAccount);
+            var response = await _friendRepository.GetRequests(senderAccount, friendAccount);
             if (response == null) throw new AppException("Current request is not found");
 
             response.RequestTime = null;
@@ -83,10 +90,12 @@ namespace LitChat.BLL.Services
             await _friendRepository.UpdateFriendsRequestAsync(response);
         }
 
-        public async Task SendRequestToUserAsync(AccountDto sender, AccountDto friend)
+        public async Task SendRequestToUserAsync(int senderId, int friendId)
         {
-            var senderAccount = _mapper.Map<Account>(sender);
-            var friendAccount = _mapper.Map<Account>(friend);
+            var senderAccount = await _accountRepository.GetAccountByIdAsync(senderId);
+            var friendAccount = await _accountRepository.GetAccountByIdAsync(friendId);
+            if (senderAccount is null || friendAccount is null) throw new AppException("Users is not found");
+
             var request = await _friendRepository.GetRequests(senderAccount, friendAccount);
             if (request == null)
             {

@@ -4,8 +4,12 @@ namespace LitChat.API.Models
 {
     public class UserInfoViewModel
     {
-        [Phone]
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
         public string Phone { get; set; }
+
         public string Description { get; set; }
     }
 }

@@ -1,19 +1,26 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace LitChat.Blazor.Models
+namespace LitChat.DAL.Models
 {
-    public class Users
+    public class UserInfo
     {
-        public string Email { get; set; }
+        [Key]
+        public int UserId { get; set; }
+
+        public int AccountId { get; set; }
 
         [Required]
-        [MinLength(2)]
         public string FirstName { get; set; }
 
         [Required]
-        [MinLength(2)]
         public string LastName { get; set; }
+
+        [Phone]
         public string Phone { get; set; }
+
+        [MaxLength(100)]
         public string Description { get; set; }
+
+        public Account Account { get; set; }
     }
 }

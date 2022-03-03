@@ -2,7 +2,6 @@
 @using Microsoft.JSInterop;
 @using LitChat.Blazor.Services.Interfaces;
 @using LitChat.Blazor.Models;
-@attribute [Authorize]
 @page "/chat/{ContactId}"
 @page "/chat"
 @page "/"
@@ -168,7 +167,7 @@
                         await _jsRuntime.InvokeAsync<string>("OnScrollEvent", "chatContainer");
                         StateHasChanged();
                     });
-            await GetAllFavorites(CurrentUserId, ContactId);
+            await GetAllFriends(CurrentUserId, ContactId);
             if (!string.IsNullOrEmpty(ContactId))
             {
                 await LoadUserChat(ContactId);
@@ -180,26 +179,32 @@
         }
     }
     public List<Friend> ChatUsers = new List<Friend>();
-    public Models.Connections connection = new Models.Connections();
+
+    public Connections connection = new Connections();
+
     [Parameter] public string ContactEmail { get; set; }
+
     [Parameter] public string ContactId { get; set; }
+
     async Task LoadUserChat(string userId)
     {
         await CheckConnection(Token);
         var contact = await _accountService.GetUserDetailsAsync(userId);
         ContactId = contact.Id.ToString();
         ContactEmail = contact.Email;
-        messages = new List<Models.ChatMessages>();
+        messages = new List<ChatMessages>();
         messages = await _chatService.GetConversationAsync(ContactId, CurrentUserId);
     }
+
     async Task LoadFullChatHistory(string userId)
     {
         var contact = await _accountService.GetUserDetailsAsync(userId);
         ContactId = contact.Id.ToString();
         ContactEmail = contact.Email;
-        messages = new List<Models.ChatMessages>();
+        messages = new List<ChatMessages>();
         messages = await _chatService.GetFullChatHistory(ContactId, CurrentUserId);
     }
+
     async Task DeleteChatHistory(string userId)
     {
         var contact = await _accountService.GetUserDetailsAsync(userId);
@@ -208,15 +213,18 @@
         await _chatService.DeleteChatHistoryAsync(CurrentUserId, ContactId);
         messages = await _chatService.GetFullChatHistory(ContactId, CurrentUserId);
     }
+
     async Task DeleteChatMessage(string messageId)
     {
         await _chatService.DeleteChatMessageAsync(messageId);
         messages = await _chatService.GetFullChatHistory(ContactId, CurrentUserId);
     }
-    async Task GetAllFavorites(string currentUserId, string favoriteUserId)
+
+    async Task GetAllFriends(string currentUserId, string favoriteUserId)
     {
         ChatUsers = await _friendService.FriendsList();
     }
+
     private void ShowInformation(string userId)
     {
         ContactId = userId;

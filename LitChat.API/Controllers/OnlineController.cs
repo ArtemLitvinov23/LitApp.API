@@ -24,9 +24,9 @@ namespace LitChat.API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<ConnectionsResponseViewModel>>> GetConnectedClient()
         {
-           var allClients = await _connectionService.GetAllClientsAsync();
-           var mappingModel = _mapper.Map<List<ConnectionsResponseViewModel>>(allClients);
-           return Ok(mappingModel);
+            var allClients = await _connectionService.GetAllClientsAsync();
+            var mappingModel = _mapper.Map<List<ConnectionsResponseViewModel>>(allClients);
+            return Ok(mappingModel);
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<ConnectionsResponseViewModel>> GetConnectedClient(int id)

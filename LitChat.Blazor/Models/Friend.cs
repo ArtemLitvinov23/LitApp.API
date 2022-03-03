@@ -16,6 +16,8 @@ namespace LitChat.Blazor.Models
 
         public DateTime? RequestTime { get; set; }
 
+        public RequestFlags RequestFlags { get; set; }
+
         public bool Approved { get; set; }
 
         public DateTime? ApprovedDate { get; set; }

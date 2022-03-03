@@ -6,6 +6,7 @@ namespace LitChat.BLL.ModelsDto
     public class FriendDto
     {
         public int RequestById { get; set; }
+
         public int RequestToId { get; set; }
         public virtual AccountDto RequestTo { get; set; }
 
@@ -16,7 +17,9 @@ namespace LitChat.BLL.ModelsDto
         public bool Approved => RequestFlags == RequestFlags.Approved;
 
         public DateTime? ApprovedDate { get; set; }
+
         public DateTime? DateOfRejection { get; set; }
+
         public DateTime? NextRequest { get; set; }
     }
 }

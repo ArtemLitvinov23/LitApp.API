@@ -22,9 +22,9 @@ namespace LitChat.Blazor.Services
 
         public async Task<List<Friend>> FriendsList() => await _httpService.GetAll<Friend>("api/Friend/FriendsList");
 
-        public async Task<Friend> GetFriend(int friendId) => await _httpService.Get<Friend>($"api/Friend/{friendId}");
+        public async Task<Friend> GetFriend(int friendId) => await _httpService.Get<Friend>($"api/Friend/GetFriend/{friendId}");
 
-        public async Task<List<Friend>> PendingRequests() => await _httpService.GetAll<Friend>("api/Friend/Pending");
+        public async Task<List<Friend>> PendingRequests(int accountId) => await _httpService.GetAll<Friend>($"api/Friend/PendingRequests/{accountId}");
 
         public async Task Rejected(FriendRequest rejectedFriend) => await _httpService.Post("api/Friend/Rejected", rejectedFriend);
 

@@ -21,7 +21,7 @@ namespace LitChat.BLL.Services
 
         public async Task AddInfoAboutAccountAsync(int id, UserInfoDto addUserInfoRequest)
         {
-            var getAccount = await _accountRepository.GetAccountAsync(id);
+            var getAccount = await _accountRepository.GetAccountByIdAsync(id);
             if (getAccount == null)
                 throw new AppException();
             _mapper.Map(addUserInfoRequest, getAccount);
@@ -38,13 +38,13 @@ namespace LitChat.BLL.Services
         public async Task RemovePhoneFromAccountAsync(int id)
         {
             var account = await _accountRepository.GetAccountByIdAsync(id);
-            account.Phone = null;
+            account.Profile.Phone = null;
             await _accountRepository.UpdateAccountAsync(account);
         }
         public async Task RemoveDescriptionFromAccountAsync(int id)
         {
             var account = await _accountRepository.GetAccountByIdAsync(id);
-            account.Description = null;
+            account.Profile.Description = null;
             await _accountRepository.UpdateAccountAsync(account);
         }
     }

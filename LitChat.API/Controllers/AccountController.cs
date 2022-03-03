@@ -16,17 +16,14 @@ namespace LitChat.API.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
-        private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
         public AccountController(
             IAccountService accountService,
-            IMapper mapper,
-            IUserService userService)
+            IMapper mapper)
         {
             _accountService = accountService;
             _mapper = mapper;
-            _userService = userService;
         }
 
         [AllowAnonymous]
@@ -106,25 +103,10 @@ namespace LitChat.API.Controllers
             return Ok(mapDto);
         }
 
-        [Authorize]
-        [HttpGet("[action]/{currentUserId}")]
-        public async Task<ActionResult<List<UserResponseViewModel>>> GetAllUsersWithoutCurrent(int currentUserId)
-        {
-            var result = await _userService.GetAllUsersWithoutCurrentUserAsync(currentUserId);
-            return Ok(_mapper.Map<List<UserResponseViewModel>>(result));
-        }
 
         [Authorize]
-        [HttpGet("[action]/{id}")]
-        public async Task<ActionResult<UserResponseViewModel>> GetUserById(int id)
-        {
-            var result = await _userService.GetUserByIdAsync(id);
-            return Ok(_mapper.Map<UserResponseViewModel>(result));
-        }
-
-        [Authorize]
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<List<AccountResponseViewModel>>> GetAccountById(int id)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<AccountResponseViewModel>> GetAccountById(int id)
         {
             var result = await _accountService.GetAccountByIdAsync(id);
             return Ok(result);

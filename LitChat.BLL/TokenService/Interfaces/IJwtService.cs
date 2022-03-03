@@ -1,5 +1,6 @@
 ﻿using LitChat.BLL.ModelsDto;
 using LitChat.DAL.Models;
+using System.Threading.Tasks;
 
 namespace LitChat.BLL.Jwt.Interfaces
 {

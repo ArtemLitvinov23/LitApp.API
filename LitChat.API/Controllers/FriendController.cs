@@ -44,10 +44,10 @@ namespace LitChat.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("[action]")]
-        public async Task<ActionResult<List<FriendViewModel>>> PendingRequests()
+        [HttpGet("[action]/{accountId}")]
+        public async Task<ActionResult<List<FriendViewModel>>> PendingRequests(int accountId)
         {
-            var friendsList = await _friendService.GetAllPendingRequestsAsync();
+            var friendsList = await _friendService.GetAllPendingRequestsAsync(accountId);
             var response = _mapper.Map<List<FriendViewModel>>(friendsList);
             return Ok(response);
         }
@@ -65,53 +65,32 @@ namespace LitChat.API.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> Approved(FriendRequestViewModel approvedFriend)
         {
-            var senderAccount = await _accountService.GetAccountByIdAsync(approvedFriend.AccountId);
-            var friendAccount = await _accountService.GetAccountByIdAsync(approvedFriend.FriendAccountId);
-            if (senderAccount == null || friendAccount == null) return BadRequest();
 
-            var sender = _mapper.Map<AccountDto>(senderAccount);
-            var friend = _mapper.Map<AccountDto>(friendAccount);
-
-            await _friendService.ApprovedUserAsync(sender, friend);
+            await _friendService.ApprovedUserAsync(approvedFriend.AccountId, approvedFriend.FriendAccountId);
             return Ok();
         }
 
         [HttpPost("[action]")]
         public async Task<IActionResult> Rejected(FriendRequestViewModel rejectedFriend)
         {
-            var senderAccount = await _accountService.GetAccountByIdAsync(rejectedFriend.AccountId);
-            var friendAccount = await _accountService.GetAccountByIdAsync(rejectedFriend.FriendAccountId);
-            if (senderAccount == null || friendAccount == null) return BadRequest();
-
-            var sender = _mapper.Map<AccountDto>(senderAccount);
-            var friend = _mapper.Map<AccountDto>(friendAccount);
-
-            await _friendService.RejectUserAsync(sender, friend);
+            await _friendService.RejectUserAsync(rejectedFriend.AccountId, rejectedFriend.FriendAccountId);
             return Ok();
         }
 
         [HttpPost("Request")]
         public async Task<IActionResult> CreateRequestToFriend(FriendRequestViewModel request)
         {
-            var senderAccount = await _accountService.GetAccountByIdAsync(request.AccountId);
-            var friendAccount = await _accountService.GetAccountByIdAsync(request.FriendAccountId);
-            if (senderAccount == null || friendAccount == null) return BadRequest();
+            if (request == null) return BadRequest();
 
-            var sender = _mapper.Map<AccountDto>(senderAccount);
-            var friend = _mapper.Map<AccountDto>(friendAccount);
-
-            await _friendService.SendRequestToUserAsync(sender, friend);
+            await _friendService.SendRequestToUserAsync(request.AccountId, request.FriendAccountId);
             return Ok();
         }
 
         [HttpDelete("{friendId}")]
         public async Task<IActionResult> DeleteFriend(int friendId)
         {
-            var getFriendAccount = await _accountService.GetAccountByIdAsync(friendId);
-            if (getFriendAccount == null) return BadRequest();
 
-            var friendAccount = _mapper.Map<AccountDto>(getFriendAccount);
-            await _friendService.DeleteUserFromFriends(friendAccount);
+            await _friendService.DeleteUserFromFriends(friendId);
             return Ok();
         }
     }

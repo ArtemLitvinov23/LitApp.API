@@ -20,19 +20,20 @@ namespace LitChat.BLL.Jwt
         private readonly TokenOptions _appSettings;
         private readonly IAccountRepository _accountRepository;
 
-        public JwtService(IOptions<TokenOptions> appSettings, IAccountRepository accountRepository)
+        public JwtService(IOptions<TokenOptions> appSettings,
+            IAccountRepository accountRepository)
         {
             _accountRepository = accountRepository;
             _appSettings = appSettings.Value;
         }
-        public string GenerateJwtToken(AccountDto account)
+        public string GenerateJwtToken(AccountDto accountDto)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[] { new Claim("id",account.Id.ToString()),
-                                                     new Claim(ClaimTypes.Email,account.Email)}),
+                Subject = new ClaimsIdentity(new[] { new Claim("id",accountDto.Id.ToString()),
+                                                     new Claim(ClaimTypes.Email,accountDto.Email)}),
                 Expires = DateTime.Now.AddDays(double.Parse(_appSettings.TokenLifeTime)),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
             };

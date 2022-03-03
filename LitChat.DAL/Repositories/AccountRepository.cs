@@ -1,5 +1,4 @@
-﻿using LitChat.DAL;
-using LitChat.DAL.Models;
+﻿using LitChat.DAL.Models;
 using LitChat.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -17,18 +16,11 @@ namespace LitChat.DAL.Repositories
             _context = context;
         }
 
-        public IQueryable<Account> GetAllAccounts() => _context.Accounts.AsQueryable();
-
-        public async Task<Account> GetAccountAsync(int id)
-        {
-            var account = await _context.Accounts.FindAsync(id);
-            if (account == null) throw new NullReferenceException("Account not found");
-            return account;
-        }
+        public IQueryable<Account> GetAllAccounts() => _context.Accounts.Include(x => x.Profile).AsQueryable();
 
         public Account GetRefreshToken(string token) => _context.Accounts.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
 
-        public async Task<Account> GetAccountByIdAsync(int accountId) => await _context.Accounts.FirstOrDefaultAsync(x => x.Id == accountId);
+        public async Task<Account> GetAccountByIdAsync(int accountId) => await _context.Accounts.Include(x => x.Profile).FirstOrDefaultAsync(x => x.Id == accountId);
 
 
         public async Task CreateAccountAsync(Account account)

@@ -2,6 +2,7 @@
 using LitChat.BLL.ModelsDto;
 using LitChat.BLL.Services.Interfaces;
 using LitChat.BLL.Settings;
+using LitChat.DAL.Models;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
@@ -44,7 +45,7 @@ namespace LitChat.BLL.Services
 
         }
 
-        public async Task<bool> SendVerificationEmailAsync(AccountDto account, string origin)
+        public async Task<bool> SendVerificationEmailAsync(Account account, string origin)
         {
             string message;
             if (!string.IsNullOrEmpty(origin))
@@ -86,7 +87,7 @@ namespace LitChat.BLL.Services
             );
         }
 
-        public async Task SendPasswordResetEmailAsync(AccountDto account, string origin)
+        public async Task SendPasswordResetEmailAsync(Account account, string origin)
         {
             string message;
             if (!string.IsNullOrEmpty(origin))

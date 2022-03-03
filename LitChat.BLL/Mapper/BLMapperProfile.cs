@@ -9,40 +9,45 @@ namespace LitChat.BLL.Mapper
         public BLMapperProfile()
         {
             CreateMap<object, AccountDto>();
+
+            CreateMap<UserInfoDto, UserInfo>()
+                .ForMember(x => x.FirstName, opt => opt.MapFrom(src => src.FirstName))
+                .ForMember(x => x.LastName, opt => opt.MapFrom(src => src.LastName))
+                .ForMember(x => x.Phone, opt => opt.MapFrom(x => x.Phone))
+                .ForMember(x => x.Description, opt => opt.MapFrom(x => x.Description)).ReverseMap();
+
             CreateMap<AccountDto, Account>()
+                .ForMember(x => x.Profile, opt => opt.MapFrom(x => x.Profile))
                 .ForMember(x => x.MessagesFromUser, opt => opt.MapFrom(src => src.MessagesFromUser))
                 .ForMember(x => x.MessagesToUser, opt => opt.MapFrom(src => src.MessagesToUser))
                 .ForMember(x => x.SentFriendsRequest, opt => opt.MapFrom(src => src.SentFriendsRequest))
-                .ForMember(x => x.RecievedFriendRequest, opt => opt.MapFrom(src => src.RecievedFriendRequest))
-                .ReverseMap();
+                .ForMember(x => x.RecievedFriendRequest, opt => opt.MapFrom(src => src.RecievedFriendRequest)).ReverseMap();
 
-            CreateMap<AccountDto, AuthenticateResponseDto>();
+            CreateMap<AccountDto, AuthenticateResponseDto>()
+                .ForMember(x => x.AccountId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(x => x.Profile, opt => opt.MapFrom(src => src.Profile))
+                .ForMember(x => x.TokenExpires, opt => opt.MapFrom(src => src.TokenExpires));
 
-            CreateMap<Account, AccountResponseDto>();
-
-            CreateMap<AccountResponseDto, AccountDto>()
-                .ForMember(x => x.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(x => x.Email, opt => opt.MapFrom(src => src.Email))
-                .ForMember(x => x.FirstName, opt => opt.MapFrom(src => src.FirstName))
-                .ForMember(x => x.LastName, opt => opt.MapFrom(src => src.LastName))
-                .ForMember(x => x.IsVerified, opt => opt.MapFrom(src => src.IsVerified))
-                .ForMember(x => x.Created, opt => opt.MapFrom(src => src.Created))
-                .ForMember(x => x.Updated, opt => opt.MapFrom(src => src.Updated));
-
-            CreateMap<Account, UsersResponseDto>();
+            CreateMap<Account, AccountResponseDto>()
+                .ForMember(x => x.Profile, opt => opt.MapFrom(src => src.Profile))
+                .ForMember(x => x.TokenExpires, opt => opt.MapFrom(src => src.TokenExpires));
 
             CreateMap<Account, AuthenticateRequestDto>();
 
-            CreateMap<Account, AuthenticateResponseDto>();
+            CreateMap<Account, AuthenticateResponseDto>()
+                .ForMember(x => x.Profile, opt => opt.MapFrom(src => src.Profile));
+
 
             CreateMap<Account, UserInfoDto>()
-                .ForMember(x => x.Phone, opt => opt.MapFrom(x => x.Phone))
-                .ForMember(x => x.Description, opt => opt.MapFrom(x => x.Description))
+                .ForMember(x => x.FirstName, opt => opt.MapFrom(src => src.Profile.FirstName))
+                .ForMember(x => x.LastName, opt => opt.MapFrom(src => src.Profile.LastName))
+                .ForMember(x => x.Phone, opt => opt.MapFrom(x => x.Profile.Phone))
+                .ForMember(x => x.Description, opt => opt.MapFrom(x => x.Profile.Description))
                 .ReverseMap();
 
-            CreateMap<Role, RoleDto>();
 
-            CreateMap<UpdateAccountDto, Account>();
+            CreateMap<UpdateAccountDto, Account>()
+                .ForMember(x => x.Profile, opt => opt.MapFrom(src => src.Profile));
 
             CreateMap<AccountDto, ResetPasswordRequestDto>();
 
@@ -75,13 +80,11 @@ namespace LitChat.BLL.Mapper
 
             CreateMap<Connections, ConnectionsDto>().ReverseMap();
 
-            CreateMap<Friend, UsersResponseDto>()
-                .ForMember(x => x.AccountId, opt => opt.MapFrom(src => src.RequestToId))
-                .ForMember(x => x.FirstName, opt => opt.MapFrom(src => src.RequestTo.FirstName))
-                .ForMember(x => x.LastName, opt => opt.MapFrom(src => src.RequestTo.LastName))
-                .ForMember(x => x.Phone, opt => opt.MapFrom(src => src.RequestTo.Phone))
-                .ForMember(x => x.Description, opt => opt.MapFrom(src => src.RequestTo.Description))
-                .ForMember(x => x.Email, opt => opt.MapFrom(src => src.RequestTo.Email));
+            CreateMap<Friend, AccountResponseDto>()
+                .ForMember(x => x.Id, opt => opt.MapFrom(src => src.RequestToId))
+                .ForMember(x => x.Email, opt => opt.MapFrom(src => src.RequestTo.Email))
+                .ForMember(x => x.Profile, opt => opt.MapFrom(src => src.RequestTo.Profile));
+
 
             CreateMap<Friend, FriendDto>()
                 .ForMember(x => x.RequestTo, opt => opt.MapFrom(src => src.RequestTo))

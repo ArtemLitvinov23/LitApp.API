@@ -35,6 +35,32 @@ namespace LitChat.API.HubController
                 throw;
             }
         }
+
+        public async Task SendFriendRequest(FriendRequestViewModel friendRequest)
+        {
+            try
+            {
+                await Clients.All.SendAsync("ReceiveFriendRequest", friendRequest);
+            }
+            catch (Exception e)
+            {
+                new InternalServerException(e.Message);
+                throw;
+            }
+        }
+        public async Task FriendNotificationAsync(string message, string senderUserId, string receiverUserId)
+        {
+            try
+            {
+                await Clients.All.SendAsync("FriendNotification", message, senderUserId, receiverUserId);
+            }
+            catch (Exception e)
+            {
+                new InternalServerException(e.Message);
+                throw;
+            }
+        }
+
         public async Task ChatNotificationAsync(string message, string receiverUserId, string senderUserId)
         {
             try

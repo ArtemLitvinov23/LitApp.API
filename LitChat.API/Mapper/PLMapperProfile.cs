@@ -15,8 +15,8 @@ namespace LitChat.API.Mapper
                 .ForMember(x => x.RecievedFriendRequest, opt => opt.MapFrom(src => src.RecievedFriendRequest));
 
             CreateMap<AccountViewModel, UserInfoViewModel>()
-                .ForMember(x => x.Phone, opt => opt.MapFrom(x => x.Phone))
-                .ForMember(x => x.Description, opt => opt.MapFrom(x => x.Description))
+                .ForMember(x => x.Phone, opt => opt.MapFrom(x => x.Profile.Phone))
+                .ForMember(x => x.Description, opt => opt.MapFrom(x => x.Profile.Description))
                 .ReverseMap();
 
             CreateMap<UserInfoDto, UserInfoViewModel>()
@@ -36,17 +36,26 @@ namespace LitChat.API.Mapper
                 .ForMember(x => x.DisconnectedAt, opt => opt.MapFrom(src => src.DisconnectedAt))
                 .ReverseMap();
 
-            CreateMap<AccountDto, AccountRegisterViewModel>().ReverseMap();
+            CreateMap<AccountResponseDto, AccountResponseViewModel>()
+                .ForMember(x => x.FirstName, opt => opt.MapFrom(src => src.Profile.FirstName))
+                .ForMember(x => x.LastName, opt => opt.MapFrom(src => src.Profile.LastName))
+                .ForMember(x => x.Description, opt => opt.MapFrom(src => src.Profile.Description))
+                .ForMember(x => x.Phone, opt => opt.MapFrom(src => src.Profile.Phone));
+
+            CreateMap<AccountRegisterViewModel, AccountDto>()
+                .ForPath(x => x.Profile.FirstName, opt => opt.MapFrom(src => src.FirstName))
+                .ForPath(x => x.Profile.LastName, opt => opt.MapFrom(src => src.LastName));
 
             CreateMap<AuthenticateResponseDto, AccountRegisterViewModel>();
 
-            CreateMap<UsersResponseDto, UserResponseViewModel>();
-
             CreateMap<AuthenticateRequestDto, AuthenticateRequestViewModel>().ReverseMap();
 
-            CreateMap<AuthenticateResponseDto, AuthenticateResponseViewModel>().ReverseMap();
+            CreateMap<AuthenticateResponseDto, AuthenticateResponseViewModel>()
+                .ForMember(x => x.Id, opt => opt.MapFrom(src => src.AccountId))
+                .ForMember(x => x.Profile, opt => opt.MapFrom(src => src.Profile));
 
-            CreateMap<UpdateAccountViewModel, UpdateAccountDto>().ReverseMap();
+            CreateMap<UpdateAccountViewModel, UpdateAccountDto>()
+                .ForMember(x => x.Profile, opt => opt.MapFrom(src => src.Profile));
 
             CreateMap<ResetPasswordRequestDto, ResetPasswordRequestViewModel>().ReverseMap();
 
@@ -71,29 +80,30 @@ namespace LitChat.API.Mapper
                 .ForMember(x => x.Message, opt => opt.MapFrom(src => src.Message))
                 .ReverseMap();
 
-            CreateMap<AccountDto, UserResponseViewModel>().ReverseMap();
-
-            CreateMap<RoleDto, RoleViewModel>();
-
             CreateMap<FavoritesListViewModel, FavoritesListDto>();
 
             CreateMap<FavoritesListResponseDto, FavoritesListResponseViewModel>();
 
-            CreateMap<FriendDto, UserResponseViewModel>()
+            CreateMap<FriendDto, AccountResponseViewModel>()
                 .ForMember(x => x.Id, opt => opt.MapFrom(src => src.RequestToId))
-                .ForMember(x => x.FirstName, opt => opt.MapFrom(src => src.RequestTo.FirstName))
-                .ForMember(x => x.LastName, opt => opt.MapFrom(src => src.RequestTo.LastName))
-                .ForMember(x => x.Phone, opt => opt.MapFrom(src => src.RequestTo.Phone))
-                .ForMember(x => x.Description, opt => opt.MapFrom(src => src.RequestTo.Description))
+                .ForMember(x => x.FirstName, opt => opt.MapFrom(src => src.RequestTo.Profile.FirstName))
+                .ForMember(x => x.LastName, opt => opt.MapFrom(src => src.RequestTo.Profile.LastName))
+                .ForMember(x => x.Description, opt => opt.MapFrom(src => src.RequestTo.Profile.Description))
+                .ForMember(x => x.Phone, opt => opt.MapFrom(src => src.RequestTo.Profile.Phone))
                 .ForMember(x => x.Email, opt => opt.MapFrom(src => src.RequestTo.Email));
 
             CreateMap<FriendDto, FriendViewModel>()
                 .ForPath(x => x.FriendId, opt => opt.MapFrom(src => src.RequestToId))
                 .ForPath(x => x.Email, opt => opt.MapFrom(src => src.RequestTo.Email))
-                .ForPath(x => x.FirstName, opt => opt.MapFrom(src => src.RequestTo.FirstName))
-                .ForPath(x => x.LastName, opt => opt.MapFrom(src => src.RequestTo.LastName))
+                .ForPath(x => x.FirstName, opt => opt.MapFrom(src => src.RequestTo.Profile.FirstName))
+                .ForPath(x => x.LastName, opt => opt.MapFrom(src => src.RequestTo.Profile.LastName))
                 .ForPath(x => x.Approved, opt => opt.MapFrom(src => src.Approved))
                 .ForPath(x => x.RequestFlags, opt => opt.MapFrom(src => src.RequestFlags));
+
+            CreateMap<FriendRequestViewModel, AccountDto>()
+                .ForMember(x => x.Id, opt => opt.MapFrom(src => src.AccountId))
+                .ForMember(x => x.Id, opt => opt.MapFrom(src => src.FriendAccountId));
+
 
         }
     }

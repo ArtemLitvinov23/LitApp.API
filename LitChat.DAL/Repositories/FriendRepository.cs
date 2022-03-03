@@ -20,7 +20,7 @@ namespace LitChat.DAL.Repositories
             await _blogContext.SaveChangesAsync();
         }
 
-        public IQueryable<Friend> GetAllFriends() => _blogContext.Friends.Include(x => x.RequestTo).AsQueryable();
+        public IQueryable<Friend> GetAllFriends() => _blogContext.Friends.Include(x => x.RequestTo.Profile).AsQueryable();
 
         public async Task<Friend> GetFriendById(int id) => await _blogContext.Friends.Include(x => x.RequestTo).FirstOrDefaultAsync(x => x.RequestToId == id || x.RequestById == id);
 

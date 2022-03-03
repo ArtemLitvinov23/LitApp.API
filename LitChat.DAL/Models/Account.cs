@@ -6,7 +6,6 @@ namespace LitChat.DAL.Models
 {
     public class Account
     {
-        [Key]
         public int Id { get; set; }
 
         [Required]
@@ -16,17 +15,7 @@ namespace LitChat.DAL.Models
         [Required]
         public string PasswordHash { get; set; }
 
-        [Required]
-        public string FirstName { get; set; }
-
-        [Required]
-        public string LastName { get; set; }
-
-        [Phone]
-        public string Phone { get; set; }
-
-        [MaxLength(100)]
-        public string Description { get; set; }
+        public UserInfo Profile { get; set; }
 
         public Role Role { get; set; }
 
@@ -48,6 +37,8 @@ namespace LitChat.DAL.Models
 
         public DateTime? Updated { get; set; }
 
+        public DateTime? TokenExpires { get; set; }
+
         public ICollection<ChatMessages> MessagesFromUser { get; set; }
 
         public ICollection<ChatMessages> MessagesToUser { get; set; }
@@ -61,6 +52,7 @@ namespace LitChat.DAL.Models
         public ICollection<Friend> RecievedFriendRequest { get; set; }
 
         public List<RefreshToken> RefreshTokens { get; set; }
+
         public bool OwnsToken(string token)
         {
             return RefreshTokens?.Find(x => x.Token == token) != null;

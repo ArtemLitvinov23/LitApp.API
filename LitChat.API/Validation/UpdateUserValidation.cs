@@ -7,9 +7,9 @@ namespace LitChat.API.Validators
     {
         public UpdateUserValidation()
         {
-            RuleFor(x => x.FirstName).NotEmpty().MinimumLength(2).WithMessage("Name must be at least 2 characters");
-            RuleFor(x => x.LastName).NotEmpty().MinimumLength(2).WithMessage("Last name must be at least 2 characters");
-            RuleFor(x => x.Description).MaximumLength(100);
+            RuleFor(x => x.Profile.FirstName).NotEmpty().MinimumLength(2).WithMessage("Name must be at least 2 characters");
+            RuleFor(x => x.Profile.LastName).NotEmpty().MinimumLength(2).WithMessage("Last name must be at least 2 characters");
+            RuleFor(x => x.Profile.Description).MaximumLength(100);
         }
     }
 }

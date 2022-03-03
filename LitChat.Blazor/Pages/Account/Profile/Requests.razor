@@ -1,0 +1,66 @@
+﻿@page "/requests"
+
+<MudContainer Style="display: inline-block; position: relative; top: 0; bottom: 0; left: 0; right: 0; width: 500px; height: 500px; margin: auto; ">
+
+    <MudPaper Height="50px" Width="100%" Square="true" Class="mud-theme-primary"></MudPaper>
+    <MudTable Items="@friendRequest" Breakpoint="Breakpoint.Sm" Loading="@loading" LoadingProgressColor="Color.Info" Dense="@dense">
+        <RowTemplate>
+            <MudTd>
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderAvatar>
+                            <MudAvatar Color="Color.Dark" Style="height:70px; width:70px;">@_account.FirstName</MudAvatar>
+                        </CardHeaderAvatar>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.body1">@_account.FirstName @_account.LastName </MudText>
+                            <MudText Typo="Typo.body2">@_account.Email </MudText>
+                            <MudText Typo="Typo.body2">@_account.Description </MudText>
+                        </CardHeaderContent>
+                        <CardHeaderActions>
+                            <MudIconButton OnClick="@(() => ShowInformation(_account.Id))" Icon="@Icons.Filled.Info" Color="Color.Inherit" ButtonType="ButtonType.Button"></MudIconButton>
+                        </CardHeaderActions>
+                    </MudCardHeader>
+                    <MudCardActions>
+                        <MudButton StartIcon="@Icons.Filled.Done" Color="Color.Success" ButtonType="ButtonType.Button">Approve</MudButton>
+                        <MudButton StartIcon="@Icons.Filled.Cancel" Color="Color.Error" ButtonType="ButtonType.Button">Reject</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudContainer>
+
+@code {
+    private List<Friend> friendRequest = new();
+    private Account _account = new();
+    [Parameter] public string UserId { get; set; }
+    private bool dense = false;
+    private bool loading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            friendRequest = await _friendService.PendingRequests(_accountService.Account.Id);
+            foreach (var item in friendRequest)
+            {
+                UserId = item.RequestById.ToString();
+            }
+            _account = await _accountService.GetUserDetailsAsync(UserId);
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+    void ShowInformation(int userId)
+    {
+        UserId = userId.ToString();
+        _navigationManager.NavigateTo($"card/{UserId}");
+    }
+    async Task ApprovedAsync(int userId)
+    {
+        UserId = userId.ToString();
+        _navigationManager.NavigateTo($"card/{UserId}");
+    }
+}

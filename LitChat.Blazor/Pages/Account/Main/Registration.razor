@@ -30,16 +30,11 @@
         {
             <div class="alert alert-danger mt-3 mb-0">@message</div>
         }
-        @if (!string.IsNullOrEmpty(error))
-        {
-            <div class="alert alert-danger mt-3 mb-0">@error</div>
-        }
     </EditForm>
 </MudContainer>
 @code
 {
-    private readonly RegisterAccount _registerAccount = new();
-    private string error;
+    private RegisterAccount _registerAccount = new RegisterAccount();
     private string message;
     private bool loading;
     protected void Login()
@@ -57,7 +52,7 @@
         catch (Exception ex)
         {
             loading = false;
-            error = ex.Message;
+            message = ex.Message;
             StateHasChanged();
         }
     }
