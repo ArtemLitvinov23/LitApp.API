@@ -90,15 +90,23 @@ namespace LitChat.API.Mapper
                 .ForMember(x => x.LastName, opt => opt.MapFrom(src => src.RequestTo.Profile.LastName))
                 .ForMember(x => x.Description, opt => opt.MapFrom(src => src.RequestTo.Profile.Description))
                 .ForMember(x => x.Phone, opt => opt.MapFrom(src => src.RequestTo.Profile.Phone))
-                .ForMember(x => x.Email, opt => opt.MapFrom(src => src.RequestTo.Email));
+                .ForMember(x => x.Email, opt => opt.MapFrom(src => src.RequestTo.Email))
+                .ForMember(x => x.Id, opt => opt.MapFrom(src => src.RequestById))
+                .ForMember(x => x.FirstName, opt => opt.MapFrom(src => src.RequestBy.Profile.FirstName))
+                .ForMember(x => x.LastName, opt => opt.MapFrom(src => src.RequestBy.Profile.LastName))
+                .ForMember(x => x.Description, opt => opt.MapFrom(src => src.RequestBy.Profile.Description))
+                .ForMember(x => x.Phone, opt => opt.MapFrom(src => src.RequestBy.Profile.Phone))
+                .ForMember(x => x.Email, opt => opt.MapFrom(src => src.RequestBy.Email));
 
             CreateMap<FriendDto, FriendViewModel>()
-                .ForPath(x => x.FriendId, opt => opt.MapFrom(src => src.RequestToId))
-                .ForPath(x => x.Email, opt => opt.MapFrom(src => src.RequestTo.Email))
-                .ForPath(x => x.FirstName, opt => opt.MapFrom(src => src.RequestTo.Profile.FirstName))
-                .ForPath(x => x.LastName, opt => opt.MapFrom(src => src.RequestTo.Profile.LastName))
-                .ForPath(x => x.Approved, opt => opt.MapFrom(src => src.Approved))
-                .ForPath(x => x.RequestFlags, opt => opt.MapFrom(src => src.RequestFlags));
+                .ForPath(x => x.FriendId, opt => opt.MapFrom(src => src.RequestById))
+                .ForPath(x => x.SenderEmail, opt => opt.MapFrom(src => src.RequestBy.Email))
+                .ForPath(x => x.SenderFirstName, opt => opt.MapFrom(src => src.RequestBy.Profile.FirstName))
+                .ForPath(x => x.SenderLastName, opt => opt.MapFrom(src => src.RequestBy.Profile.LastName))
+                .ForPath(x => x.RequestById, opt => opt.MapFrom(src => src.RequestToId))
+                .ForPath(x => x.ReceiverEmail, opt => opt.MapFrom(src => src.RequestTo.Email))
+                .ForPath(x => x.ReceiverFirstName, opt => opt.MapFrom(src => src.RequestTo.Profile.FirstName))
+                .ForPath(x => x.ReceiverLastName, opt => opt.MapFrom(src => src.RequestTo.Profile.LastName));
 
             CreateMap<FriendRequestViewModel, AccountDto>()
                 .ForMember(x => x.Id, opt => opt.MapFrom(src => src.AccountId))

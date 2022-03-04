@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 <audio id="notification" src="media/notification.mp3" />
-<audio id="friend" src="~/media/chat.mp3"/>
+<audio id="friend" src="~/media/chat.mp3" />
 
 <MudThemeProvider />
 <MudDialogProvider />
@@ -13,8 +13,9 @@
         @if (_accountService.Account != null)
         {
             <MudText>@_accountService.Account.Email.ToLower()</MudText>
+
             <MudBadge Dot="IsDot" Overlap="true" Class="mx-6 my-4">
-                <MudIconButton OnClick="@(() => FriendRequest(CurrentUserId))" Icon="@Icons.Filled.GroupAdd" Color="Color.Inherit" />
+                <MudIconButton OnClick="@(() => FriendRequest(CurrentUserId))" Icon="@Icons.Material.Filled.EmojiPeople" Color="Color.Inherit" ButtonType="ButtonType.Button"></MudIconButton>
             </MudBadge>
             <MudIconButton Icon="@Icons.Custom.Brands.LinkedIn" Color="Color.Inherit" />
             <MudIconButton OnClick="@(() => EditProfile(CurrentUserId))" Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit"></MudIconButton>
@@ -37,7 +38,7 @@
     private HubConnection hubConnection;
     [Parameter] public string CurrentUserId { get; set; }
     [Parameter] public string Token { get; set; }
-    [Parameter] public bool IsDot { get; set; }
+    public bool IsDot { get; set; }
     bool _drawerOpen = false;
     void DrawerToggle()
     {
@@ -58,7 +59,7 @@
     {
         var requests = await _friendService.PendingRequests(int.Parse(accountId));
 
-        if(requests.Count >= 1) return true;
+        if (requests.Count > 0) return true;
 
         return false;
     }
@@ -109,7 +110,7 @@
                           config.ActionColor = Color.Info;
                           config.Onclick = snackbar =>
                           {
-                              _navigationManager.NavigateTo($"");
+                              _navigationManager.NavigateTo($"/requests");
                               return Task.CompletedTask;
                           };
                       });

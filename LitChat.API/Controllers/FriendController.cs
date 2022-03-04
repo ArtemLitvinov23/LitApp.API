@@ -16,30 +16,27 @@ namespace LitChat.API.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IFriendService _friendService;
-        private readonly IAccountService _accountService;
 
         public FriendController(
             IMapper mapper,
-            IFriendService friendService,
-            IAccountService accountService)
+            IFriendService friendService)
         {
             _mapper = mapper;
             _friendService = friendService;
-            _accountService = accountService;
         }
 
-        [HttpGet("[action]")]
-        public async Task<ActionResult<List<FriendViewModel>>> FriendsList()
+        [HttpGet("[action]/{accountId}")]
+        public async Task<ActionResult<List<FriendViewModel>>> FriendsList(int accountId)
         {
-            var friendsList = await _friendService.GetAllApprovedFriendsAsync();
+            var friendsList = await _friendService.GetAllApprovedFriendsAsync(accountId);
             var response = _mapper.Map<List<FriendViewModel>>(friendsList);
             return Ok(response);
         }
 
-        [HttpGet("[action]")]
-        public async Task<ActionResult<List<FriendViewModel>>> RejectedRequests()
+        [HttpGet("[action]/{accountId}")]
+        public async Task<ActionResult<List<FriendViewModel>>> RejectedRequests(int accountId)
         {
-            var friendsList = await _friendService.GetAllRejectedRequestsAsync();
+            var friendsList = await _friendService.GetAllRejectedRequestsAsync(accountId);
             var response = _mapper.Map<List<FriendViewModel>>(friendsList);
             return Ok(response);
         }

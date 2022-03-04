@@ -40,7 +40,7 @@
     </MudCard>
     @if (!string.IsNullOrEmpty(errorMessage))
     {
-        <div class="alert alert-danger mt-3 mb-0">@errorMessage</div>
+        <MudText Typo="Typo.body1">@errorMessage</MudText>
     }
 </MudContainer>
 

@@ -8,7 +8,6 @@ namespace LitChat.BLL.ModelsDto
         public int RequestById { get; set; }
 
         public int RequestToId { get; set; }
-        public virtual AccountDto RequestTo { get; set; }
 
         public DateTime? RequestTime { get; set; }
 
@@ -21,5 +20,9 @@ namespace LitChat.BLL.ModelsDto
         public DateTime? DateOfRejection { get; set; }
 
         public DateTime? NextRequest { get; set; }
+
+        public virtual AccountDto RequestTo { get; set; }
+
+        public virtual AccountDto RequestBy { get; set; }
     }
 }

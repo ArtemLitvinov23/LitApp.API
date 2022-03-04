@@ -2,7 +2,7 @@
 @attribute [Authorize]
 @layout MainLayout
 
-<MudContainer Style="display: inline-block; position: relative; top: 0; bottom: 0; left: 0; right: 0; width: 500px; height: 500px; margin: auto; ">
+<MudContainer Style="display: inline-block; position: relative; top: 0; bottom: 0; left: 0; right: 0; width: 700px; height: 600px; margin: auto; ">
     <MudTable Items="@users" Filter="new Func<Account,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1" Breakpoint="Breakpoint.Sm" Loading="@loading" LoadingProgressColor="Color.Info" Dense="@dense">
         <ToolBarContent>
             <MudSpacer />
@@ -13,9 +13,17 @@
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Name">@context.FirstName @context.LastName</MudTd>
+            <MudTd>@context.Email </MudTd>
             <MudTd>
-                <MudButton OnClick="@(() => ShowInformation(context.Id))" StartIcon="@Icons.Material.Outlined.Info" Color="Color.Info" ButtonType="ButtonType.Button">Info</MudButton>
-                <MudButton OnClick="@(() => LoadUserChat(context.Id))" StartIcon="@Icons.Material.Filled.Chat" Color="Color.Primary" ButtonType="ButtonType.Button">Chat</MudButton>
+                <MudMenu Label="Open Menu" Variant="Variant.Filled" EndIcon="@Icons.Filled.KeyboardArrowDown">
+                    <MudMenuItem>
+                        <MudButton OnClick="@(() => ShowInformation(context.Id))" StartIcon="@Icons.Material.Outlined.Info" Color="Color.Info" ButtonType="ButtonType.Button">Info</MudButton>
+                    </MudMenuItem>
+                    <MudMenuItem>
+                        <MudButton OnClick="@(() => LoadUserChat(context.Id))" StartIcon="@Icons.Material.Filled.Chat" Color="Color.Primary" ButtonType="ButtonType.Button">Chat</MudButton>
+                    </MudMenuItem>
+                    <MudMenuItem>New feature</MudMenuItem>
+                </MudMenu>
             </MudTd>
         </RowTemplate>
     </MudTable>
@@ -63,6 +71,7 @@
             CurrentUserId = _accountService.Account.Id.ToString();
             users = await _accountService.GetAllUsersAsync(CurrentUserId);
             loading = false;
+            dense = true;
         }
         catch (Exception ex)
         {

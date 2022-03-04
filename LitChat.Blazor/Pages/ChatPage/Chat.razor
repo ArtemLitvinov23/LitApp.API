@@ -66,29 +66,58 @@
             <MudList Clickable="true">
                 @foreach (var user in ChatUsers)
                 {
-                    <MudListItem Class="pa-0 px-2" OnClick="@(() => LoadUserChat(user.FriendId.ToString()))">
-                        <div class="d-flex flex-row mt-n1 mb-n1">
-                            <div class="mr-4">
-                                <MudBadge Class="my-2">
-                                    @if (user.RequestById.ToString() == ContactId)
-                                    {
-                                        <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">
-                                            @user.Email.ToUpper().FirstOrDefault()
-                                        </MudAvatar>
-                                    }
-                                    else
-                                    {
-                                        <MudAvatar Color="Color.Dark" Style="height:70px; width:70px;">@user.FirstName</MudAvatar>
-                                    }
-                                </MudBadge>
+                    @if (user.RequestById == int.Parse(CurrentUserId))
+                    {
+                        <MudListItem Class="pa-0 px-2" OnClick="@(() => LoadUserChat(user.FriendId.ToString()))">
+                            <div class="d-flex flex-row mt-n1 mb-n1">
+                                <div class="mr-4">
+                                    <MudBadge Class="my-2">
+                                        @if (user.RequestById.ToString() == ContactId)
+                                        {
+                                            <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">
+                                                @user.SenderEmail.ToUpper().FirstOrDefault()
+                                            </MudAvatar>
+                                        }
+                                        else
+                                        {
+                                            <MudAvatar Color="Color.Dark" Style="height:70px; width:70px;">@user.SenderFirstName</MudAvatar>
+                                        }
+                                    </MudBadge>
+                                </div>
+                                <div>
+                                    <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.SenderEmail</MudText>
+                                    <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.SenderFirstName @user.SenderLastName </MudText>
+                                </div>
                             </div>
-                            <div>
-                                <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.Email</MudText>
-                                <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.FirstName @user.LastName </MudText>
+                        </MudListItem>
+                    }
+                    @if (user.FriendId == int.Parse(CurrentUserId))
+                    {
+                        <MudListItem Class="pa-0 px-2" OnClick="@(() => LoadUserChat(user.RequestById.ToString()))">
+
+                            <div class="d-flex flex-row mt-n1 mb-n1">
+                                <div class="mr-4">
+                                    <MudBadge Class="my-2">
+                                        @if (user.RequestById.ToString() == ContactId)
+                                        {
+                                            <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">
+                                                @user.ReceiverEmail.ToUpper().FirstOrDefault()
+                                            </MudAvatar>
+                                        }
+                                        else
+                                        {
+                                            <MudAvatar Color="Color.Dark" Style="height:70px; width:70px;">@user.ReceiverFirstName</MudAvatar>
+                                        }
+                                    </MudBadge>
+                                </div>
+                                <div>
+                                    <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.ReceiverEmail</MudText>
+                                    <MudText Typo="Typo.body2" Class="mt-3 mb-n2">@user.ReceiverFirstName @user.ReceiverLastName </MudText>
+                                </div>
                             </div>
-                        </div>
-                    </MudListItem>
-                    <MudMenu Icon="@Icons.Material.Filled.MoreHoriz">
+                        </MudListItem>
+                    }
+                    <MudMenu Icon="@Icons.Filled.KeyboardArrowDown">
                         <MudMenuItem>
                             <MudButton OnClick="@(() => LoadFullChatHistory(user.FriendId.ToString()))" StartIcon="@Icons.Filled.History" Color="Color.Primary" Size="Size.Small" ButtonType="ButtonType.Button">Chat history</MudButton>
                         </MudMenuItem>
@@ -157,17 +186,18 @@
                     {
                         if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId))
                         {
-                            await hubConnection.SendAsync("ChatNotificationAsync", $"New Message From {userName}", ContactId, CurrentUserId);
                             messages.Add(message);
                         }
                         else if ((ContactId == message.FromUserId && CurrentUserId == message.ToUserId))
                         {
+                            await hubConnection.SendAsync("ChatNotificationAsync", $"New Message From {userName}", ContactId, CurrentUserId);
                             messages.Add(message);
                         }
                         await _jsRuntime.InvokeAsync<string>("OnScrollEvent", "chatContainer");
                         StateHasChanged();
                     });
-            await GetAllFriends(CurrentUserId, ContactId);
+
+            await GetAllFriends(CurrentUserId);
             if (!string.IsNullOrEmpty(ContactId))
             {
                 await LoadUserChat(ContactId);
@@ -220,9 +250,9 @@
         messages = await _chatService.GetFullChatHistory(ContactId, CurrentUserId);
     }
 
-    async Task GetAllFriends(string currentUserId, string favoriteUserId)
+    async Task GetAllFriends(string currentUserId)
     {
-        ChatUsers = await _friendService.FriendsList();
+        ChatUsers = await _friendService.FriendsList(int.Parse(currentUserId));
     }
 
     private void ShowInformation(string userId)

@@ -6,8 +6,8 @@ namespace LitChat.Blazor.Services.Interfaces
 {
     public interface IFriendService
     {
-        Task<List<Friend>> FriendsList();
-        Task<List<Friend>> RejectedRequests();
+        Task<List<Friend>> FriendsList(int accountId);
+        Task<List<Friend>> RejectedRequests(int accountId);
         Task<List<Friend>> PendingRequests(int accountId);
         Task<Friend> GetFriend(int friendId);
         Task Approved(FriendRequest approvedFriend);

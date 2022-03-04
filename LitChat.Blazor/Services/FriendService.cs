@@ -20,7 +20,7 @@ namespace LitChat.Blazor.Services
 
         public async Task DeleteFriend(int friendId) => await _httpService.Delete($"api/Friend/{friendId}");
 
-        public async Task<List<Friend>> FriendsList() => await _httpService.GetAll<Friend>("api/Friend/FriendsList");
+        public async Task<List<Friend>> FriendsList(int accountId) => await _httpService.GetAll<Friend>($"api/Friend/FriendsList/{accountId}");
 
         public async Task<Friend> GetFriend(int friendId) => await _httpService.Get<Friend>($"api/Friend/GetFriend/{friendId}");
 
@@ -28,6 +28,6 @@ namespace LitChat.Blazor.Services
 
         public async Task Rejected(FriendRequest rejectedFriend) => await _httpService.Post("api/Friend/Rejected", rejectedFriend);
 
-        public async Task<List<Friend>> RejectedRequests() => await _httpService.GetAll<Friend>("api/Friend/RejectedRequest");
+        public async Task<List<Friend>> RejectedRequests(int accountId) => await _httpService.GetAll<Friend>($"api/Friend/RejectedRequest/{accountId}");
     }
 }

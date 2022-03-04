@@ -54,16 +54,23 @@ namespace LitChat.BLL.Services
             await _friendRepository.RemoveUserFromFriends(friendAccount.Id);
         }
 
-        public async Task<List<FriendDto>> GetAllApprovedFriendsAsync()
+        public async Task<List<FriendDto>> GetAllApprovedFriendsAsync(int accountId)
         {
-            var friends = await _friendRepository.GetAllFriends().Where(x => x.RequestFlags == RequestFlags.Approved).ToListAsync();
+            var friends = await _friendRepository.GetAllFriends()
+                .Where(x => x.RequestFlags == RequestFlags.Approved)
+                .ToListAsync();
+
             return _mapper.Map<List<FriendDto>>(friends);
         }
            
 
-        public async Task<List<FriendDto>> GetAllPendingRequestsAsync(int accountId) => _mapper.Map<List<FriendDto>>(await _friendRepository.GetAllFriends().Where(x => x.RequestFlags == RequestFlags.Pending && x.RequestToId == accountId).ToListAsync());
+        public async Task<List<FriendDto>> GetAllPendingRequestsAsync(int accountId) => _mapper.Map<List<FriendDto>>(await _friendRepository.GetAllFriends().
+            Where(x => x.RequestFlags == RequestFlags.Pending && x.RequestToId == accountId)
+            .ToListAsync());
 
-        public async Task<List<FriendDto>> GetAllRejectedRequestsAsync() => _mapper.Map<List<FriendDto>>(await _friendRepository.GetAllFriends().Where(x => x.RequestFlags == RequestFlags.Rejected).ToListAsync());
+        public async Task<List<FriendDto>> GetAllRejectedRequestsAsync(int accountId) => _mapper.Map<List<FriendDto>>(await _friendRepository.GetAllFriends()
+            .Where(x => x.RequestFlags == RequestFlags.Rejected && x.RequestToId == accountId || x.RequestById == accountId)
+            .ToListAsync());
 
         public async Task<FriendDto> GetFriendById(int friendAccountId)
         {

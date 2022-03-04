@@ -21,8 +21,8 @@
                         </CardHeaderActions>
                     </MudCardHeader>
                     <MudCardActions>
-                        <MudButton StartIcon="@Icons.Filled.Done" Color="Color.Success" ButtonType="ButtonType.Button">Approve</MudButton>
-                        <MudButton StartIcon="@Icons.Filled.Cancel" Color="Color.Error" ButtonType="ButtonType.Button">Reject</MudButton>
+                        <MudButton OnClick="@(() => ApprovedAsync(request))" StartIcon="@Icons.Filled.Done" Color="Color.Success" ButtonType="ButtonType.Button">Approve</MudButton>
+                        <MudButton OnClick="@(() => RejectedAsync(request))" StartIcon="@Icons.Filled.Cancel" Color="Color.Error" ButtonType="ButtonType.Button">Reject</MudButton>
                     </MudCardActions>
                 </MudCard>
             </MudTd>
@@ -33,34 +33,62 @@
 @code {
     private List<Friend> friendRequest = new();
     private Account _account = new();
+    private FriendRequest request = new();
     [Parameter] public string UserId { get; set; }
     private bool dense = false;
     private bool loading = false;
+    private string exception;
 
     protected override async Task OnInitializedAsync()
     {
+        loading = true;
         try
         {
             friendRequest = await _friendService.PendingRequests(_accountService.Account.Id);
-            foreach (var item in friendRequest)
+            if (friendRequest != null)
             {
-                UserId = item.RequestById.ToString();
+                foreach (var item in friendRequest)
+                {
+                    if(item.RequestById == _accountService.Account.Id) UserId = item.FriendId.ToString();
+                }
+                _account = await _accountService.GetUserDetailsAsync(UserId);
+
+                request = new FriendRequest()
+                {
+                    AccountId = _account.Id,
+                    FriendAccountId = _accountService.Account.Id
+                };
             }
-            _account = await _accountService.GetUserDetailsAsync(UserId);
+
+            loading = false;
         }
         catch (Exception ex)
         {
-
+            loading = false;
+            exception = ex.Message;
         }
     }
+
     void ShowInformation(int userId)
     {
         UserId = userId.ToString();
         _navigationManager.NavigateTo($"card/{UserId}");
     }
-    async Task ApprovedAsync(int userId)
+
+    void UpdatePage()
     {
-        UserId = userId.ToString();
-        _navigationManager.NavigateTo($"card/{UserId}");
+        _navigationManager.NavigateTo($"/requests");
+    }
+
+    private async Task ApprovedAsync(FriendRequest request)
+    {
+        await _friendService.Approved(request);
+        UpdatePage();
+    }
+
+    private async Task RejectedAsync(FriendRequest request)
+    {
+        await _friendService.Rejected(request);
+        UpdatePage();
     }
 }
