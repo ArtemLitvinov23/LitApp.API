@@ -8,8 +8,6 @@ namespace LitChat.DAL.Repositories.Interfaces
     {
         public IQueryable<Account> GetAllAccounts();
 
-        public Task<Account> GetAccountAsync(int id);
-
         public Account GetRefreshToken(string token);
 
         public Task<Account> GetAccountByIdAsync(int accountId);

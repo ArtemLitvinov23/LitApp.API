@@ -3,50 +3,50 @@
 @attribute [Authorize]
 
 <MudContainer Style="display: inline-block; position: relative; top: 0; bottom: 0; left: 0; right: 0; width: 450px; height: 200px; margin: auto; ">
-<MudCard>
-    <MudCardHeader>
-        <CardHeaderAvatar>
-            <MudAvatar Color="Color.Dark" Style="height:70px; width:70px;">@userInfo.FirstName</MudAvatar>
-        </CardHeaderAvatar>
-        <CardHeaderContent>
-            <MudText Typo="Typo.body1">@userInfo.FirstName @userInfo.LastName </MudText>
-            <MudText Typo="Typo.body2">@userInfo.Email</MudText>
-            <MudText Typo="Typo.caption">@userInfo.Phone</MudText>
-        </CardHeaderContent>
-        <CardHeaderActions>
-                     <MudIconButton OnClick="@(() => Refresh())" Icon="@Icons.Filled.Refresh" Color="Color.Dark" ButtonType="ButtonType.Button"></MudIconButton>
-                     <MudIconButton OnClick="@(() => Return())" Icon="@Icons.TwoTone.ArrowBackIosNew" Color="Color.Inherit" ButtonType="ButtonType.Button">Return</MudIconButton>
-        </CardHeaderActions>
-    </MudCardHeader>
-    <MudCardContent>
-        <MudText Typo="Typo.body2">@userInfo.Description.</MudText>
-    </MudCardContent>
-    <MudCardActions>
-                <MudButton OnClick="@(() => EditAccount(userInfo.Id.ToString()))" Variant="Variant.Filled" StartIcon="@Icons.Filled.Edit" Color="Color.Primary" ButtonType="ButtonType.Button">Edit information</MudButton>
-                <MudSpacer/>
-                <MudButton @onclick="OpenDialog" Variant="Variant.Filled" StartIcon="@Icons.Filled.NoAccounts" Color="Color.Warning">Delete account</MudButton>
-    </MudCardActions>
-</MudCard>
-<br />
-<br/>
-<MudCard>
+    <MudCard>
+        <MudCardHeader>
+            <CardHeaderAvatar>
+                <MudAvatar Color="Color.Dark" Style="height:70px; width:70px;">@userInfo.FirstName</MudAvatar>
+            </CardHeaderAvatar>
+            <CardHeaderContent>
+                <MudText Typo="Typo.body1">@userInfo.FirstName @userInfo.LastName </MudText>
+                <MudText Typo="Typo.body2">@userInfo.Email</MudText>
+                <MudText Typo="Typo.caption">@userInfo.Phone</MudText>
+            </CardHeaderContent>
+            <CardHeaderActions>
+                <MudIconButton OnClick="@(() => Refresh())" Icon="@Icons.Filled.Refresh" Color="Color.Dark" ButtonType="ButtonType.Button"></MudIconButton>
+                <MudIconButton OnClick="@(() => Return())" Icon="@Icons.TwoTone.ArrowBackIosNew" Color="Color.Inherit" ButtonType="ButtonType.Button">Return</MudIconButton>
+            </CardHeaderActions>
+        </MudCardHeader>
         <MudCardContent>
-            <MudTextField @bind-Value="model.FirstName" Label="First name" Variant="Variant.Text" Margin="Margin.Normal"  HelperText="Min. 2 characters"></MudTextField>
-            <MudTextField @bind-Value="model.LastName" Label="Last name" Variant="Variant.Text" Margin="Margin.Normal"  HelperText="Min. 2 characters"></MudTextField>
-            <MudTextField @bind-Value="model.Phone" Label="Phone" Variant="Variant.Text" Margin="Margin.Normal"  HelperText="Personal phone number"></MudTextField>
-            <MudTextField @bind-Value="model.Description" Label="Description" Variant="Variant.Text" Margin="Margin.Normal"  HelperText="Max. 100 characters"></MudTextField>
+            <MudText Typo="Typo.body2">@userInfo.Description.</MudText>
         </MudCardContent>
-    <MudCardActions>
-                <MudButton OnClick="@(() => AddUserInfoAsync(userInfo.Id.ToString(), model))" StartIcon="@Icons.Filled.Save" Color="Color.Inherit" ButtonType="ButtonType.Button">Save changes</MudButton>
-    </MudCardActions>
-</MudCard>
+        <MudCardActions>
+            <MudButton OnClick="@(() => EditAccount(userInfo.Id.ToString()))" Variant="Variant.Filled" StartIcon="@Icons.Filled.Edit" Color="Color.Primary" ButtonType="ButtonType.Button">Edit information</MudButton>
+            <MudSpacer />
+            <MudButton @onclick="OpenDialog" Variant="Variant.Filled" StartIcon="@Icons.Filled.NoAccounts" Color="Color.Warning">Delete account</MudButton>
+        </MudCardActions>
+    </MudCard>
+    <br />
+    <br />
+    <MudCard>
+        <MudCardContent>
+            <MudTextField @bind-Value="model.FirstName" Label="First name" Variant="Variant.Text" Margin="Margin.Normal" HelperText="Min. 2 characters"></MudTextField>
+            <MudTextField @bind-Value="model.LastName" Label="Last name" Variant="Variant.Text" Margin="Margin.Normal" HelperText="Min. 2 characters"></MudTextField>
+            <MudTextField @bind-Value="model.Phone" Label="Phone" Variant="Variant.Text" Margin="Margin.Normal" HelperText="Personal phone number"></MudTextField>
+            <MudTextField @bind-Value="model.Description" Label="Description" Variant="Variant.Text" Margin="Margin.Normal" HelperText="Max. 100 characters"></MudTextField>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton OnClick="@(() => AddUserInfoAsync(userInfo.Id.ToString(), model))" StartIcon="@Icons.Filled.Save" Color="Color.Inherit" ButtonType="ButtonType.Button">Save changes</MudButton>
+        </MudCardActions>
+    </MudCard>
 </MudContainer>
 
 
 @code {
-    private Models.Users userInfo = new Models.Users();
+    private Account userInfo = new Account();
     private Models.UpdateAccount model = new Models.UpdateAccount();
-    [Parameter] public string CurrentUserId{ get; set;}
+    [Parameter] public string CurrentUserId { get; set; }
 
     void Return()
     {
@@ -58,7 +58,7 @@
         userInfo = await _accountService.GetUserDetailsAsync(CurrentUserId);
     }
 
-    async Task AddUserInfoAsync(string userId,UpdateAccount updateAccount)
+    async Task AddUserInfoAsync(string userId, UpdateAccount updateAccount)
     {
         await _accountService.Update(Convert.ToInt32(CurrentUserId), updateAccount);
         updateAccount.FirstName = string.Empty;
@@ -69,7 +69,7 @@
     }
     async Task EditAccount(string userId)
     {
-        var userInfo =  await _accountService.GetUserDetailsAsync(CurrentUserId);
+        var userInfo = await _accountService.GetUserDetailsAsync(CurrentUserId);
         var editForms = new UpdateAccount
             {
                 FirstName = userInfo.FirstName,

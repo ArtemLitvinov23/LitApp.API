@@ -22,15 +22,13 @@ namespace LitChat.API.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
         public async Task<ActionResult<List<ConnectionsResponseViewModel>>> GetConnectedClient()
         {
-           var allClients = await _connectionService.GetAllClientsAsync();
-           var mappingModel = _mapper.Map<List<ConnectionsResponseViewModel>>(allClients);
-           return Ok(mappingModel);
+            var allClients = await _connectionService.GetAllClientsAsync();
+            var mappingModel = _mapper.Map<List<ConnectionsResponseViewModel>>(allClients);
+            return Ok(mappingModel);
         }
         [HttpGet("{id}")]
-        [AllowAnonymous]
         public async Task<ActionResult<ConnectionsResponseViewModel>> GetConnectedClient(int id)
         {
             var allClients = await _connectionService.GetClientByUserIdAsync(id);
@@ -38,7 +36,6 @@ namespace LitChat.API.Controllers
             return Ok(mappingModel);
         }
         [HttpPatch("{id}")]
-        [AllowAnonymous]
         public async Task<ActionResult<ConnectionsResponseViewModel>> DisconnectClient(int id)
         {
             await _connectionService.CloseConnection(id);

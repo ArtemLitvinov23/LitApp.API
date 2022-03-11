@@ -31,11 +31,12 @@ namespace LitChat.API.Controllers
             var result = _mapper.Map<UserInfoViewModel>(users);
             return Ok(result);
         }
+
         [HttpPatch("{id}")]
-        public async Task<ActionResult> AddUserInfoAsync(string id,UserInfoViewModel model)
+        public async Task<ActionResult> AddUserInfoAsync(string id, UserInfoViewModel model)
         {
             var result = _mapper.Map<UserInfoDto>(model);
-            await _profileService.AddInfoAboutAccountAsync(int.Parse(id),result);
+            await _profileService.AddInfoAboutAccountAsync(int.Parse(id), result);
             return Ok();
         }
 
@@ -45,6 +46,7 @@ namespace LitChat.API.Controllers
             await _profileService.RemovePhoneFromAccountAsync(int.Parse(id));
             return Ok();
         }
+
         [HttpPatch("description/{id}")]
         public async Task<IActionResult> RemoveDescriptionAsync(string id)
         {

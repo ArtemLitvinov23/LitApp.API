@@ -1,16 +1,16 @@
-﻿using System.Threading.Tasks;
-using LitChat.BLL.ModelsDto;
+﻿using LitChat.DAL.Models;
+using System.Threading.Tasks;
 
 namespace LitChat.BLL.Services.Interfaces
 {
     public interface IEmailService
     {
-        Task SendAsync(string to, string subject, string html, string from = null);
+        Task<bool> SendAsync(string to, string subject, string html, string from = null);
 
-        Task SendVerificationEmailAsync(AccountDto account, string origin);
+        Task<bool> SendVerificationEmailAsync(Account account, string origin);
 
         Task SendAlreadyRegisteredEmailAsync(string email, string origin);
 
-        Task SendPasswordResetEmailAsync(AccountDto account, string origin);
+        Task SendPasswordResetEmailAsync(Account account, string origin);
     }
 }

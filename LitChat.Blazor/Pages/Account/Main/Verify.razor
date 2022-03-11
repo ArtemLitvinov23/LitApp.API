@@ -1,16 +1,16 @@
 ﻿@page "/account/verify/{JwtToken}"
 @page "/account/verify"
 
-@code{
+@code {
     private VerifyAccount model = new();
-    [Parameter] public string JwtToken { get; set; } 
+    [Parameter] public string JwtToken { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-         if (_accountService.Account != null)
-         {
+        if (_accountService.Account != null)
+        {
             await _accountService.Logout();
-         }
+        }
         try
         {
             model = new VerifyAccount()
@@ -18,7 +18,7 @@
                     Token = JwtToken
                 };
             await _accountService.Verify(model);
-        _navigationManager.NavigateTo("/account/login");
+            _navigationManager.NavigateTo("/account/login");
         }
         catch
         {

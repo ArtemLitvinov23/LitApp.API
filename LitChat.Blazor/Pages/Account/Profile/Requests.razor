@@ -1,0 +1,94 @@
+﻿@page "/requests"
+
+<MudContainer Style="display: inline-block; position: relative; top: 0; bottom: 0; left: 0; right: 0; width: 500px; height: 500px; margin: auto; ">
+
+    <MudPaper Height="50px" Width="100%" Square="true" Class="mud-theme-primary"></MudPaper>
+    <MudTable Items="@friendRequest" Breakpoint="Breakpoint.Sm" Loading="@loading" LoadingProgressColor="Color.Info" Dense="@dense">
+        <RowTemplate>
+            <MudTd>
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderAvatar>
+                            <MudAvatar Color="Color.Dark" Style="height:70px; width:70px;">@_account.FirstName</MudAvatar>
+                        </CardHeaderAvatar>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.body1">@_account.FirstName @_account.LastName </MudText>
+                            <MudText Typo="Typo.body2">@_account.Email </MudText>
+                            <MudText Typo="Typo.body2">@_account.Description </MudText>
+                        </CardHeaderContent>
+                        <CardHeaderActions>
+                            <MudIconButton OnClick="@(() => ShowInformation(_account.Id))" Icon="@Icons.Filled.Info" Color="Color.Inherit" ButtonType="ButtonType.Button"></MudIconButton>
+                        </CardHeaderActions>
+                    </MudCardHeader>
+                    <MudCardActions>
+                        <MudButton OnClick="@(() => ApprovedAsync(request))" StartIcon="@Icons.Filled.Done" Color="Color.Success" ButtonType="ButtonType.Button">Approve</MudButton>
+                        <MudButton OnClick="@(() => RejectedAsync(request))" StartIcon="@Icons.Filled.Cancel" Color="Color.Error" ButtonType="ButtonType.Button">Reject</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudContainer>
+
+@code {
+    private List<Friend> friendRequest = new();
+    private Account _account = new();
+    private FriendRequest request = new();
+    [Parameter] public string UserId { get; set; }
+    private bool dense = false;
+    private bool loading = false;
+    private string exception;
+
+    protected override async Task OnInitializedAsync()
+    {
+        loading = true;
+        try
+        {
+            friendRequest = await _friendService.PendingRequests(_accountService.Account.Id);
+            if (friendRequest != null)
+            {
+                foreach (var item in friendRequest)
+                {
+                    if(item.RequestById == _accountService.Account.Id) UserId = item.FriendId.ToString();
+                }
+                _account = await _accountService.GetUserDetailsAsync(UserId);
+
+                request = new FriendRequest()
+                {
+                    AccountId = _account.Id,
+                    FriendAccountId = _accountService.Account.Id
+                };
+            }
+
+            loading = false;
+        }
+        catch (Exception ex)
+        {
+            loading = false;
+            exception = ex.Message;
+        }
+    }
+
+    void ShowInformation(int userId)
+    {
+        UserId = userId.ToString();
+        _navigationManager.NavigateTo($"card/{UserId}");
+    }
+
+    void UpdatePage()
+    {
+        _navigationManager.NavigateTo($"/requests");
+    }
+
+    private async Task ApprovedAsync(FriendRequest request)
+    {
+        await _friendService.Approved(request);
+        UpdatePage();
+    }
+
+    private async Task RejectedAsync(FriendRequest request)
+    {
+        await _friendService.Rejected(request);
+        UpdatePage();
+    }
+}

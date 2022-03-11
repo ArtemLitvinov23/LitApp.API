@@ -1,48 +1,47 @@
-﻿using LitChat.BLL.ModelsDto;
-using LitChat.BLL.Services.Interfaces;
-using LitChat.BLL.Settings;
+﻿using LitChat.BLL.Services.Interfaces;
+using LitChat.DAL.Models;
 using MailKit.Net.Smtp;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 using MimeKit;
 using MimeKit.Text;
-using System;
 using System.Threading.Tasks;
 
 namespace LitChat.BLL.Services
 {
     public class EmailService : IEmailService
     {
-        private readonly EmailSettings _appSettings;
-        public EmailService(IOptions<EmailSettings> settings)
+        private IConfiguration Configuration { get; }
+        public EmailService(IConfiguration configuration)
         {
-            _appSettings = settings.Value;
+            Configuration = configuration;
         }
-        public async Task SendAsync(string to, string subject, string html, string from = null)
+        public async Task<bool> SendAsync(string to, string subject, string html, string from = null)
         {
             try
             {
                 var email = new MimeMessage();
-                email.From.Add(MailboxAddress.Parse(from ?? _appSettings.EmailFrom));
+                email.From.Add(MailboxAddress.Parse(from ?? Configuration["AppSettings.EmailFrom"]));
                 email.To.Add(MailboxAddress.Parse(to));
                 email.Subject = subject;
                 email.Body = new TextPart(TextFormat.Html) { Text = html };
 
 
                 using var smtp = new SmtpClient();
-                await smtp.ConnectAsync(_appSettings.SmtpHost, _appSettings.SmtpPort, true);
-                await smtp.AuthenticateAsync(_appSettings.SmtpUser, _appSettings.SmtpPass);
+                await smtp.ConnectAsync(Configuration["AppSettings.SmtpHost"], int.Parse(Configuration["AppSettings.SmtpPort"]), true);
+                await smtp.AuthenticateAsync(Configuration["AppSettings.SmtpUser"], Configuration["AppSettings.SmtpPass"]);
                 await smtp.SendAsync(email);
 
                 await smtp.DisconnectAsync(true);
+                return true;
             }
-            catch (System.Exception e)
+            catch
             {
-                throw new ArgumentException(e.Message);
+                return false;
             }
 
         }
 
-        public async Task SendVerificationEmailAsync(AccountDto account, string origin)
+        public async Task<bool> SendVerificationEmailAsync(Account account, string origin)
         {
             string message;
             if (!string.IsNullOrEmpty(origin))
@@ -59,11 +58,12 @@ namespace LitChat.BLL.Services
                               <p><a href=""{verifyUrlWithoutOrigin}"">{verifyUrlWithoutOrigin}</a></p>";
             }
 
-            await SendAsync(account.Email, "Sign-up Verification API - Verify Email",
-                $@"<h4>Verify Email</h4>
+            var result = await SendAsync(account.Email, "Sign-up Verification API - Verify Email",
+                 $@"<h4>Verify Email</h4>
                      <p>Thanks for registering!</p>
                       {message}"
-                     );
+                      );
+            return result;
         }
 
         public async Task SendAlreadyRegisteredEmailAsync(string email, string origin)
@@ -83,7 +83,7 @@ namespace LitChat.BLL.Services
             );
         }
 
-        public async Task SendPasswordResetEmailAsync(AccountDto account, string origin)
+        public async Task SendPasswordResetEmailAsync(Account account, string origin)
         {
             string message;
             if (!string.IsNullOrEmpty(origin))

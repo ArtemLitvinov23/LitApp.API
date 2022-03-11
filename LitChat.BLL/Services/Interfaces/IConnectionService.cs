@@ -7,7 +7,8 @@ namespace LitChat.BLL.Services.Interfaces
     public interface IConnectionService
     {
         Task<IEnumerable<ConnectionsResponseDto>> GetAllClientsAsync();
-        Task<ConnectionsDto> GetConnectionForUserAsync(int accountId);
+        Task<ConnectionsResponseDto> GetConnectionForUserAsync(int accountId);
+        Task<ConnectionsResponseDto> GetConnectionById(int connectionId);
         Task<ConnectionsResponseDto> GetClientByUserIdAsync(int UserId);
         Task CreateConnectionAsync(ConnectionsDto connections);
         Task CloseConnection(int accountId);

@@ -1,7 +1,7 @@
 using FluentValidation.AspNetCore;
 using LitChat.API.Extensions;
 using LitChat.API.HubController;
-using LitChat.BLL.Settings;
+using LitChat.API.Middleware;
 using LitChat.DAL;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -21,7 +21,7 @@ namespace LitChat.API
 {
     public class Startup
     {
-        public IConfiguration Configuration { get; set; }
+        public IConfiguration Configuration { get; }
 
         public Startup(IConfiguration configuration)
         {
@@ -31,9 +31,9 @@ namespace LitChat.API
         {
             services.AddDbContext<BlogContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("WebApiDatabase")));
             services.AddCors();
-            services.AddControllers().AddNewtonsoftJson(options =>
-            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore).
-            AddFluentValidation(fvc => fvc.RegisterValidatorsFromAssemblyContaining<Startup>());
+            services.AddControllers()
+                .AddFluentValidation(fvc => fvc.RegisterValidatorsFromAssemblyContaining<Startup>());
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "LitChat.WebApi", Version = "v2.2" });
@@ -41,11 +41,13 @@ namespace LitChat.API
 
             services.AddSignalR(hubOptions =>
             {
-                hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(10);
+                hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(30);
             });
-            services.Configure<EmailSettings>(Configuration.GetSection("AppSettings"));
+
             services.AddHttpContextAccessor();
-            services.AllServices();
+
+            services.AllServices(Configuration);
+
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -57,7 +59,7 @@ namespace LitChat.API
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration.GetSection("JwtConfig").GetSection("Secret").Value)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration["JwtConfig:Secret"])),
                     ValidateIssuer = false,
                     ValidateAudience = false,
                 };
@@ -96,7 +98,10 @@ namespace LitChat.API
                     );
 
             app.UseAuthentication();
+
             app.UseAuthorization();
+
+            app.UseMiddleware<ErrorHandlerMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

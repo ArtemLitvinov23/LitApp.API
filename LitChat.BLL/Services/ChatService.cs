@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LitChat.BLL.Exceptions;
 using LitChat.BLL.ModelsDto;
 using LitChat.BLL.Services.Interfaces;
 using LitChat.DAL.Models;
@@ -58,7 +59,7 @@ namespace LitChat.BLL.Services
             var contact = _accountRepository.GetAccountByIdAsync(contactId);
             if (user == null || contact == null)
             {
-                throw new ApplicationException("Can't find this users");
+                throw new AppException("Can't find this users");
             }
             await _chatRepository.RemoveChatHistory(userId, contactId);
         }

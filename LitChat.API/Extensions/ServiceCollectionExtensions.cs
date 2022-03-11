@@ -1,26 +1,23 @@
-﻿using LitChat.API.Helpers;
-using LitChat.BLL.Jwt;
-using LitChat.BLL.Jwt.Interfaces;
+﻿using LitChat.API.Mapper;
 using LitChat.BLL.Mapper;
-using LitChat.BLL.PasswordHasher;
-using LitChat.BLL.PasswordHasher.Interfaces;
 using LitChat.BLL.Services;
 using LitChat.BLL.Services.Interfaces;
 using LitChat.DAL.Repositories;
 using LitChat.DAL.Repositories.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LitChat.API.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AllServices(this IServiceCollection services)
+        public static IServiceCollection AllServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddAutoMapper(typeof(MapperProfile), typeof(AutoMapperProfile));
+            services.AddAutoMapper(typeof(BLMapperProfile), typeof(PLMapperProfile));
 
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAccountRepository, AccountRepository>();
-            services.AddTransient<IJwtOptions, JwtService>();
+            services.AddTransient<IJwtService, TokenService>();
             services.AddTransient<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IChatRepository, ChatRepository>();
@@ -28,8 +25,12 @@ namespace LitChat.API.Extensions
             services.AddScoped<IFavoritesRepository, FavoritesRepository>();
             services.AddScoped<IFavoritesService, FavoritesService>();
             services.AddScoped<IUserProfileService, UserProfileService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IConnectionRepository, ConnectionRepository>();
             services.AddScoped<IConnectionService, ConnectionService>();
+            services.AddScoped<IFriendRepository, FriendRepository>();
+            services.AddScoped<IFriendService, FriendService>();
+
             return services;
         }
     }
