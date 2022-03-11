@@ -1,38 +1,34 @@
-﻿using LitChat.BLL.Exceptions;
-using LitChat.BLL.ModelsDto;
-using LitChat.BLL.Services.Interfaces;
-using LitChat.BLL.Settings;
+﻿using LitChat.BLL.Services.Interfaces;
 using LitChat.DAL.Models;
 using MailKit.Net.Smtp;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 using MimeKit;
 using MimeKit.Text;
-using System;
 using System.Threading.Tasks;
 
 namespace LitChat.BLL.Services
 {
     public class EmailService : IEmailService
     {
-        private readonly EmailSettings _appSettings;
-        public EmailService(IOptions<EmailSettings> settings)
+        private IConfiguration Configuration { get; }
+        public EmailService(IConfiguration configuration)
         {
-            _appSettings = settings.Value;
+            Configuration = configuration;
         }
         public async Task<bool> SendAsync(string to, string subject, string html, string from = null)
         {
             try
             {
                 var email = new MimeMessage();
-                email.From.Add(MailboxAddress.Parse(from ?? _appSettings.EmailFrom));
+                email.From.Add(MailboxAddress.Parse(from ?? Configuration["AppSettings.EmailFrom"]));
                 email.To.Add(MailboxAddress.Parse(to));
                 email.Subject = subject;
                 email.Body = new TextPart(TextFormat.Html) { Text = html };
 
 
                 using var smtp = new SmtpClient();
-                await smtp.ConnectAsync(_appSettings.SmtpHost, _appSettings.SmtpPort, true);
-                await smtp.AuthenticateAsync(_appSettings.SmtpUser, _appSettings.SmtpPass);
+                await smtp.ConnectAsync(Configuration["AppSettings.SmtpHost"], int.Parse(Configuration["AppSettings.SmtpPort"]), true);
+                await smtp.AuthenticateAsync(Configuration["AppSettings.SmtpUser"], Configuration["AppSettings.SmtpPass"]);
                 await smtp.SendAsync(email);
 
                 await smtp.DisconnectAsync(true);
@@ -40,7 +36,7 @@ namespace LitChat.BLL.Services
             }
             catch
             {
-                return false; 
+                return false;
             }
 
         }
@@ -62,11 +58,11 @@ namespace LitChat.BLL.Services
                               <p><a href=""{verifyUrlWithoutOrigin}"">{verifyUrlWithoutOrigin}</a></p>";
             }
 
-           var result =  await SendAsync(account.Email, "Sign-up Verification API - Verify Email",
-                $@"<h4>Verify Email</h4>
+            var result = await SendAsync(account.Email, "Sign-up Verification API - Verify Email",
+                 $@"<h4>Verify Email</h4>
                      <p>Thanks for registering!</p>
                       {message}"
-                     );
+                      );
             return result;
         }
 

@@ -9,6 +9,7 @@ namespace LitChat.DAL.Repositories.Interfaces
         Task<IEnumerable<Connections>> GetAllClients();
         Task<Connections> GetConnectionForUserAsync(int userAccount);
         Task<Connections> GetClientById(int UserId);
+        Task<Connections> GetConnectionsById(int connectionId);
         Task CreateConnection(Connections connections);
         Task UpdateConnection(Connections connections);
         Task DeleteConnection(string ConnectionId);

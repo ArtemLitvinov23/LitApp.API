@@ -17,7 +17,10 @@ namespace LitChat.API.HubController
         private readonly IConnectionService _connectionService;
         private readonly IAccountService _accountService;
         private readonly IMapper _mapper;
-        public SignalRHub(IConnectionService connectionService, IAccountService accountService, IMapper mapper)
+        public SignalRHub(
+            IConnectionService connectionService,
+            IAccountService accountService,
+            IMapper mapper)
         {
             _connectionService = connectionService;
             _accountService = accountService;
@@ -31,8 +34,7 @@ namespace LitChat.API.HubController
             }
             catch (Exception e)
             {
-                new InternalServerException(e.Message);
-                throw;
+                throw new InternalServerException(e.Message);
             }
         }
 
@@ -44,8 +46,7 @@ namespace LitChat.API.HubController
             }
             catch (Exception e)
             {
-                new InternalServerException(e.Message);
-                throw;
+                throw new InternalServerException(e.Message);
             }
         }
         public async Task FriendNotificationAsync(string message, string senderUserId, string receiverUserId)
@@ -56,8 +57,7 @@ namespace LitChat.API.HubController
             }
             catch (Exception e)
             {
-                new InternalServerException(e.Message);
-                throw;
+                throw new InternalServerException(e.Message);
             }
         }
 
@@ -69,8 +69,7 @@ namespace LitChat.API.HubController
             }
             catch (Exception e)
             {
-                new InternalServerException(e.Message);
-                throw;
+                throw new InternalServerException(e.Message);
             }
         }
         public override async Task OnConnectedAsync()
@@ -78,38 +77,34 @@ namespace LitChat.API.HubController
             try
             {
                 var user = await GetUserAsync();
-                var connection = await _connectionService.GetConnectionForUserAsync(user.Id);
-                if (connection == null)
+                var connectionInfo = await _connectionService.GetConnectionForUserAsync(user.Id);
+                if (connectionInfo == null)
                 {
-                    var connectionsModel = new ConnectionViewModel()
+                    var newConnections = new ConnectionViewModel()
                     {
                         ConnectedAt = DateTime.Now,
                         IsOnline = true,
                         ConnectionId = Context.ConnectionId,
                         UserAccount = user.Id
                     };
-                    var mappingModel = _mapper.Map<ConnectionsDto>(connectionsModel);
-                    await _connectionService.CreateConnectionAsync(mappingModel);
+                    var conectionDto = _mapper.Map<ConnectionsDto>(newConnections);
+                    await _connectionService.CreateConnectionAsync(conectionDto);
                 }
-                else
-                {
-                    var connectionsModel = new ConnectionViewModel()
-                    {
-                        ConnectedAt = DateTime.Now,
-                        IsOnline = true,
-                        ConnectionId = Context.ConnectionId,
-                        UserAccount = user.Id
-                    };
-                    var mappingModel = _mapper.Map<ConnectionsDto>(connectionsModel);
-                    await _connectionService.UpdateConnection(mappingModel);
-                    await _connectionService.DeleteConnectionAsync(connection.UserAccount);
-                }
+                var updateConnection = await _connectionService.GetConnectionById(connectionInfo.Id);
+
+                updateConnection.Id = connectionInfo.Id;
+                updateConnection.ConnectionId = Context.ConnectionId;
+                updateConnection.ConnectedAt = DateTime.Now;
+                updateConnection.IsOnline = true;
+
+                var updateConnectionDto = _mapper.Map<ConnectionsDto>(updateConnection);
+
+                await _connectionService.UpdateConnection(updateConnectionDto);
                 await base.OnConnectedAsync();
             }
             catch (Exception e)
             {
-                new InternalServerException(e.Message);
-                throw;
+                throw new InternalServerException(e.Message);
             }
         }
         public override async Task OnDisconnectedAsync(Exception exception)

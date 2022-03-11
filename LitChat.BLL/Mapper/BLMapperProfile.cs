@@ -65,6 +65,7 @@ namespace LitChat.BLL.Mapper
                 .ForMember(x => x.ToEmail, opt => opt.MapFrom(src => src.ToEmail))
                 .ForMember(x => x.Message, opt => opt.MapFrom(src => src.Message))
                 .ReverseMap();
+
             CreateMap<object, ChatMessages>();
 
             CreateMap<FavoritesListDto, FavoritesList>().ReverseMap();
@@ -80,11 +81,12 @@ namespace LitChat.BLL.Mapper
 
             CreateMap<Connections, ConnectionsDto>().ReverseMap();
 
+            CreateMap<ConnectionsResponseDto, ConnectionsDto>().ReverseMap();
+
             CreateMap<Friend, AccountResponseDto>()
                 .ForMember(x => x.Id, opt => opt.MapFrom(src => src.RequestToId))
                 .ForMember(x => x.Email, opt => opt.MapFrom(src => src.RequestTo.Email))
                 .ForMember(x => x.Profile, opt => opt.MapFrom(src => src.RequestTo.Profile));
-
 
             CreateMap<Friend, FriendDto>()
                 .ForMember(x => x.RequestTo, opt => opt.MapFrom(src => src.RequestTo))

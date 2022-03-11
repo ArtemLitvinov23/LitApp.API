@@ -26,11 +26,11 @@ namespace LitChat.DAL.Repositories
             await _blogContext.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Connections>> GetAllClients()=> await _blogContext.Connections.ToListAsync();
+        public async Task<IEnumerable<Connections>> GetAllClients() => await _blogContext.Connections.ToListAsync();
 
         public async Task<Connections> GetConnectionForUserAsync(int userAccount)
         {
-            var result = await _blogContext.Connections.FirstOrDefaultAsync(x=>x.UserAccount == userAccount);
+            var result = await _blogContext.Connections.FirstOrDefaultAsync(x => x.UserAccount == userAccount);
             return result;
         }
 
@@ -41,5 +41,7 @@ namespace LitChat.DAL.Repositories
             _blogContext.Connections.Update(connections);
             await _blogContext.SaveChangesAsync();
         }
+
+        public async Task<Connections> GetConnectionsById(int connectionId) => await _blogContext.Connections.FirstOrDefaultAsync(x => x.Id == connectionId);
     }
 }

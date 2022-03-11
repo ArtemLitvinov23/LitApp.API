@@ -1,7 +1,4 @@
 ﻿using LitChat.API.Mapper;
-using LitChat.BLL.Jwt;
-using LitChat.BLL.Jwt.Interfaces;
-using LitChat.BLL.Jwt.Options;
 using LitChat.BLL.Mapper;
 using LitChat.BLL.Services;
 using LitChat.BLL.Services.Interfaces;
@@ -20,7 +17,7 @@ namespace LitChat.API.Extensions
 
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAccountRepository, AccountRepository>();
-            services.AddTransient<IJwtService, JwtService>();
+            services.AddTransient<IJwtService, TokenService>();
             services.AddTransient<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IChatRepository, ChatRepository>();
@@ -33,13 +30,6 @@ namespace LitChat.API.Extensions
             services.AddScoped<IConnectionService, ConnectionService>();
             services.AddScoped<IFriendRepository, FriendRepository>();
             services.AddScoped<IFriendService, FriendService>();
-
-            services.Configure<TokenOptions>(opt =>
-            {
-                opt.Secret = configuration["JwtConfig:Secret"];
-                opt.TokenLifeTime = configuration["JwtConfig:TokenLifeTime"];
-                opt.RefreshTokenTTL = configuration["JwtConfig:RefreshTokenTTL"];
-            });
 
             return services;
         }

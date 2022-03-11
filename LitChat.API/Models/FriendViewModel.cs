@@ -1,7 +1,7 @@
 ﻿using LitChat.DAL.Models;
 using System;
 
-namespace LitChat.BLL.ModelsDto
+namespace LitChat.API.Models
 {
     public class FriendViewModel
     {

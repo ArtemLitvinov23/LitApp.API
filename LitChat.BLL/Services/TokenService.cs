@@ -1,10 +1,9 @@
 ﻿using LitChat.BLL.Exceptions;
-using LitChat.BLL.Jwt.Interfaces;
-using LitChat.BLL.Jwt.Options;
 using LitChat.BLL.ModelsDto;
+using LitChat.BLL.Services.Interfaces;
 using LitChat.DAL.Models;
 using LitChat.DAL.Repositories.Interfaces;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -13,28 +12,29 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace LitChat.BLL.Jwt
+namespace LitChat.BLL.Services
 {
-    public class JwtService : IJwtService
+    public class TokenService : IJwtService
     {
-        private readonly TokenOptions _appSettings;
         private readonly IAccountRepository _accountRepository;
+        private IConfiguration Configuration { get; }
 
-        public JwtService(IOptions<TokenOptions> appSettings,
-            IAccountRepository accountRepository)
+        public TokenService(
+            IAccountRepository accountRepository,
+            IConfiguration configuration)
         {
             _accountRepository = accountRepository;
-            _appSettings = appSettings.Value;
+            Configuration = configuration;
         }
         public string GenerateJwtToken(AccountDto accountDto)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            var key = Encoding.ASCII.GetBytes(Configuration["JwtConfig:Secret"]);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] { new Claim("id",accountDto.Id.ToString()),
                                                      new Claim(ClaimTypes.Email,accountDto.Email)}),
-                Expires = DateTime.Now.AddDays(double.Parse(_appSettings.TokenLifeTime)),
+                Expires = DateTime.Now.AddDays(double.Parse(Configuration["JwtConfig:TokenLifeTime"])),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -70,7 +70,7 @@ namespace LitChat.BLL.Jwt
         public void RemoveOldRefreshTokens(AccountDto account)
         {
             account.RefreshTokens.RemoveAll(x =>
-                !x.IsActive && x.Created.AddDays(double.Parse(_appSettings.RefreshTokenTTL)) <= DateTime.UtcNow);
+                !x.IsActive && x.Created.AddDays(double.Parse(Configuration["JwtConfig:RefreshTokenTTL"])) <= DateTime.UtcNow);
         }
 
         public string RandomTokenString()

@@ -1,13 +1,11 @@
 ﻿using AutoMapper;
 using LitChat.BLL.Exceptions;
-using LitChat.BLL.Jwt.Interfaces;
-using LitChat.BLL.Jwt.Options;
 using LitChat.BLL.ModelsDto;
 using LitChat.BLL.Services.Interfaces;
 using LitChat.DAL.Models;
 using LitChat.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +22,7 @@ namespace LitChat.BLL.Services
         private readonly IJwtService _jwtOptions;
         private readonly IMapper _mapper;
         private readonly IPasswordHasher _password;
-        private readonly TokenOptions _appSettings;
+        private IConfiguration Configuration { get; }
 
         public AccountService(
             IAccountRepository accountRepository,
@@ -33,7 +31,7 @@ namespace LitChat.BLL.Services
             IMapper mapper, IPasswordHasher password,
             IFavoritesRepository favoriteRepository,
             IChatRepository chatRepository,
-            IOptions<TokenOptions> appSettings)
+            IConfiguration configuration)
         {
             _accountRepository = accountRepository;
             _emailService = emailService;
@@ -42,7 +40,7 @@ namespace LitChat.BLL.Services
             _password = password;
             _favoriteRepository = favoriteRepository;
             _chatRepository = chatRepository;
-            _appSettings = appSettings.Value;
+            Configuration = configuration;
         }
 
         public async Task<AuthenticateResponseDto> AuthenticateAsync(AuthenticateRequestDto authRequest, string ipAddress)
@@ -65,7 +63,7 @@ namespace LitChat.BLL.Services
                 account.RefreshTokens.Add(refreshToken);
                 //remove old refresh tokens from account
                 _jwtOptions.RemoveOldRefreshTokens(accountDto);
-                account.TokenExpires = DateTime.Now.AddDays(double.Parse(_appSettings.TokenLifeTime));
+                account.TokenExpires = DateTime.Now.AddDays(double.Parse(Configuration["JwtConfig:TokenLifeTime"]));
                 await _accountRepository.UpdateAccountAsync(account);
             }
 
@@ -136,8 +134,7 @@ namespace LitChat.BLL.Services
             }
             catch (Exception e)
             {
-                new InternalServerException(e.Message);
-                throw;
+                throw new InternalServerException(e.Message);
             }
         }
 
@@ -164,8 +161,7 @@ namespace LitChat.BLL.Services
             }
             catch (Exception e)
             {
-                new InternalServerException(e.Message);
-                throw;
+                throw new InternalServerException(e.Message);
             }
         }
 
@@ -235,6 +231,7 @@ namespace LitChat.BLL.Services
         public async Task<AccountResponseDto> GetAccountByEmailAsync(string accountEmail)
         {
             var account = await _accountRepository.GetAllAccounts().FirstOrDefaultAsync(x => x.Email == accountEmail);
+
             if (account == null)
                 throw new AppException($"User with {accountEmail} does not found");
 

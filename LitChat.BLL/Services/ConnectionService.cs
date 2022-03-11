@@ -32,9 +32,8 @@ namespace LitChat.BLL.Services
         public async Task CreateConnectionAsync(ConnectionsDto connections)
         {
             if (connections is null)
-            {
                 throw new AppException("null connection");
-            }
+
             var mappingModel = _mapper.Map<Connections>(connections);
             await _connectionRepository.CreateConnection(mappingModel);
         }
@@ -56,9 +55,15 @@ namespace LitChat.BLL.Services
             return _mapper.Map<ConnectionsResponseDto>(connections);
         }
 
-        public async Task<ConnectionsDto> GetConnectionForUserAsync(int accountId)
+        public async Task<ConnectionsResponseDto> GetConnectionById(int connectionId)
         {
-            return _mapper.Map<ConnectionsDto>(await _connectionRepository.GetConnectionForUserAsync(accountId));
+            var connections = await _connectionRepository.GetConnectionsById(connectionId);
+            return _mapper.Map<ConnectionsResponseDto>(connections);
+        }
+
+        public async Task<ConnectionsResponseDto> GetConnectionForUserAsync(int accountId)
+        {
+            return _mapper.Map<ConnectionsResponseDto>(await _connectionRepository.GetConnectionForUserAsync(accountId));
         }
 
         public async Task UpdateConnection(ConnectionsDto connections)

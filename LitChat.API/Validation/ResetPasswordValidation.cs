@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using LitChat.API.Models;
 
-namespace LitChat.API.Validators
+namespace LitChat.API.Validation
 {
     public class ResetPasswordValidation : AbstractValidator<ResetPasswordRequestViewModel>
     {
