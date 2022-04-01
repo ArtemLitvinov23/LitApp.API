@@ -28,7 +28,12 @@ namespace LitChat.API.Controllers
         public async Task<ActionResult<List<FriendViewModel>>> FriendsList(int accountId)
         {
             var friendsList = await _friendService.GetAllApprovedFriendsAsync(accountId);
+
             var response = _mapper.Map<List<FriendViewModel>>(friendsList);
+
+            if (response == null)
+                return BadRequest();
+
             return Ok(response);
         }
 
@@ -36,7 +41,12 @@ namespace LitChat.API.Controllers
         public async Task<ActionResult<List<FriendViewModel>>> RejectedRequests(int accountId)
         {
             var friendsList = await _friendService.GetAllRejectedRequestsAsync(accountId);
+
             var response = _mapper.Map<List<FriendViewModel>>(friendsList);
+
+            if (response == null)
+                return BadRequest();
+
             return Ok(response);
         }
 
@@ -44,7 +54,11 @@ namespace LitChat.API.Controllers
         public async Task<ActionResult<List<FriendViewModel>>> PendingRequests(int accountId)
         {
             var friendsList = await _friendService.GetAllPendingRequestsAsync(accountId);
+
             var response = _mapper.Map<List<FriendViewModel>>(friendsList);
+
+            if (response == null) return BadRequest();
+
             return Ok(response);
         }
 
@@ -52,17 +66,19 @@ namespace LitChat.API.Controllers
         public async Task<ActionResult<FriendViewModel>> GetFriend(int friendId)
         {
             var friend = await _friendService.GetFriendById(friendId);
+
             if (friend == null) return BadRequest();
 
             var response = _mapper.Map<FriendViewModel>(friend);
+
             return Ok(response);
         }
 
         [HttpPost("[action]")]
         public async Task<IActionResult> Approved(FriendRequestViewModel approvedFriend)
         {
-
             await _friendService.ApprovedUserAsync(approvedFriend.AccountId, approvedFriend.FriendAccountId);
+
             return Ok();
         }
 
@@ -70,6 +86,7 @@ namespace LitChat.API.Controllers
         public async Task<IActionResult> Rejected(FriendRequestViewModel rejectedFriend)
         {
             await _friendService.RejectUserAsync(rejectedFriend.AccountId, rejectedFriend.FriendAccountId);
+
             return Ok();
         }
 

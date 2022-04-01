@@ -12,7 +12,7 @@ namespace LitChat.API.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class FavoritesController : ControllerBase
+    public class FavoritesController : ControllerBase //unusing controller
     {
         private readonly IFavoritesService _favoritesService;
         private readonly IMapper _mapper;

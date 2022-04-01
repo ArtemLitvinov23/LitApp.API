@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace LitChat.DAL.Models
 {
@@ -39,18 +40,19 @@ namespace LitChat.DAL.Models
 
         public DateTime? TokenExpires { get; set; }
 
+        [JsonIgnore]
         public ICollection<ChatMessages> MessagesFromUser { get; set; }
-
+        [JsonIgnore]
         public ICollection<ChatMessages> MessagesToUser { get; set; }
-
+        [JsonIgnore]
         public ICollection<Connections> Connections { get; set; }
-
+        [JsonIgnore]
         public ICollection<FavoritesList> Favorites { get; set; }
-
+        [JsonIgnore]
         public ICollection<Friend> SentFriendsRequest { get; set; }
-
+        [JsonIgnore]
         public ICollection<Friend> RecievedFriendRequest { get; set; }
-
+        [JsonIgnore]
         public List<RefreshToken> RefreshTokens { get; set; }
 
         public bool OwnsToken(string token)

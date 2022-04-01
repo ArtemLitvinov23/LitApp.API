@@ -28,18 +28,12 @@ namespace LitChat.API.Middleware
                 var response = context.Response;
                 response.ContentType = "application/json";
 
-                switch (error)
+                response.StatusCode = error switch
                 {
-                    case AppException e:
-                        response.StatusCode = (int)HttpStatusCode.BadRequest;
-                        break;
-                    case InternalServerException e:
-                        response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                        break;
-                    default:
-                        response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                        break;
-                }
+                    AppException e => (int)HttpStatusCode.BadRequest,
+                    InternalServerException e => (int)HttpStatusCode.InternalServerError,
+                    _ => (int)HttpStatusCode.InternalServerError,
+                };
                 var result = JsonSerializer.Serialize(new { message = error?.Message });
                 await response.WriteAsync(result);
             }

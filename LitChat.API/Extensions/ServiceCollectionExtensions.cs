@@ -1,7 +1,9 @@
 ﻿using LitChat.API.Mapper;
 using LitChat.BLL.Mapper;
+using LitChat.BLL.ModelsDto;
 using LitChat.BLL.Services;
 using LitChat.BLL.Services.Interfaces;
+using LitChat.DAL.Models;
 using LitChat.DAL.Repositories;
 using LitChat.DAL.Repositories.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -30,6 +32,13 @@ namespace LitChat.API.Extensions
             services.AddScoped<IConnectionService, ConnectionService>();
             services.AddScoped<IFriendRepository, FriendRepository>();
             services.AddScoped<IFriendService, FriendService>();
+            services.AddScoped<ICacheService<AccountResponseDto>, CacheService>();
+
+            services.AddDistributedRedisCache(options =>
+            {
+                options.Configuration = configuration.GetConnectionString("Redis");
+                options.InstanceName = configuration["Redis:InstanceName"];
+            });
 
             return services;
         }

@@ -1,4 +1,5 @@
-﻿using LitChat.BLL.Services.Interfaces;
+﻿using LitChat.BLL.ModelsDTO;
+using LitChat.BLL.Services.Interfaces;
 using LitChat.DAL.Models;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +16,7 @@ namespace LitChat.BLL.Services
         {
             Configuration = configuration;
         }
-        public async Task<bool> SendAsync(string to, string subject, string html, string from = null)
+        public async Task<StatusEnum> SendAsync(string to, string subject, string html, string from = null)
         {
             try
             {
@@ -32,16 +33,16 @@ namespace LitChat.BLL.Services
                 await smtp.SendAsync(email);
 
                 await smtp.DisconnectAsync(true);
-                return true;
+                return StatusEnum.OK;
             }
             catch
             {
-                return false;
+                return StatusEnum.BadRequest;
             }
 
         }
 
-        public async Task<bool> SendVerificationEmailAsync(Account account, string origin)
+        public async Task<StatusEnum> SendVerificationEmailAsync(Account account, string origin)
         {
             string message;
             if (!string.IsNullOrEmpty(origin))
@@ -63,7 +64,11 @@ namespace LitChat.BLL.Services
                      <p>Thanks for registering!</p>
                       {message}"
                       );
-            return result;
+            if (result != StatusEnum.OK)
+            {
+                return StatusEnum.BadRequest;
+            }
+            return StatusEnum.OK;
         }
 
         public async Task SendAlreadyRegisteredEmailAsync(string email, string origin)
