@@ -1,9 +1,0 @@
-﻿@page "/account/logout"
-@layout MainLayout
-
-@code {
-    protected override async void OnInitialized()
-    {
-        await _accountService.Logout();
-    }
-}

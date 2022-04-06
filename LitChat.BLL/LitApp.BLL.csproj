@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LitChat.DAL\LitChat.DAL.csproj" />
+    <ProjectReference Include="..\LitChat.DAL\LitApp.DAL.csproj" />
   </ItemGroup>
 
 </Project>
