@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LitApp.PL", "LitChat.API\LitApp.PL.csproj", "{7E707459-98E5-4E8E-9EB8-DCA39F4A53E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LitApp.PL", "LitApp.PL\LitApp.PL.csproj", "{7E707459-98E5-4E8E-9EB8-DCA39F4A53E3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LitApp.DAL", "LitChat.DAL\LitApp.DAL.csproj", "{C6A6ABA8-328C-4A55-94C2-C9DD117FF0DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LitApp.DAL", "LitApp.DAL\LitApp.DAL.csproj", "{C6A6ABA8-328C-4A55-94C2-C9DD117FF0DF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LitApp.BLL", "LitChat.BLL\LitApp.BLL.csproj", "{6CA4D46E-DD20-46C3-8D3D-7DC814AE0D4C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LitApp.BLL", "LitApp.BLL\LitApp.BLL.csproj", "{6CA4D46E-DD20-46C3-8D3D-7DC814AE0D4C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
