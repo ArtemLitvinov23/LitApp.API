@@ -11,6 +11,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace LitApp.BLL.Services
 {
@@ -34,6 +35,7 @@ namespace LitApp.BLL.Services
             {
                 Subject = new ClaimsIdentity(new[] { new Claim("id",accountDto.Id.ToString()),
                                                      new Claim(ClaimTypes.Email,accountDto.Email)}),
+
                 Expires = DateTime.Now.AddDays(double.Parse(Configuration["JwtConfig:TokenLifeTime"])),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
             };
@@ -42,14 +44,16 @@ namespace LitApp.BLL.Services
 
         }
 
-        public (RefreshToken, Account) GetRefreshToken(string token)
+        public async Task<(RefreshToken, Account)> GetRefreshToken(string token)
         {
-            var account = _accountRepository.GetRefreshToken(token);
+            var account = await _accountRepository.GetRefreshToken(token);
             if (account == null)
                 throw new AppException("InvalidToken");
+
             var refreshToken = account.RefreshTokens.Single(x => x.Token == token);
             if (!refreshToken.IsActive)
                 throw new AppException("Invalid token");
+
             return (refreshToken, account);
         }
 

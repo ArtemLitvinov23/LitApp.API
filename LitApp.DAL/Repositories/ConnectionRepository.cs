@@ -1,5 +1,4 @@
-﻿using LitApp.DAL;
-using LitApp.DAL.Models;
+﻿using LitApp.DAL.Models;
 using LitApp.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -29,11 +28,7 @@ namespace LitApp.DAL.Repositories
 
         public async Task<IEnumerable<Connections>> GetAllClients() => await _blogContext.Connections.ToListAsync();
 
-        public async Task<Connections> GetConnectionForUserAsync(int userAccount)
-        {
-            var result = await _blogContext.Connections.FirstOrDefaultAsync(x => x.UserAccount == userAccount);
-            return result;
-        }
+        public async Task<Connections> GetConnectionForUserAsync(int userAccount) => await _blogContext.Connections.FirstOrDefaultAsync(x => x.UserAccount == userAccount);
 
         public async Task<Connections> GetClientById(int UserId) => await _blogContext.Connections.FirstOrDefaultAsync(x => x.UserAccount == UserId);
 

@@ -12,26 +12,27 @@ using System.Threading.Tasks;
 namespace LitChat.API.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/Account")]
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
         private readonly IMapper _mapper;
-        private readonly ICacheService<AccountResponseDto> _cacheService;
+        //private readonly ICacheService<AccountResponseDto> _cacheService;
 
         public AccountController(
             IAccountService accountService,
-            IMapper mapper,
-            ICacheService<AccountResponseDto> cacheService)
+            IMapper mapper)
+            //ICacheService<AccountResponseDto> cacheService)
         {
             _accountService = accountService;
             _mapper = mapper;
-            _cacheService = cacheService;
+            //_cacheService = cacheService;
         }
 
 
         [AllowAnonymous]
-        [HttpPost("sign-in")]
+        [HttpPost("SignIn")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthenticateResponseViewModel))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<AuthenticateResponseViewModel>> Authenticate(AuthenticateRequestViewModel request)
@@ -58,10 +59,7 @@ namespace LitChat.API.Controllers
         {
             var account = _mapper.Map<AccountDto>(request);
 
-            var result = await _accountService.RegisterAsync(account, Request.Headers["origin"]);
-
-            if (result != StatusEnum.OK)
-                return BadRequest();
+            await _accountService.RegisterAsync(account, Request.Headers["origin"]);
 
             return Ok(new { message = "Registration successful, please check your email for verify instructions" });
         }
@@ -72,10 +70,7 @@ namespace LitChat.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Verify(VerifyRequestViewModel verifyRequest)
         {
-            var result = await _accountService.VerifyEmailAsync(verifyRequest.Token);
-
-            if (result != StatusEnum.OK)
-                return BadRequest();
+            await _accountService.VerifyEmailAsync(verifyRequest.Token);
 
             return Ok(new { message = "Verification successful, you can now login" });
         }
@@ -88,10 +83,7 @@ namespace LitChat.API.Controllers
         {
             var mapModel = _mapper.Map<ForgotPasswordRequestDto>(model);
 
-            var result = await _accountService.ForgotPasswordAsync(mapModel, Request.Headers["origin"]);
-
-            if (result != StatusEnum.OK)
-                return BadRequest();
+            await _accountService.ForgotPasswordAsync(mapModel, Request.Headers["origin"]);
 
             return Ok(new { message = "Please check your email for password reset instructions" });
         }
@@ -104,15 +96,11 @@ namespace LitChat.API.Controllers
         {
             var mapModel = _mapper.Map<ResetPasswordRequestDto>(model);
 
-            var result = await _accountService.ResetPasswordAsync(mapModel);
-
-            if (result != StatusEnum.OK)
-                return BadRequest();
+            await _accountService.ResetPasswordAsync(mapModel);
 
             return Ok(new { message = "Password reset successful, you can now login" });
         }
 
-        [Authorize]
         [HttpPost("[action]")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthenticateResponseViewModel))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -122,7 +110,7 @@ namespace LitChat.API.Controllers
 
             var response = await _accountService.RefreshTokenAsync(refreshToken, IpAddress());
 
-            if (response == null)
+            if (response is null)
                 return BadRequest();
 
             SetTokenCookie(response.RefreshToken);
@@ -130,38 +118,36 @@ namespace LitChat.API.Controllers
             return Ok(response);
         }
 
-        [Authorize]
         [HttpPost("[action]")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> RevokeToken(RevokeTokenRequestViewModel model)
+        public async Task<IActionResult> RevokeToken(RevokeTokenRequestViewModel model)
         {
             var token = model.Token ?? Request.Cookies["refreshToken"];
 
             if (string.IsNullOrEmpty(token))
                 return BadRequest(new { message = "Token is required" });
 
-            var result = await _accountService.RevokeTokenAsync(token, IpAddress());
-
-            if (result != StatusEnum.OK)
-                return BadRequest();
+            await _accountService.RevokeTokenAsync(token, IpAddress());
 
             return Ok(new { message = "Token revoked" });
         }
 
         [Authorize]
         [HttpGet("[action]")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AccountResponseViewModel))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<AccountResponseViewModel>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<List<AccountResponseViewModel>>> GetAllAccount()
         {
-            var result = await _cacheService.GetList();
+            //var result = await _cacheService.GetList();  ~~~REDIS~~~~
 
-            if (result == null)
-            {
-                result = await _accountService.GetAllAccountsAsync();
-                await _cacheService.SetList(result);
-            }
+            //if (result is null)
+            //{
+            //    result = await _accountService.GetAllAccountsAsync();
+            //    await _cacheService.SetList(result);
+            //}
+
+            var result = await _accountService.GetAllAccountsAsync();
 
             var mapDto = _mapper.Map<List<AccountResponseViewModel>>(result);
 
@@ -169,47 +155,43 @@ namespace LitChat.API.Controllers
         }
 
 
-        [Authorize]
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AccountResponseViewModel))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<AccountResponseViewModel>> GetAccountById(int id)
         {
-            var result = await _cacheService.Get(id);
+            //var result = await _cacheService.Get(id); ~~~Redis~~~
 
-            if (result == null)
-            {
-                result = await _accountService.GetAccountByIdAsync(id);
-                await _cacheService.Set(result);
-            }
+            //if (result == null)
+            //{
+            //    result = await _accountService.GetAccountByIdAsync(id);
+            //    await _cacheService.Set(result);
+            //}
+
+            var result = await _accountService.GetAccountByIdAsync(id);
             var mapModel = _mapper.Map<AccountResponseViewModel>(result);
 
             return Ok(mapModel);
         }
 
-        [Authorize]
         [HttpPut("{CurrentUserId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AccountResponseViewModel))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<AccountResponseViewModel>> UpdateAccount(int CurrentUserId, UpdateAccountViewModel create)
+        public async Task<ActionResult<AccountResponseViewModel>> UpdateAccount(UpdateAccountViewModel create)
         {
             var mapModel = _mapper.Map<UpdateAccountDto>(create);
 
-            await _accountService.UpdateAccountAsync(CurrentUserId, mapModel);
+            await _accountService.UpdateAccountAsync(mapModel);
 
             return Ok("Updated");
         }
 
-        [Authorize]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteAccount(int id)
         {
-            var result = await _accountService.DeleteAccountAsync(id);
-
-            if (result != StatusEnum.OK)
-                return BadRequest();
+            await _accountService.DeleteAccountAsync(id);
 
             return Ok();
         }

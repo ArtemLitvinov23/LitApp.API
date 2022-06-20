@@ -73,7 +73,7 @@ namespace LitChat.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Accounts");
+                    b.ToTable("Accounts", (string)null);
                 });
 
             modelBuilder.Entity("LitChat.DAL.Models.ChatMessages", b =>
@@ -108,7 +108,7 @@ namespace LitChat.DAL.Migrations
 
                     b.HasIndex("ToUserId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("LitChat.DAL.Models.Connections", b =>
@@ -138,7 +138,7 @@ namespace LitChat.DAL.Migrations
 
                     b.HasIndex("UserAccount");
 
-                    b.ToTable("Connections");
+                    b.ToTable("Connections", (string)null);
                 });
 
             modelBuilder.Entity("LitChat.DAL.Models.FavoritesList", b =>
@@ -176,7 +176,7 @@ namespace LitChat.DAL.Migrations
 
                     b.HasIndex("OwnerAccountId");
 
-                    b.ToTable("FavoritesUsers");
+                    b.ToTable("FavoritesUsers", (string)null);
                 });
 
             modelBuilder.Entity("LitChat.DAL.Models.Friend", b =>
@@ -214,7 +214,7 @@ namespace LitChat.DAL.Migrations
 
                     b.HasIndex("RequestToId");
 
-                    b.ToTable("Friends");
+                    b.ToTable("Friends", (string)null);
                 });
 
             modelBuilder.Entity("LitChat.DAL.Models.UserInfo", b =>
@@ -248,12 +248,12 @@ namespace LitChat.DAL.Migrations
                     b.HasIndex("AccountId")
                         .IsUnique();
 
-                    b.ToTable("UserInfos");
+                    b.ToTable("UserInfos", (string)null);
                 });
 
             modelBuilder.Entity("LitChat.DAL.Models.Account", b =>
                 {
-                    b.OwnsMany("LitChat.DAL.Models.RefreshToken", "RefreshTokens", b1 =>
+                    b.OwnsMany("LitChat.DAL.Models.Account.RefreshTokens#LitChat.DAL.Models.RefreshToken", "RefreshTokens", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -289,7 +289,7 @@ namespace LitChat.DAL.Migrations
 
                             b1.HasIndex("AccountId");
 
-                            b1.ToTable("RefreshToken");
+                            b1.ToTable("RefreshToken", (string)null);
 
                             b1.WithOwner("Account")
                                 .HasForeignKey("AccountId");

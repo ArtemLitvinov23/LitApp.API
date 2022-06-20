@@ -14,7 +14,9 @@ namespace LitApp.BLL.Services
     {
         private readonly IConnectionRepository _connectionRepository;
         private readonly IMapper _mapper;
-        public ConnectionService(IConnectionRepository connectionRepository, IMapper mapper)
+        public ConnectionService(
+            IConnectionRepository connectionRepository,
+            IMapper mapper)
         {
             _connectionRepository = connectionRepository;
             _mapper = mapper;

@@ -20,7 +20,9 @@ namespace LitApp.DAL.Models
         public bool Approved => RequestFlags == RequestFlags.Approved;
 
         public DateTime? ApprovedDate { get; set; }
+
         public DateTime? DateOfRejection { get; set; }
+
         public DateTime? NextRequest { get; set; }
     }
 }

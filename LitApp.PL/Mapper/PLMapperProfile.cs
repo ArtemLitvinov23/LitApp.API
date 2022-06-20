@@ -108,9 +108,9 @@ namespace LitApp.PL.Mapper
                 .ForPath(x => x.ReceiverFirstName, opt => opt.MapFrom(src => src.RequestTo.Profile.FirstName))
                 .ForPath(x => x.ReceiverLastName, opt => opt.MapFrom(src => src.RequestTo.Profile.LastName));
 
-            CreateMap<FriendRequestViewModel, AccountDto>()
-                .ForMember(x => x.Id, opt => opt.MapFrom(src => src.AccountId))
-                .ForMember(x => x.Id, opt => opt.MapFrom(src => src.FriendAccountId));
+            CreateMap<FriendRequestViewModel, FriendRequestDto>()
+                .ForMember(x => x.SenderId, opt => opt.MapFrom(src => src.AccountId))
+                .ForMember(x => x.RecieverId, opt => opt.MapFrom(src => src.FriendAccountId));
 
 
         }

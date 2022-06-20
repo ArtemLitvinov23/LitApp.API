@@ -13,7 +13,9 @@ namespace LitApp.BLL.Services
         private readonly IAccountRepository _accountRepository;
         private readonly IMapper _mapper;
 
-        public UserProfileService(IAccountRepository accountRepository, IMapper mapper)
+        public UserProfileService(
+            IAccountRepository accountRepository,
+            IMapper mapper)
         {
             _accountRepository = accountRepository;
             _mapper = mapper;

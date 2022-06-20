@@ -1,7 +1,7 @@
-﻿using LitApp.DAL;
-using LitApp.DAL.Models;
+﻿using LitApp.DAL.Models;
 using LitApp.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,44 +11,57 @@ namespace LitApp.DAL.Repositories
     public class AccountRepository : IAccountRepository
     {
         private readonly BlogContext _context;
+        private readonly IMemoryCache _memoryCache;
 
-        public AccountRepository(BlogContext context)
+        public AccountRepository(
+            BlogContext context,
+            IMemoryCache memoryCache)
         {
             _context = context;
+            _memoryCache = memoryCache;
         }
 
         public IQueryable<Account> GetAllAccounts() => _context.Accounts.Include(x => x.Profile).AsQueryable();
 
-        public Account GetRefreshToken(string token) => _context.Accounts.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
+        public async Task<Account> GetRefreshToken(string token) => await _context.Accounts.SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
 
-        public async Task<Account> GetAccountByIdAsync(int accountId) => await _context.Accounts.Include(x => x.Profile).FirstOrDefaultAsync(x => x.Id == accountId);
+        public async Task<Account> GetAccountByIdAsync(int accountId)
+        {
+            Account account = null;
 
+            if (!_memoryCache.TryGetValue(accountId, out account))
+            {
+                account = await _context.Accounts.Include(x => x.Profile).FirstOrDefaultAsync(x => x.Id == accountId);
+                if (account is not null)
+                {
+                    _memoryCache.Set(accountId, account, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
+                }
+            }
+            return account;
+        }
 
         public async Task CreateAccountAsync(Account account)
         {
-            if (account is null)
-                throw new NullReferenceException("Account can't be is null");
-
             await _context.Accounts.AddAsync(account);
             await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAccountAsync(Account account)
         {
-            if (account is null)
-                throw new NullReferenceException("Account can't be is null");
-
             _context.Accounts.Update(account);
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int accountId)
         {
-            var user = await _context.Accounts.FirstOrDefaultAsync(x => x.Id == accountId);
-            if (user is null)
-                throw new NullReferenceException("Account is not found");
+            if (!_memoryCache.TryGetValue(accountId, out var account))
+            {
+                account = await _context.Accounts.FirstOrDefaultAsync(x => x.Id == accountId);
 
-            _context.Remove(user);
+                if (account is not null)
+                    _context.Remove(account);
+            }
+
             await _context.SaveChangesAsync();
         }
     }

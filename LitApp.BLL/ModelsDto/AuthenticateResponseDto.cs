@@ -19,7 +19,6 @@ namespace LitApp.BLL.ModelsDto
 
         public DateTime? Verified { get; set; }
 
-        public DateTime? TokenExpires { get; set; }
 
         public string JwtToken { get; set; }
 

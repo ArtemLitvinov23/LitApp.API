@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace LitApp.PL.Models
 {
@@ -12,6 +11,5 @@ namespace LitApp.PL.Models
 
         [JsonIgnore] // refresh token is returned in http only cookie
         public string RefreshToken { get; set; }
-        public DateTime? TokenExpires { get; set; }
     }
 }

@@ -8,6 +8,7 @@ namespace LitApp.DAL.Models
 {
     public class Account
     {
+
         public int Id { get; set; }
 
         [Required]
@@ -19,13 +20,13 @@ namespace LitApp.DAL.Models
 
         public UserInfo Profile { get; set; }
 
-        public Role Role { get; set; }
+        public Role Role { get; set; } = Role.User;
 
         public string VerificationToken { get; set; }
 
-        public DateTime? Verified { get; set; }
+        public DateTime? Verified { get; set; } 
 
-        public bool IsVerified { get; set; }
+        public bool IsVerified { get; set; } = false;
 
         public string ResetToken { get; set; }
 
@@ -35,7 +36,7 @@ namespace LitApp.DAL.Models
 
         public DateTime? PasswordReset { get; set; }
 
-        public DateTime Created { get; set; }
+        public DateTime Created { get; set; } = DateTime.UtcNow;
 
         public DateTime? Updated { get; set; }
 
@@ -43,16 +44,22 @@ namespace LitApp.DAL.Models
 
         [JsonIgnore]
         public ICollection<ChatMessages> MessagesFromUser { get; set; }
+
         [JsonIgnore]
         public ICollection<ChatMessages> MessagesToUser { get; set; }
+
         [JsonIgnore]
         public ICollection<Connections> Connections { get; set; }
+
         [JsonIgnore]
         public ICollection<FavoritesList> Favorites { get; set; }
+
         [JsonIgnore]
         public ICollection<Friend> SentFriendsRequest { get; set; }
+
         [JsonIgnore]
         public ICollection<Friend> RecievedFriendRequest { get; set; }
+
         [JsonIgnore]
         public List<RefreshToken> RefreshTokens { get; set; }
 

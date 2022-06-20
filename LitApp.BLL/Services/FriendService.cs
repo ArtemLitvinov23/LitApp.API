@@ -21,24 +21,23 @@ namespace LitApp.BLL.Services
         private readonly IMapper _mapper;
         public FriendService(
             IFriendRepository friendRepository,
-            IMapper mapper, IAccountRepository accountRepository)
+            IMapper mapper,
+            IAccountRepository accountRepository)
         {
             _friendRepository = friendRepository;
             _mapper = mapper;
             _accountRepository = accountRepository;
         }
 
-        public async Task ApprovedUserAsync(int senderId, int friendId)
+        public async Task ApprovedUserAsync(FriendRequestDto friendRequestDto)
         {
-            var senderAccount = await _accountRepository.GetAccountByIdAsync(senderId);
-            var friendAccount = await _accountRepository.GetAccountByIdAsync(friendId);
-            if (senderAccount is null || friendAccount is null) throw new AppException("Users is not found");
+            var mapFriendRequest = _mapper.Map<FriendRequest>(friendRequestDto);
 
-            var response = await _friendRepository.GetRequests(senderAccount, friendAccount);
+            var response = await _friendRepository.GetRequests(mapFriendRequest);
             if (response != null)
             {
                 response.RequestTime = null;
-                response.ApprovedDate = DateTime.Now.ToLocalTime();
+                response.ApprovedDate = DateTime.UtcNow;
                 response.DateOfRejection = null;
                 response.NextRequest = null;
                 response.RequestFlags = RequestFlags.Approved;
@@ -82,54 +81,50 @@ namespace LitApp.BLL.Services
             return response;
         }
 
-        public async Task RejectUserAsync(int senderId, int friendId)
+        public async Task RejectUserAsync(FriendRequestDto friendRequest)
         {
-            var senderAccount = await _accountRepository.GetAccountByIdAsync(senderId);
-            var friendAccount = await _accountRepository.GetAccountByIdAsync(friendId);
-            if (senderAccount is null || friendAccount is null) throw new AppException("Users is not found");
-
-            var response = await _friendRepository.GetRequests(senderAccount, friendAccount);
-            if (response == null) throw new AppException("Current request is not found");
+            var response = await GetRequest(friendRequest);
 
             response.RequestTime = null;
             response.RequestFlags = RequestFlags.Rejected;
-            response.DateOfRejection = DateTime.Now.ToLocalTime();
-            response.NextRequest = DateTime.Now.AddDays(2).ToLocalTime();
+            response.DateOfRejection = DateTime.UtcNow;
+            response.NextRequest = DateTime.UtcNow.AddDays(2);
+
             await _friendRepository.UpdateFriendsRequestAsync(response);
         }
 
-        public async Task SendRequestToUserAsync(int senderId, int friendId)
+        public async Task SendRequestToUserAsync(FriendRequestDto friendRequest)
         {
-            var senderAccount = await _accountRepository.GetAccountByIdAsync(senderId);
-            var friendAccount = await _accountRepository.GetAccountByIdAsync(friendId);
-            if (senderAccount is null || friendAccount is null)
-            {
-                throw new AppException("Users is not found");
-            }
+            var response = await GetRequest(friendRequest);
 
-            var request = await _friendRepository.GetRequests(senderAccount, friendAccount);
-            if (request == null)
+            if (response == null)
             {
-                var createRequest = new FriendDto()
-                {
-                    RequestById = senderAccount.Id,
-                    RequestToId = friendAccount.Id,
-                    RequestFlags = RequestFlags.Pending,
-                    RequestTime = DateTime.Now.ToLocalTime()
-                };
+                var createRequest = new FriendDto(friendRequest.SenderId, friendRequest.RecieverId);
                 var friends = _mapper.Map<Friend>(createRequest);
                 await _friendRepository.AddUserToFriends(friends);
             }
-            else if (request.NextRequest < DateTime.Now.ToLocalTime())
+            else if (response.NextRequest < DateTime.UtcNow)
             {
-                request.RequestFlags = RequestFlags.Pending;
-                request.RequestTime = DateTime.Now.ToLocalTime();
-                request.DateOfRejection = null;
-                request.NextRequest = null;
-                await _friendRepository.UpdateFriendsRequestAsync(request);
+                response.RequestFlags = RequestFlags.Pending;
+                response.RequestTime = DateTime.UtcNow;
+                response.DateOfRejection = null;
+                response.NextRequest = null;
+                await _friendRepository.UpdateFriendsRequestAsync(response);
             }
             else
-                throw new AppException($"You cannot send a request earlier than {request.NextRequest}");
+                throw new AppException($"You can't send a request earlier than {response.NextRequest}");
+        }
+
+        private async Task<Friend> GetRequest(FriendRequestDto friendRequest)
+        {
+            var mapFriendRequest = _mapper.Map<FriendRequest>(friendRequest);
+
+            var response = await _friendRepository.GetRequests(mapFriendRequest);
+            if (response == null)
+            {
+                throw new AppException("Not found");
+            }
+            return response;
         }
     }
 }

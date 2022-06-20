@@ -8,7 +8,7 @@ namespace LitApp.DAL.Models
 
         public string Message { get; set; }
 
-        public DateTime CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         public int FromUserId { get; set; }
 

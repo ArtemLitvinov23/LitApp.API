@@ -33,10 +33,7 @@ namespace LitChat.API.Controllers
         {
             var messageDto = _mapper.Map<ChatMessagesDto>(message);
 
-            var result = await _chatService.SaveMessageAsync(userId, messageDto);
-
-            if (result != StatusEnum.OK)
-                return BadRequest();
+            await _chatService.SaveMessageAsync(userId, messageDto);
 
             return Ok();
         }
@@ -73,10 +70,7 @@ namespace LitChat.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteChatHistory(int userId, int contactId)
         {
-            var result = await _chatService.RemoveChatHistory(userId, contactId);
-
-            if (result != StatusEnum.OK)
-                return BadRequest();
+            await _chatService.RemoveChatHistory(userId, contactId);
 
             return Ok();
         }
@@ -86,10 +80,7 @@ namespace LitChat.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteChatHistory(int messageId)
         {
-            var result = await _chatService.RemoveMessage(messageId);
-
-            if (result != StatusEnum.OK)
-                return BadRequest();
+            await _chatService.RemoveMessage(messageId);
 
             return Ok();
         }

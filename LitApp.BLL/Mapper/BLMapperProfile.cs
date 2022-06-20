@@ -25,8 +25,7 @@ namespace LitApp.BLL.Mapper
 
             CreateMap<AccountDto, AuthenticateResponseDto>()
                 .ForMember(x => x.AccountId, opt => opt.MapFrom(src => src.Id))
-                .ForMember(x => x.Profile, opt => opt.MapFrom(src => src.Profile))
-                .ForMember(x => x.TokenExpires, opt => opt.MapFrom(src => src.TokenExpires));
+                .ForMember(x => x.Profile, opt => opt.MapFrom(src => src.Profile));
 
             CreateMap<Account, AccountResponseDto>()
                 .ForMember(x => x.Profile, opt => opt.MapFrom(src => src.Profile))
@@ -91,6 +90,8 @@ namespace LitApp.BLL.Mapper
             CreateMap<Friend, FriendDto>()
                 .ForMember(x => x.RequestTo, opt => opt.MapFrom(src => src.RequestTo))
                 .ReverseMap();
+
+            CreateMap<FriendRequestDto, FriendRequest>();
         }
     }
 }

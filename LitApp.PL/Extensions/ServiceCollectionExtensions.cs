@@ -47,6 +47,8 @@ namespace LitApp.PL.Extensions
                 options.InstanceName = configuration["Redis:InstanceName"];
             });
 
+            services.AddMemoryCache();
+
             return services;
         }
     }

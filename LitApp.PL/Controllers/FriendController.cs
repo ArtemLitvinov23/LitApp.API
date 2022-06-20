@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LitApp.BLL.ModelsDto;
 using LitApp.BLL.Services.Interfaces;
 using LitApp.PL.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -28,7 +29,6 @@ namespace LitApp.PL.Controllers
         public async Task<ActionResult<List<FriendViewModel>>> FriendsList(int accountId)
         {
             var friendsList = await _friendService.GetAllApprovedFriendsAsync(accountId);
-
             var response = _mapper.Map<List<FriendViewModel>>(friendsList);
 
             if (response == null)
@@ -41,7 +41,6 @@ namespace LitApp.PL.Controllers
         public async Task<ActionResult<List<FriendViewModel>>> RejectedRequests(int accountId)
         {
             var friendsList = await _friendService.GetAllRejectedRequestsAsync(accountId);
-
             var response = _mapper.Map<List<FriendViewModel>>(friendsList);
 
             if (response == null)
@@ -54,10 +53,12 @@ namespace LitApp.PL.Controllers
         public async Task<ActionResult<List<FriendViewModel>>> PendingRequests(int accountId)
         {
             var friendsList = await _friendService.GetAllPendingRequestsAsync(accountId);
-
             var response = _mapper.Map<List<FriendViewModel>>(friendsList);
 
-            if (response == null) return BadRequest();
+            if (response == null)
+            {
+                return BadRequest();
+            }
 
             return Ok(response);
         }
@@ -67,7 +68,10 @@ namespace LitApp.PL.Controllers
         {
             var friend = await _friendService.GetFriendById(friendId);
 
-            if (friend == null) return BadRequest();
+            if (friend == null)
+            {
+                return BadRequest();
+            }
 
             var response = _mapper.Map<FriendViewModel>(friend);
 
@@ -77,7 +81,8 @@ namespace LitApp.PL.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> Approved(FriendRequestViewModel approvedFriend)
         {
-            await _friendService.ApprovedUserAsync(approvedFriend.AccountId, approvedFriend.FriendAccountId);
+            var maprFriendRequest = _mapper.Map<FriendRequestDto>(approvedFriend);
+            await _friendService.ApprovedUserAsync(maprFriendRequest);
 
             return Ok();
         }
@@ -85,7 +90,8 @@ namespace LitApp.PL.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> Rejected(FriendRequestViewModel rejectedFriend)
         {
-            await _friendService.RejectUserAsync(rejectedFriend.AccountId, rejectedFriend.FriendAccountId);
+            var maprFriendRequest = _mapper.Map<FriendRequestDto>(rejectedFriend);
+            await _friendService.RejectUserAsync(maprFriendRequest);
 
             return Ok();
         }
@@ -93,16 +99,18 @@ namespace LitApp.PL.Controllers
         [HttpPost("Request")]
         public async Task<IActionResult> CreateRequestToFriend(FriendRequestViewModel request)
         {
-            if (request == null) return BadRequest();
-
-            await _friendService.SendRequestToUserAsync(request.AccountId, request.FriendAccountId);
+            if (request == null)
+            {
+                return BadRequest();
+            }
+            var maprFriendRequest = _mapper.Map<FriendRequestDto>(request);
+            await _friendService.SendRequestToUserAsync(maprFriendRequest);
             return Ok();
         }
 
         [HttpDelete("{friendId}")]
         public async Task<IActionResult> DeleteFriend(int friendId)
         {
-
             await _friendService.DeleteUserFromFriends(friendId);
             return Ok();
         }

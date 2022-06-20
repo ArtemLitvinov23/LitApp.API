@@ -28,6 +28,7 @@ namespace LitApp.PL.Controllers
             var mappingModel = _mapper.Map<List<ConnectionsResponseViewModel>>(allClients);
             return Ok(mappingModel);
         }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<ConnectionsResponseViewModel>> GetConnectedClient(int id)
         {
@@ -35,6 +36,7 @@ namespace LitApp.PL.Controllers
             var mappingModel = _mapper.Map<ConnectionsResponseViewModel>(allClients);
             return Ok(mappingModel);
         }
+
         [HttpPatch("{id}")]
         public async Task<ActionResult<ConnectionsResponseViewModel>> DisconnectClient(int id)
         {

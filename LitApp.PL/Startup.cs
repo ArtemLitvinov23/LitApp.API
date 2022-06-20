@@ -3,6 +3,7 @@ using LitApp.DAL;
 using LitApp.PL.Extensions;
 using LitApp.PL.HubController;
 using LitApp.PL.Middleware;
+using LitChat.API.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,12 +32,36 @@ public class Startup
     {
         services.AddDbContext<BlogContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("WebApiDatabase")));
         services.AddCors();
-        services.AddControllers()
-            .AddFluentValidation(fvc => fvc.RegisterValidatorsFromAssemblyContaining<Startup>());
+        services.AddControllers(opt =>
+        {
+            opt.Filters.Add(typeof(ValidatorActionFilter));
+        }).AddFluentValidation(fvc => fvc.RegisterValidatorsFromAssemblyContaining<Startup>());
 
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "LitChat.WebApi", Version = "v2.2" });
+
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey
+            });
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+            {
+              new OpenApiSecurityScheme
+              {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+              },
+              Array.Empty<string>()
+            }
+            });
+
         });
 
         services.AddSignalR(hubOptions =>
@@ -78,7 +103,6 @@ public class Startup
             };
         });
     }
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         if (env.IsDevelopment())

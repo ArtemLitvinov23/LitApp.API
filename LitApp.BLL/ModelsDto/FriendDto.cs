@@ -5,6 +5,14 @@ namespace LitApp.BLL.ModelsDto
 {
     public class FriendDto
     {
+        public FriendDto() {}
+        public FriendDto(int requestById, int requestToId)
+        {
+            RequestById = requestById;
+            RequestToId = requestToId;
+            RequestFlags = RequestFlags.Pending;
+            RequestTime = DateTime.UtcNow;
+        }
         public int RequestById { get; set; }
 
         public int RequestToId { get; set; }

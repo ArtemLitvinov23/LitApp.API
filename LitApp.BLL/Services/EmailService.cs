@@ -1,10 +1,11 @@
-﻿using LitApp.BLL.ModelsDto;
+﻿using LitApp.BLL.Exceptions;
 using LitApp.BLL.Services.Interfaces;
 using LitApp.DAL.Models;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
 using MimeKit.Text;
+using System;
 using System.Threading.Tasks;
 
 namespace LitApp.BLL.Services
@@ -12,11 +13,9 @@ namespace LitApp.BLL.Services
     public class EmailService : IEmailService
     {
         private IConfiguration Configuration { get; }
-        public EmailService(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-        public async Task<StatusEnum> SendAsync(string to, string subject, string html, string from = null)
+        public EmailService(IConfiguration configuration) => Configuration = configuration;
+
+        public async Task SendAsync(string to, string subject, string html, string from = null)
         {
             try
             {
@@ -33,16 +32,15 @@ namespace LitApp.BLL.Services
                 await smtp.SendAsync(email);
 
                 await smtp.DisconnectAsync(true);
-                return StatusEnum.OK;
             }
-            catch
+            catch (Exception ex)
             {
-                return StatusEnum.BadRequest;
+                throw new InternalServerException(ex.Message);
             }
 
         }
 
-        public async Task<StatusEnum> SendVerificationEmailAsync(Account account, string origin)
+        public async Task SendVerificationEmailAsync(Account account, string origin)
         {
             string message;
             if (!string.IsNullOrEmpty(origin))
@@ -59,16 +57,10 @@ namespace LitApp.BLL.Services
                               <p><a href=""{verifyUrlWithoutOrigin}"">{verifyUrlWithoutOrigin}</a></p>";
             }
 
-            var result = await SendAsync(account.Email, "Sign-up Verification API - Verify Email",
-                 $@"<h4>Verify Email</h4>
-                     <p>Thanks for registering!</p>
-                      {message}"
-                      );
-            if (result != StatusEnum.OK)
-            {
-                return StatusEnum.BadRequest;
-            }
-            return StatusEnum.OK;
+            await SendAsync(account.Email, "Sign-up Verification API - Verify Email",
+                                            $@"<h4>Verify Email</h4>
+                                            <p>Thanks for registering!</p>
+                                            {message}");
         }
 
         public async Task SendAlreadyRegisteredEmailAsync(string email, string origin)

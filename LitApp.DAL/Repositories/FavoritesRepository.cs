@@ -1,5 +1,4 @@
-﻿using LitApp.DAL;
-using LitApp.DAL.Models;
+﻿using LitApp.DAL.Models;
 using LitApp.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -11,10 +10,7 @@ namespace LitApp.DAL.Repositories
     public class FavoritesRepository : IFavoritesRepository
     {
         private readonly BlogContext _blogContext;
-        public FavoritesRepository(BlogContext blogContext)
-        {
-            _blogContext = blogContext;
-        }
+        public FavoritesRepository(BlogContext blogContext) => _blogContext = blogContext;
 
         public async Task AddUserToFavorite(FavoritesList user)
         {
@@ -38,8 +34,10 @@ namespace LitApp.DAL.Repositories
         public async Task RemoveUserFromFavorite(int id)
         {
             var user = await _blogContext.FavoritesUsers.FirstOrDefaultAsync(x => x.FavoriteUserAccountId == id);
-            if (user != null)
+
+            if (user is not null)
                 _blogContext.Remove(user);
+
             await _blogContext.SaveChangesAsync();
         }
     }

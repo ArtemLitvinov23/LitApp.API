@@ -6,6 +6,7 @@ using LitApp.PL.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -94,7 +95,7 @@ namespace LitApp.PL.HubController
 
                 updateConnection.Id = connectionInfo.Id;
                 updateConnection.ConnectionId = Context.ConnectionId;
-                updateConnection.ConnectedAt = DateTime.Now;
+                updateConnection.ConnectedAt = DateTime.UtcNow;
                 updateConnection.IsOnline = true;
 
                 var updateConnectionDto = _mapper.Map<ConnectionsDto>(updateConnection);
@@ -115,10 +116,10 @@ namespace LitApp.PL.HubController
         }
         private async Task<AccountResponseDto> GetUserAsync()
         {
-            var contextUser = Context.User;
-            var userEmail = contextUser.FindFirst(ClaimTypes.Email)?.Value;
-            var user = await _accountService.GetAccountByEmailAsync(userEmail);
-            return user;
+            var userEmail = Context.User.FindFirst(ClaimTypes.Email)?.Value;
+            var user = await _accountService.GetAllAccountsAsync();
+            var mapMode = _mapper.Map<AccountResponseDto>(user.FirstOrDefault(x => x.Email == userEmail));
+            return mapMode;
         }
     }
 }

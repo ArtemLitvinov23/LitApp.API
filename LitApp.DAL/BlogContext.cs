@@ -5,13 +5,14 @@ namespace LitApp.DAL
 {
     public class BlogContext : DbContext
     {
+        public BlogContext(DbContextOptions<BlogContext> options) : base(options) { }
+
         public DbSet<Account> Accounts { get; set; }
         public DbSet<UserInfo> UserInfos { get; set; }
         public DbSet<FavoritesList> FavoritesUsers { get; set; }
         public DbSet<ChatMessages> Messages { get; set; }
         public DbSet<Connections> Connections { get; set; }
         public DbSet<Friend> Friends { get; set; }
-        public BlogContext(DbContextOptions<BlogContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

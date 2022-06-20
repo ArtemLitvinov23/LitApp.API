@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LitApp.BLL.Exceptions;
 using LitApp.BLL.ModelsDto;
 using LitApp.BLL.Services.Interfaces;
 using LitApp.DAL.Models;
@@ -41,45 +42,34 @@ namespace LitApp.BLL.Services
 
             return result;
         }
-        public async Task<StatusEnum> SaveMessageAsync(int userId, ChatMessagesDto chatMessage)
+        public async Task SaveMessageAsync(int userId, ChatMessagesDto chatMessage)
         {
             var fromUser = await _accountRepository.GetAccountByIdAsync(userId);
 
-            if (fromUser == null)
-                return StatusEnum.BadRequest;
-
             chatMessage.FromUserId = userId;
-
             chatMessage.FromEmail = fromUser.Email;
-
-            chatMessage.CreatedDate = DateTime.UtcNow;
 
             var messageDto = _mapper.Map<ChatMessages>(chatMessage);
 
             await _chatRepository.SaveMessageAsync(messageDto);
 
-            return StatusEnum.OK;
         }
 
-        public async Task<StatusEnum> RemoveMessage(int messageId)
+        public async Task RemoveMessage(int messageId)
         {
             await _chatRepository.RemoveMessage(messageId);
-
-            return StatusEnum.OK;
         }
 
-        public async Task<StatusEnum> RemoveChatHistory(int userId, int contactId)
+        public async Task RemoveChatHistory(int userId, int contactId)
         {
             var user = _accountRepository.GetAccountByIdAsync(userId);
 
             var contact = _accountRepository.GetAccountByIdAsync(contactId);
 
             if (user == null || contact == null)
-                return StatusEnum.BadRequest;
+                throw new InternalServerException();
 
             await _chatRepository.RemoveChatHistory(userId, contactId);
-
-            return StatusEnum.OK;
         }
     }
 }

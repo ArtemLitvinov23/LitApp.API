@@ -8,7 +8,7 @@ namespace LitApp.DAL.Repositories.Interfaces
     {
         public IQueryable<Account> GetAllAccounts();
 
-        public Account GetRefreshToken(string token);
+        public Task<Account> GetRefreshToken(string token);
 
         public Task<Account> GetAccountByIdAsync(int accountId);
 

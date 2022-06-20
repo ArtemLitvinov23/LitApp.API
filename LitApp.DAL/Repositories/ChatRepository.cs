@@ -1,5 +1,4 @@
-﻿using LitApp.DAL;
-using LitApp.DAL.Models;
+﻿using LitApp.DAL.Models;
 using LitApp.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -11,10 +10,8 @@ namespace LitApp.DAL.Repositories
     public class ChatRepository : IChatRepository
     {
         private readonly BlogContext _blogContext;
-        public ChatRepository(BlogContext blogContext)
-        {
-            _blogContext = blogContext;
-        }
+        public ChatRepository(BlogContext blogContext) => _blogContext = blogContext;
+
 
         public async Task<IEnumerable<ChatMessages>> GetFullChatHistory(int userId, int contactId)
         {
@@ -34,7 +31,9 @@ namespace LitApp.DAL.Repositories
                     ToEmail = x.ToEmail,
                     FromUser = x.FromUser,
                     CreatedDate = x.CreatedDate.ToLocalTime(),
-                }).ToListAsync();
+                })
+                .ToListAsync();
+
             return message;
         }
 
